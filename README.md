@@ -14,6 +14,84 @@ Text Console Chat Client
     Add a indent and this will end up as code
 
 
+
+
+
+*************************************************
+*** Components to build
+- Command interpreter
+ . read user's input and convert to: messages, commands, searches, etc
+- 
+- Map to hooking up @hostname.com addresses with puple protocol choices
+ . be able to (override) augment with local choices easily
+ . be able to augment from commandline, environment, config file?
+- Pub/Sub type signal (internally) which efficiently connects PurpleClientIF
+ to particular window
+ . Do we want a hashed GUID, string, 
+- Probably want an internal data store which windows connect to
+ . separate concerns MVC
+- Colors
+ . Make a Stream::Entry contain a secondary color attribute vector
+ . The vector enables use of boost::zip_iterator (I think)
+ . Make a default CTOR which makes color blank
+ . with this approach how easy will it be to add a colored time entry at
+ the beginning?  Or should time be separated into another Stream::Entry 
+ member variable?
+
+
+*************************************************
+*** Components to fix
+
+- New window for incoming messages (per buddy)
+- Be able to close/delete a window properly
+- Change derivation of Window so that you don't override refresh
+ . instead use draw, this should help with windows inside of other windows
+- Line wrapping does not currently work at all
+ . under the current scheme it's hard to know how many lines have been
+ drawn and when to quit - the nice getWindownDown() doesn't know about
+ entries with multiple lines
+ . it all depends on how wide the screen is
+- Redraw when window is resized
+- Segfault on quit (cleanly exits)
+- Goes back to original text window after exit (order of unallocating objects)
+ . but make sure we can still get debug info from PurpleClientIF
+
+
+*************************************************
+*** New Functionality
+
+- Add ability to remap keys other functionality
+ . Probably want to change around architecture to make it so that
+ commands can easily be accessed
+- Command history
+ . Up/Down Arrow for Previous/Next commands
+ . CTRL-R for search
+ . SHIFT-CTRL-R for forward search (LOW priority)
+- Be able to edit current command easily 
+ . Left/Right arrow, delete/backspace work properly
+- CTRL-u deletes current line behind cursor to beginning
+- CTRL-a moves cursor to beginning of current line
+- CTRL-e moves cursor to end of current line
+- CTRL-c cancels current line (LOW priority, don't know if I like this)
+- Send a buddy queued messages (only on certain networks which don't buffer) 
+ LOW priority
+
+
+*** Use Cases
+- Log onto a network (newconn) from inside the app
+- Be able to receive a message (from a buddy)
+- Be able to send a message (to a buddy)
+
+- When a buddy in our buddy list logs on some kind of note should be made
+- When a buddy we are currently talking to logs off and/or logs back on a stream entry 
+ should be made
+- Automatically retry a connection
+
+
+
+
+
+
 |
 |
 |
