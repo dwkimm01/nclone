@@ -4,7 +4,6 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/LibPurple.cpp \
 ../src/NCApp.cpp \
 ../src/NCClientIf.cpp \
 ../src/NCClientPurple.cpp \
@@ -17,7 +16,6 @@ CPP_SRCS += \
 ../src/NCWinScrollback.cpp 
 
 OBJS += \
-./src/LibPurple.o \
 ./src/NCApp.o \
 ./src/NCClientIf.o \
 ./src/NCClientPurple.o \
@@ -30,7 +28,6 @@ OBJS += \
 ./src/NCWinScrollback.o 
 
 CPP_DEPS += \
-./src/LibPurple.d \
 ./src/NCApp.d \
 ./src/NCClientIf.d \
 ./src/NCClientPurple.d \

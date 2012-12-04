@@ -22,7 +22,6 @@
 #include "NCCmdLineOptions.h"
 #include "NCConnectionString.h"
 #include "NCClientPurple.h"
-#include "LibPurple.h"
 #include "TestExampleText.h"
 using namespace std;
 using namespace ncpp;
@@ -371,11 +370,11 @@ int doit(int argc, char* argv[])
 					winCmd.refresh();
 				}
 				break;
-			case '1':
-				static int x = 0;
-				ncs->append( boost::lexical_cast<std::string>(++x));
-				ncs->refresh();
-				break;
+//			case '1':
+//				static int x = 0;
+//				ncs->append( boost::lexical_cast<std::string>(++x));
+//				ncs->refresh();
+//				break;
 			case 10:
 			case KEY_ENTER:
 				if(!cmd.empty())
