@@ -16,6 +16,12 @@ Text Console Chat Client
 
 
 
+** Note: building on OS X with clang++
+
+this will build boost with clang++
+ ./bootstrap.sh --with-toolset=clang --prefix=/Users/dwkimm01/.libs/boost_1_52_0
+ ./b2 toolset=clang cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" -j4 install
+
 
 *************************************************
 *** Components to build
