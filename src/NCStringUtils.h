@@ -33,7 +33,7 @@ public:
 
 	inline static bool splitByLength
 		( const std::string &s
-		, const int length
+		, const std::string::size_type length
 		, std::function<bool(const std::string &)> func )
 	{
 		if(s.size() < length)
