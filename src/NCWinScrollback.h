@@ -57,6 +57,7 @@ public:
 
 private:
 	NCWinBuffer p_buff;
+	int p_row;
 };
 
 } // namespace ncpp

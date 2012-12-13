@@ -25,8 +25,8 @@ NCWinBuffer::~NCWinBuffer() {}
 void NCWinBuffer::addRow(const std::string &line, const bool autoScroll)
 {
 	// Determine if we are on the current line for autoScroll
-	const int bSize = static_cast<int>(p_buff.size());
-	const bool onCurrent = bSize == p_row;
+//	const int bSize = ;
+	const bool onCurrent = (static_cast<int>(p_buff.size()) == p_row);
 
 	// Add entry to buffer
 	p_buff.push_back(line);
@@ -40,6 +40,10 @@ void NCWinBuffer::addRow(const std::string &line, const bool autoScroll)
 
 void NCWinBuffer::scrollUp(const int i)
 {
+	p_row -= i;
+	if(p_row < 0) p_row = 0;
+
+#if 0
 	// Calculate the window extents
 	const Iterator rowItr = p_buff.begin() + p_row;
 	const auto range = ncstlutils::getWindowDown(p_buff.begin(), p_buff.end(), rowItr, p_winSizeY);
@@ -53,11 +57,15 @@ void NCWinBuffer::scrollUp(const int i)
 	{
 		p_row = 0;
 	}
-
+#endif
 }
 
 void NCWinBuffer::scrollDown(const int i)
 {
+	p_row += i;
+	if(p_row > p_buff.size()) p_row = p_buff.size();
+
+#if 0
 	// Calculate the window extents
 	const Iterator rowItr = p_buff.begin() + p_row;
 	const auto range = ncstlutils::getWindowDown(p_buff.begin(), p_buff.end(), rowItr, p_winSizeY);
@@ -73,6 +81,7 @@ void NCWinBuffer::scrollDown(const int i)
 	{
 		p_row = p_buff.size();
 	}
+#endif
 }
 
 void NCWinBuffer::clear()
@@ -93,28 +102,42 @@ int NCWinBuffer::curLine() const
 }
 
 
-void NCWinBuffer::print(Func fn)
+//void NCWinBuffer::print(Func fn)
+//{
+//	// Use the ncpp::foreach which takes a pair
+////	ncstlutils::foreach(getWindow(), fn);
+//
+//#if 0
+//	// TODO, can't we use like std::for_each_if or something?  for_each and bind_if?
+//	auto range = getWindow();
+//	for(; range.first != range.second; ++range.first)
+//	{
+//		if(!fn(*range.first))
+//			return;
+//	}
+//#endif
+//}
+
+//std::pair<NCWinBuffer::Iterator, NCWinBuffer::Iterator> NCWinBuffer::getWindow()
+//{	// Get iterator for current row (line)
+//	const Iterator rowItr = p_buff.begin() + p_row;
+//	// Determine the range to use then perform fn on each entry
+//	const auto range = ncstlutils::getWindowDown(p_buff.begin(), p_buff.end(), rowItr, p_winSizeY);
+//
+//	return range;
+//}
+
+NCWinBuffer::Iterator NCWinBuffer::begin()
 {
-	// Use the ncpp::foreach which takes a pair
-//	ncstlutils::foreach(getWindow(), fn);
-
-	// TODO, can't we use like std::for_each_if or something?  for_each and bind_if?
-	auto range = getWindow();
-	for(; range.first != range.second; ++range.first)
-	{
-		if(!fn(*range.first))
-			return;
-	}
+	return p_buff.begin();
 }
 
-std::pair<NCWinBuffer::Iterator, NCWinBuffer::Iterator> NCWinBuffer::getWindow()
-{	// Get iterator for current row (line)
-	const Iterator rowItr = p_buff.begin() + p_row;
-	// Determine the range to use then perform fn on each entry
-	const auto range = ncstlutils::getWindowDown(p_buff.begin(), p_buff.end(), rowItr, p_winSizeY);
-
-	return range;
+NCWinBuffer::Iterator NCWinBuffer::end()
+{
+	return p_buff.end();
 }
+
+
 
 	// Design note:
 	//  we want the text to start at the bottom and scroll up

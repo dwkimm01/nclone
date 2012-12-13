@@ -48,8 +48,8 @@ public:
 	int size() const;
 	int curLine() const;
 
-	typedef std::function<bool(const std::string&)> Func;
-	void print(Func fn);
+//	typedef std::function<bool(const std::string&)> Func;
+//	void print(Func fn);
 
 	void clear();
 
@@ -63,7 +63,14 @@ private:
 
 	Container p_buff;
 
-	std::pair<Iterator, Iterator> getWindow();  // TODO should be const
+
+//	std::pair<Iterator, Iterator> getWindow();  // TODO should be const
+public:
+
+	Iterator begin();
+	Iterator end();
+
+
 };
 
 
