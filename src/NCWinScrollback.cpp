@@ -13,10 +13,7 @@ namespace ncpp
 
 NCWinScrollback::NCWinScrollback(NCObject* parent, NCWinCfg cfg, const int scrollback)
 	: NCWin(parent, cfg)
-	, p_buff
-	( (cfg.p_hasBorder)?(cfg.p_w-2):(cfg.p_w)  // Take into account border
-	, (cfg.p_hasBorder)?(cfg.p_h-2):(cfg.p_h)  // Take into account border
-	, scrollback )
+	, p_buff(scrollback)
 	, p_row(0)
 {
 }
@@ -37,44 +34,7 @@ void NCWinScrollback::refresh()
 	// TODO, add back in pushing down lines for buffers that don't fill the height
 	// If there aren't enough lines, push down to start at bottom
 	const NCWinCfg cfg = getConfig();
-//	const int height = (cfg.p_hasBorder)?(cfg.p_h-1):(cfg.p_h);
-//	if(p_buff.size() < height)
-//	{
-//		for(int i = 0; i < height - p_buff.size(); ++i)
-//		{
-//			NCWin::cursorNextLine();
-//		}
-//	}
 
-#if 0
-	int linesPrinted = 0;
-	// Print our buffer out
-	p_buff.print([&](const std::string &s)
-	{
-		if(!
-		ncstringutils::NCStringUtils::splitByLength(s, cfg.p_w-1, [&](const std::string &sSplit)
-		{
-			NCWin::print(sSplit.c_str());
-			++linesPrinted;
-			if(linesPrinted >= (cfg.p_h))
-				return false;
-			NCWin::clearTillEnd();
-			NCWin::cursorNextLine();
-			return true;
-		})
-		) return false;
-
-		return true;
-
-//		NCWin::print(s.c_str());
-//		NCWin::clearTillEnd();
-//		NCWin::cursorNextLine();
-	} );
-#endif
-
-
-//	auto winPair = p_buff.getWindow();
-//	ncstringutils::NCStringUtils::forWindow(winPair.first, winPair.second, 0, cfg.p_w-2, cfg.p_h, [&](const std::string &line)
 	ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, cfg.p_w-2, cfg.p_h, [&](const std::string &line)
 	{
 		NCWin::print(line.c_str());
@@ -82,23 +42,30 @@ void NCWinScrollback::refresh()
 		NCWin::cursorNextLine();
 	});
 
-
-//	ncstringutils::NCStringUtils::splitByLength(s, cfg.p_w-1, [&](const std::string &sSplit)
-
-
-/*
-	// Calculate indication of where in the buffer we are displaying
-	const double percent = (1.0 * p_buff.curLine() ) / p_buff.size();
-	const int lNum = (percent * (getConfig().p_h - 3)) + 1;
-	NCWin::putChar('*', getConfig().p_w-1, lNum);
-*/
-
 	NCWin::rRefresh();
 }
 
 void NCWinScrollback::append(const std::string &line)
 {
+	const int lineSplit = (line.size() > (getConfig().p_w-2)) ? (1 + ((line.size() - 1) / (getConfig().p_w-2))) : (1);
+
+	bool followingEnd = false;
+	// Get the end
+	int endOffs = 0;
+	std::for_each(p_buff.begin(), p_buff.end(), [&](const std::string &entry)
+	{
+		endOffs += (entry.size() > (getConfig().p_w-2)) ? (1 + ((entry.size() - 1) / (getConfig().p_w-2))) : (1);
+	} );
+	if( std::abs( endOffs - p_row) <= getConfig().p_h ) followingEnd = true;
+
 	p_buff.addRow(line);
+
+	if(followingEnd)
+	{
+		// TODO, this still isn't working for startup with "lorem"
+		p_row += lineSplit;
+		// TODO, check overflow beyond container boundaries
+	}
 }
 
 void NCWinScrollback::scrollDown(const int n)
@@ -113,7 +80,6 @@ void NCWinScrollback::scrollDown(const int n)
 void NCWinScrollback::scrollUp(const int n)
 {
 	p_row -= n;
-	// Check to see if we've gone too far
 	if(p_row < 0) p_row = 0;
 }
 
@@ -132,12 +98,22 @@ void NCWinScrollback::pageUp()
 
 void NCWinScrollback::home()
 {
-	p_buff.scrollUp(p_buff.size());
+	p_row = 0;
 }
 
 void NCWinScrollback::end()
 {
-	p_buff.scrollDown(p_buff.size());
+	// TODO, this is not a good approach - should rewrite to at least
+	// start from the most recent line and go backwards
+	int sum = 0;
+	std::for_each(p_buff.begin(), p_buff.end(), [&](const std::string &entry)
+	{
+		sum += (entry.size() > (getConfig().p_w-2)) ? (1 + ((entry.size() - 1) / (getConfig().p_w-2))) : (1);
+	} );
+	p_row = sum;
+	const int space = ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, getConfig().p_w-2, getConfig().p_h, [](const std::string&){});
+	p_row -= space;
+	if(p_row < 0) p_row = 0;
 }
 
 void NCWinScrollback::clear()
@@ -146,7 +122,15 @@ void NCWinScrollback::clear()
 	NCWin::clear();
 }
 
-
+// Design note:
+//  we want the text to start at the bottom and scroll up
+//  meaning that when we start off and there are only a few
+//  lines in the buffer that don't fill up the whole window
+//  we want the text to be at the bottom of the window and
+//  empty space to be above it.
+//  This might be different for other windows but for the
+//  chat window that's what we want
+// So maybe the best approach is to calculate from the bottom up?
 
 
 } // namespace ncpp

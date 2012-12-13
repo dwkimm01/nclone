@@ -25,10 +25,7 @@ public:
 	/**
 	 * <b>Purpose:</b> CTOR
 	 */
-	NCWinBuffer
-		( const int winSizeX
-		, const int winSizeY
-		, const int scrollBack );
+	NCWinBuffer(const int scrollBack);
 
 	/**
 	 * <b>Purpose:</b> DTOR
@@ -37,40 +34,30 @@ public:
 
 	/**
 	 * <b>Purpose:</b> Append a row to the buffer
-	 * Scroll if viewport is showing current (last) line
 	 */
 	void addRow(const std::string &line, const bool autoScroll = true);
 
-	void scrollUp(const int i);
-	void scrollDown(const int i);
-
-
-	int size() const;
-	int curLine() const;
-
-//	typedef std::function<bool(const std::string&)> Func;
-//	void print(Func fn);
-
+	/**
+	 * <b>Purpose:</b> Remove all elements from container
+	 */
 	void clear();
 
-private:
-	int p_winSizeX;
-	int p_winSizeY;
-	int p_row;
-	int p_col;
+	/**
+	 * <b>Purpose:</b> Get the number of entries in the container
+	 * @return int, count of elements currently in container
+	 */
+	int size() const;
+
+	// Iterators
 	typedef boost::circular_buffer<std::string> Container;
 	typedef Container::iterator Iterator;
-
-	Container p_buff;
-
-
-//	std::pair<Iterator, Iterator> getWindow();  // TODO should be const
-public:
 
 	Iterator begin();
 	Iterator end();
 
-
+private:
+	// Data elements
+	Container p_buff;
 };
 
 
