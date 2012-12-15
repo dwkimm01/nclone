@@ -12,6 +12,7 @@
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 
 #include "NCApp.h"
@@ -41,6 +42,197 @@ INSERT, DELETE: switch between connections
  */
 
 
+
+struct LengthFinder
+{
+	LengthFinder(const int length) : p_length(length) {}
+
+	template <typename ForwardItr>
+	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
+	{
+		ForwardItr n = Begin + p_length;
+
+		if(n >= End)
+		{
+			return boost::iterator_range<ForwardItr>(End, End);
+		}
+		return boost::iterator_range<ForwardItr>(n , n);
+	}
+
+private:
+	int p_length;
+};
+
+
+//struct RLengthFinder
+//{
+//	RLengthFinder(const int length) : p_length(length) {}
+//
+//	template <typename ForwardItr>
+//	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
+//	{
+//		ForwardItr n = End - p_length;
+//
+//		if(n <= Begin)
+//		{
+//			return boost::iterator_range<ForwardItr>(Begin, Begin);
+//		}
+//		return boost::iterator_range<ForwardItr>(n , n);
+//	}
+//
+//private:
+//	int p_length;
+//};
+
+// This isn't in there already?  using namespace boost::algorithm did not help
+template<typename T>
+boost::split_iterator<T> operator+=(boost::split_iterator<T> & lhs, const int addr)
+{
+	for(int i = 0; i < addr; ++i)
+	{
+		++lhs;
+	}
+	return lhs;
+}
+
+typedef std::function<void(const std::string&)> PrinterType;
+void printVec
+   ( std::vector<std::string> &vec
+   , const unsigned int maxWidth
+   , const unsigned int maxHeight
+   , const unsigned int offsMajor
+   , const unsigned int offsMinor
+   , PrinterType print )
+{
+	unsigned int offsMinorInit = offsMinor;
+
+	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	unsigned int accum = 0;
+	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
+	for(auto lineItr = vec.begin() + std::min(vec.size(), offsMajor); lineItr != vec.end() && accum < maxHeight; ++lineItr)
+	{
+		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < maxHeight; ++subItr)
+		{
+			offsMinorInit=0;
+			print(boost::copy_range<std::string>(*subItr));
+			++accum;
+		}
+	}
+}
+
+std::pair<unsigned int, unsigned int> getBottom( std::vector<std::string> &vec, const unsigned int maxWidth, const unsigned int maxHeight )
+{
+	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+
+	unsigned int accum = 0;
+	unsigned int offsMajor = vec.size();
+	unsigned int offsMinor = 0;
+
+	// Reverse
+	for(auto lineItr = vec.rbegin(); lineItr != vec.rend() && accum < maxHeight; ++lineItr)
+	{
+		--offsMajor;
+
+		offsMinor = 0;
+		const std::string entry = *lineItr;
+		const int subLines = (entry.size() > maxWidth) ? (1 + ((entry.size() - 1) / maxWidth)) : (1);
+		accum += subLines;
+
+		if(accum > maxHeight) offsMinor += (accum - maxHeight);
+
+#if 0
+		offsMinor = 0;
+		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinor; subItr != Itr() && accum < maxHeight; ++subItr)
+		{
+			++offsMinor;
+
+		}
+		++offsMajor;
+#endif
+	}
+
+	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
+}
+
+std::pair<unsigned int, unsigned int> getTop(std::vector<std::string> &vec)
+{
+	return std::pair<unsigned int, unsigned int>(0, 0);
+}
+
+int doit(int argc, char* argv[])
+{
+	PrinterType print = [](const std::string &s) { cout << "{{" << s << "}}" << endl; };
+
+	vector<string> vec = { "This is a sample string", "Here is the second line", "Third line", "Getting lazy now", "adding another line", "really?", "4", "3", "2", "1" };
+
+	/** at maxwidth 10, maxheight 4
+
+{{This is a }}
+{{sample str}}
+{{ing}}
+{{Here is th}}
+{{e second l}}
+{{ine}}   <--   bottom of 10x4::  major 2, 3 -> 1, 2
+{{Third line}}
+{{Getting la}}
+{{zy now}}
+
+
+	 */
+
+	// Window limits: width x height
+	const unsigned int MAXHEIGHT = 4;
+	const unsigned int MAXWIDTH = 10;
+
+	const int offsMajor = 0;
+	const int offsMinor = 0;
+
+	printVec
+	   ( vec
+	   , MAXWIDTH
+	   , MAXHEIGHT
+	   , offsMajor
+	   , offsMinor
+	   , print );
+
+
+	cout << endl;
+	auto b = getBottom(vec, MAXWIDTH, MAXHEIGHT);
+	cout << b.first << ", " << b.second << endl << endl;
+
+	printVec
+	   ( vec
+	   , MAXWIDTH
+	   , MAXHEIGHT
+	   , b.first
+	   , b.second
+	   , print );
+
+	b = getTop(vec);
+	cout << endl << b.first << ", " << b.second << endl;
+	printVec
+		   ( vec
+		   , MAXWIDTH
+		   , MAXHEIGHT
+		   , b.first
+		   , b.second
+		   , print );
+
+
+
+	// Follow newly added line (if bigger than screen just stay at the bottom and cutoff top - edge edge case)
+	// Page Up - top line on screen becomes bottom line, everything else shifts accordingly
+	// Page Down - bottom line on screen becomes top line, everything else shifts accordingly
+	// Resize ... bottom line stays at bottom
+
+
+	return 0;
+}
+
+
+
+
+#if 0
 //template<typename T, typename U>
 //void DYNCAST()
 
@@ -260,7 +452,7 @@ for(unsigned int i = 0; i < 40; ++i)
 //			app << "char(" << tmp.c_str() << ")";
 //			app << "char(" << boost::lexical_cast<std::string>((int)c).c_str() << ") ";
 
-#if 0
+/*
 			const int cInt = c;
 			const std::string cStr = boost::lexical_cast<std::string>(cInt);
 			app << "CHAR(" << cStr.c_str() << ")";
@@ -279,7 +471,7 @@ for(unsigned int i = 0; i < 40; ++i)
 //				app.refresh();
 //				win.refresh();
 			}
-#endif
+*/
 
 
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
@@ -508,6 +700,8 @@ for(unsigned int i = 0; i < 40; ++i)
 
 	return 0;
 }
+
+#endif
 
 // Entry point
 int main(int argc, char* argv[])
