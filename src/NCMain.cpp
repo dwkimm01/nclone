@@ -95,12 +95,25 @@ boost::split_iterator<T> operator+=(boost::split_iterator<T> & lhs, const int ad
 	return lhs;
 }
 
+//template<typename T>
+//int operator-(boost::split_iterator<T> & lhs, boost::split_iterator<T> & rhs)
+//{
+//	boost::split_iterator<T> c = lhs;
+//	int res = 0;
+//	while(c != rhs)
+//	{
+//		res++;
+//		c-=1;
+//	}
+//	return res;
+//}
+
 typedef std::function<void(const std::string&)> PrinterType;
 void printVec
    ( std::vector<std::string> &vec
    , const unsigned int maxWidth
    , const unsigned int maxHeight
-   , const unsigned int offsMajor
+   , const unsigned int offsMajor  // TODO, change to an std::pair<unsigned int, unsigned int>
    , const unsigned int offsMinor
    , PrinterType print )
 {
@@ -139,16 +152,6 @@ std::pair<unsigned int, unsigned int> getBottom( std::vector<std::string> &vec, 
 		accum += subLines;
 
 		if(accum > maxHeight) offsMinor += (accum - maxHeight);
-
-#if 0
-		offsMinor = 0;
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinor; subItr != Itr() && accum < maxHeight; ++subItr)
-		{
-			++offsMinor;
-
-		}
-		++offsMajor;
-#endif
 	}
 
 	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
@@ -159,11 +162,88 @@ std::pair<unsigned int, unsigned int> getTop(std::vector<std::string> &vec)
 	return std::pair<unsigned int, unsigned int>(0, 0);
 }
 
+std::pair<unsigned int, unsigned int> getScrollUp
+	( std::vector<std::string> &vec
+	, const unsigned int maxWidth
+	, const unsigned int maxHeight
+	, const unsigned int lines
+	, const std::pair<unsigned int, unsigned int> offs )
+{
+
+	unsigned int offsMinorFirst = offs.second;
+	unsigned int offsMajor = vec.size() - offs.first;
+	unsigned int offsMinor = offs.second;
+
+
+	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	unsigned int accum = 0;
+	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
+	for(auto lineItr = vec.rbegin() + (vec.size() - offs.first) /*+ std::min(vec.size(), (vec.size() - offs.first))*/; lineItr != vec.rend() && accum < lines; ++lineItr, ++offsMajor)
+	{
+		// TODO, shouldn't have to use split iterator
+		// could just calculate
+		// except it will probably make swapping out the LengthFinder for one that minds spaces
+		// easier
+//		auto BEGIN = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst;
+
+		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
+
+		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
+		{
+			offsMinorFirst = 0;
+//			++offsMinor;
+			offsMinor = (--subLines);
+			++accum;
+			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << endl;
+
+		}
+	}
+
+
+	// TODO, need to check somewhere if we have gone past the bottom
+	return std::pair<unsigned int, unsigned int>(vec.size() - offsMajor, offsMinor);
+}
+
+#if 0
+std::pair<unsigned int, unsigned int> getScrollDown
+	( std::vector<std::string> &vec
+	, const unsigned int maxWidth
+	, const unsigned int maxHeight
+	, const unsigned int lines
+	, const std::pair<unsigned int, unsigned int> offs )
+{
+
+	unsigned int offsMajor = offs.first - 1;
+	unsigned int offsMinorInit = offs.second;
+
+
+	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	unsigned int accum = 0;
+	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
+	for(auto lineItr = vec.begin() + std::min(vec.size(), offs.first); lineItr != vec.begin() && accum < lines; --lineItr)
+	{
+		if(offsMajor < 1) break;
+		--offsMajor;
+		offsMinorInit=0;
+		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < lines; ++subItr)
+		{
+			++offsMinorInit;
+			++accum;
+		}
+	}
+
+	// TODO, need to check somewhere if we have gone past the bottom
+	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinorInit);
+}
+#endif
+
+
 int doit(int argc, char* argv[])
 {
-	PrinterType print = [](const std::string &s) { cout << "{{" << s << "}}" << endl; };
+	PrinterType print = [](const std::string &s) { cout << "   {{" << s << "}}" << endl; };
 
-	vector<string> vec = { "This is a sample string", "Here is the second line", "Third line", "Getting lazy now", "adding another line", "really?", "4", "3", "2", "1" };
+	vector<string> vec = { "This is a sample string", "Here is the second line", "Third line", "Getting lazy now", "Adding another line", "Really?", "4", "3", "2", "1" };
+
 
 	/** at maxwidth 10, maxheight 4
 
@@ -177,7 +257,6 @@ int doit(int argc, char* argv[])
 {{Getting la}}
 {{zy now}}
 
-
 	 */
 
 	// Window limits: width x height
@@ -187,6 +266,11 @@ int doit(int argc, char* argv[])
 	const int offsMajor = 0;
 	const int offsMinor = 0;
 
+	cout << endl << "ENTIRE BUFFER" << endl;
+	printVec(vec, MAXWIDTH, 200, offsMajor, offsMinor, print);
+
+
+#if 0
 	printVec
 	   ( vec
 	   , MAXWIDTH
@@ -197,8 +281,9 @@ int doit(int argc, char* argv[])
 
 
 	cout << endl;
+	// BOTTOM / END
 	auto b = getBottom(vec, MAXWIDTH, MAXHEIGHT);
-	cout << b.first << ", " << b.second << endl << endl;
+	cout << "Bottom = " << b.first << ", " << b.second << endl << endl;
 
 	printVec
 	   ( vec
@@ -208,8 +293,9 @@ int doit(int argc, char* argv[])
 	   , b.second
 	   , print );
 
+	// TOP / HOME
 	b = getTop(vec);
-	cout << endl << b.first << ", " << b.second << endl;
+	cout << endl << "Top = " << b.first << ", " << b.second << endl;
 	printVec
 		   ( vec
 		   , MAXWIDTH
@@ -217,6 +303,30 @@ int doit(int argc, char* argv[])
 		   , b.first
 		   , b.second
 		   , print );
+
+#endif
+
+	auto b = getBottom(vec, MAXWIDTH, MAXHEIGHT);
+	cout << "BOTTOM WINDOW VEC " << b.first << ", " << b.second << endl;
+	printVec(vec, MAXWIDTH, MAXHEIGHT, b.first, b.second, print);
+
+
+int x = 0;
+while(x != -1)
+{
+	// Page Down
+	const int LINESUP = x;
+	auto pageDownLine = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, LINESUP, b);
+	cout << endl << "ScrollUp " << LINESUP << " = " << pageDownLine.first << ", " << pageDownLine.second << endl;
+	printVec(vec, MAXWIDTH, MAXHEIGHT, pageDownLine.first, pageDownLine.second, print);
+
+	cin >> x;
+}
+
+	// Page Up
+//	auto pageUpLine = getScrollDown(vec, MAXWIDTH, MAXHEIGHT, 1, pageDownLine);
+//	cout << endl << "Up one = " << pageUpLine.first << ", " << pageUpLine.second << endl;
+//	printVec(vec, MAXWIDTH, MAXHEIGHT, pageUpLine.first, pageUpLine.second, print);
 
 
 
