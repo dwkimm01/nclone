@@ -181,24 +181,28 @@ std::pair<unsigned int, unsigned int> getScrollUp
 // ---------------------------------------------------------------------------
 // Scroll Down offset calculation based on vector, maxWidth, maxHeight, lines
 // to scroll up, and initial offset
-template <typename Iterator>
+template <typename Iterator, typename ReverseIterator>
 std::pair<unsigned int, unsigned int> getScrollDown
 	( Iterator begin
 	, Iterator end
+	, ReverseIterator rbegin
+	, ReverseIterator rend
 	, const unsigned int maxWidth
 	, const unsigned int maxHeight
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
 	const unsigned int cSize = (end - begin);
-	unsigned int offsMajor = cSize - offs.first;
+	const auto beginOffs = (offs.first < cSize)?(cSize - offs.first):(0);
+	unsigned int offsMajor = beginOffs;
 	unsigned int offsMinor = offs.second;
 	unsigned int offsMinorFirst = offs.second;
 
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
 	unsigned int accum = 0;
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = begin + (cSize-offs.first); lineItr != end && accum < lines; ++lineItr, --offsMajor)
+//	for(auto lineItr = begin + (/*cSize-*/offs.first); lineItr != end && accum < lines; ++lineItr, --offsMajor)
+	for(auto lineItr = begin + beginOffs; lineItr != end && accum < lines; ++lineItr, --offsMajor)
 	{
 		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
@@ -216,13 +220,12 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	{
 		return std::pair<unsigned int, unsigned int>(cSize - offsMajor, offsMinor);
 	}
-	return std::pair<unsigned int, unsigned int>(10, offsMinor);
+//	return getBottom(begin, end, maxWidth, maxHeight);
+//	return std::pair<unsigned int, unsigned int>(cSize-1, 0);
+	return getBottom(rbegin, rend, maxWidth, maxHeight);
 }
 
 
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
 
 
 } // namespace ncpp

@@ -57,6 +57,9 @@ public:
 
 private:
 	NCWinBuffer p_buff;
+	// Note, the second value will definitely be
+	// dependent on the width and height of the
+	// window
 	std::pair<unsigned int, unsigned int> p_offs;
 };
 

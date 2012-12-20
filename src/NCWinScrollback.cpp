@@ -64,6 +64,7 @@ void NCWinScrollback::refresh()
 
 void NCWinScrollback::append(const std::string &line)
 {
+	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
 	const auto offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
 	const bool following = offs == p_offs;
 
@@ -77,23 +78,23 @@ void NCWinScrollback::append(const std::string &line)
 
 void NCWinScrollback::scrollDown(const int n)
 {
-	p_offs = getScrollDown(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
+	p_offs = getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h-2, n, p_offs);
 }
 
 void NCWinScrollback::scrollUp(const int n)
 {
-	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
+	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h-2, n, p_offs);
 }
 
 void NCWinScrollback::pageDown()
 {
-	const int pageSize = getConfig().p_h-1;
+	const int pageSize = getConfig().p_h-3;
 	scrollDown(pageSize);
 }
 
 void NCWinScrollback::pageUp()
 {
-	const int pageSize = getConfig().p_h-1;
+	const int pageSize = getConfig().p_h-3;
 	scrollUp(pageSize);
 }
 

@@ -246,20 +246,20 @@ int doit(int argc, char* argv[])
 		winLog->append("Two");
 		winLog->append("Three");
 
-		const std::string testString = std::string("[time] ") + testexampletext::TestExampleText::get();
-		const int testStringCount = std::ceil(testString.size() / double(cfg.p_w));
-for(unsigned int i = 0; i < 5; ++i)
-{
-		winLog->append(testString);
-		winLog->append("Length " + boost::lexical_cast<string>(testStringCount));
-}
-
-for(unsigned int i = 0; i < 40; ++i)
-		winLog->append(testexampletext::TestExampleText::getOrig32());
-//		winLog->append("This is a long string that I hope will at least wrap a little big let's see what happens");
-
-		winLog->append("Four");
-		winLog->append("Five");
+//		const std::string testString = std::string("[time] ") + testexampletext::TestExampleText::get();
+//		const int testStringCount = std::ceil(testString.size() / double(cfg.p_w));
+//for(unsigned int i = 0; i < 5; ++i)
+//{
+//		winLog->append(testString);
+//		winLog->append("Length " + boost::lexical_cast<string>(testStringCount));
+//}
+//
+//for(unsigned int i = 0; i < 40; ++i)
+//		winLog->append(testexampletext::TestExampleText::getOrig32());
+////		winLog->append("This is a long string that I hope will at least wrap a little big let's see what happens");
+//
+//		winLog->append("Four");
+//		winLog->append("Five");
 
 
 		// Message received signal connect
@@ -478,6 +478,7 @@ for(unsigned int i = 0; i < 40; ++i)
 						ncs->append("      protocol		username");
 						ncs->append("      prpl-sipe	user@domain.com,domain\\user");
 						ncs->append("      prpl-jabber	user@gmail.com");
+						ncs->append("  /d1       print debug output");
 						ncs->refresh();
 					}
 					else if(cmd == "/history")
@@ -519,6 +520,23 @@ for(unsigned int i = 0; i < 40; ++i)
 						// Clear top buffer
 						ncs->clear();
 						ncs->refresh();
+					}
+					else if(cmd == "/d1")
+					{
+						if(ncs)
+						{
+							const int max = ncs->getConfig().p_h;
+							for(unsigned int i = 0; i < max*5; ++i)
+							{
+								std::string sToPrint;
+								for(unsigned int j = 1; j < i; ++j)
+								{
+									sToPrint.push_back( 'a' + (i%26) );
+								}
+								ncs->append(">> " + sToPrint);
+							}
+							ncs->refresh();
+						}
 					}
 					else
 					{
