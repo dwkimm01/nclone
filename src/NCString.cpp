@@ -27,11 +27,15 @@ namespace ncpp{
 		return cursesColor;
 	}
 
+	int NCString::size() const{
+		return theString.size();
+	}
+
 	NCString NCString::substr(int pos, int length) const{
 		return NCString(theString.substr(pos, length), cursesColor);
 	}
 
-	void NCString::draw(NCWin* win){
+	void NCString::draw(NCWin* win) const{
 		char colors[theString.size()];
 		for(int i = 0; i < theString.size(); i++){
 			colors[i] = cursesColor;

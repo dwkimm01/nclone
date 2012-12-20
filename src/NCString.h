@@ -22,7 +22,9 @@ public:
 
 	~NCString();
 
-	void draw(NCWin* win);
+	void draw(NCWin* win) const;
+
+	int size() const;
 
 	const std::string& getString() const;
 	int getColor() const;

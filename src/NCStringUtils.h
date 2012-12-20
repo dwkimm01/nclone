@@ -55,7 +55,54 @@ public:
 		}
 		return true;
 	}
+	// Split string utils
+	typedef std::function<void(const NCString&)> Printer;
 
+	template<typename Itr>
+
+	static int forWindow(Itr begin, Itr end, const int initialOffset,
+			const int maxWidth, const int maxHeight, Printer print)
+			{
+		int linesPrinted = 0;
+		int lineOffset = initialOffset;
+		for (const auto & entry : boost::make_iterator_range(begin, end))
+		{
+			const int subLines =
+					(entry.size() > maxWidth) ?
+							(1 + ((entry.size() - 1) / maxWidth)) : (1);
+			for (int i = lineOffset; i < subLines; ++i)
+			{
+				print(entry.substr(i * maxWidth, maxWidth));
+				++linesPrinted;
+				// Check to see if done
+				if (linesPrinted >= maxHeight)
+					return maxHeight - linesPrinted;
+			}
+
+			// Determine how many subLines were skipped in the name of lineOffset
+			if (lineOffset > 0)
+			{
+				// Part of entry was skipped
+				if (subLines > lineOffset)
+				{
+					lineOffset = 0;
+				}
+
+				// All of this line was skipped
+				else if (subLines == lineOffset)
+				{
+					lineOffset = 0;
+				}
+
+				// More needs to be skipped
+				else
+				{
+					lineOffset -= subLines;
+				}
+			}
+		}
+		return maxHeight - linesPrinted;
+	}
 };
 
 } // namespace ncstringutils

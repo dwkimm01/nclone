@@ -135,14 +135,14 @@ int doit(int argc, char* argv[])
 
 		const std::string testString = std::string("[time] ") + testexampletext::TestExampleText::get();
 		const int testStringCount = std::ceil(testString.size() / double(cfg.p_w));
-for(unsigned int i = 0; i < 5; ++i)
-{
-		winLog->append(testString);
-		winLog->append("Length " + boost::lexical_cast<string>(testStringCount));
-}
-
-for(unsigned int i = 0; i < 40; ++i)
-		winLog->append(testexampletext::TestExampleText::getOrig32());
+//for(unsigned int i = 0; i < 5; ++i)
+//{
+//		winLog->append(testString);
+//		winLog->append("Length " + boost::lexical_cast<string>(testStringCount));
+//}
+//
+//for(unsigned int i = 0; i < 40; ++i)
+//		winLog->append(testexampletext::TestExampleText::getOrig32());
 //		winLog->append("This is a long string that I hope will at least wrap a little big let's see what happens");
 
 		winLog->append("Four");

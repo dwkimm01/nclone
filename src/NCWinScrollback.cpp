@@ -38,28 +38,13 @@ void NCWinScrollback::refresh()
 
 	int linesPrinted = 0;
 	// Print our buffer out
-	p_buff.print([&](const ncpp::NCString &s)
+
+	ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, cfg.p_w-2, cfg.p_h, [&](const NCString &line)
 	{
-		if(!
-		ncstringutils::NCStringUtils::splitByLength(s, cfg.p_w-1, [&](const ncpp::NCString &sSplit)
-		{
-			NCWin::print(sSplit);
-			++linesPrinted;
-			if(linesPrinted >= (cfg.p_h))
-				return false;
-			NCWin::clearTillEnd();
-			NCWin::cursorNextLine();
-			return true;
-		})
-		) return false;
-
-		return true;
-	} );
-
-	// Calculate indication of where in the buffer we are displaying
-	const double percent = (1.0 * p_buff.curLine() ) / p_buff.size();
-	const int lNum = (percent * (getConfig().p_h - 3)) + 1;
-	NCWin::putChar('*', getConfig().p_w-1, lNum);
+		line.draw(this);
+		NCWin::clearTillEnd();
+		NCWin::cursorNextLine();
+	});
 
 	NCWin::rRefresh();
 }
@@ -72,6 +57,17 @@ void NCWinScrollback::append(const std::string &line)
 
 void NCWinScrollback::append(const ncpp::NCString &line)
 {
+	const int lineSplit = (line.getString().size() > (getConfig().p_w-2)) ? (1 + ((line.size() - 1) / (getConfig().p_w-2))) : (1);
+
+	bool followingEnd = false;
+	// Get the end
+	int endOffs = 0;
+	std::for_each(p_buff.begin(), p_buff.end(), [&](const NCString &entry)
+	{
+		endOffs += (entry.size() > (getConfig().p_w-2)) ? (1 + ((entry.size() - 1) / (getConfig().p_w-2))) : (1);
+	} );
+	if( std::abs( endOffs - p_row) <= getConfig().p_h ) followingEnd = true;
+
 	p_buff.addRow(line);
 
 	if(followingEnd)
@@ -84,12 +80,17 @@ void NCWinScrollback::append(const ncpp::NCString &line)
 
 void NCWinScrollback::scrollDown(const int n)
 {
-	p_buff.scrollDown(n);
+	p_row += n;
+	// Check to see if we've gone too far
+	const int space = ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, getConfig().p_w-2, getConfig().p_h, [](const NCString&){});
+	p_row -= space;
+	if(p_row < 0) p_row = 0;
 }
 
 void NCWinScrollback::scrollUp(const int n)
 {
-	p_buff.scrollUp(n);
+	p_row -= n;
+	if(p_row < 0) p_row = 0;
 }
 
 void NCWinScrollback::pageDown()
@@ -107,12 +108,22 @@ void NCWinScrollback::pageUp()
 
 void NCWinScrollback::home()
 {
-	p_buff.scrollUp(p_buff.size());
+	p_row = 0;
 }
 
 void NCWinScrollback::end()
 {
-	p_buff.scrollDown(p_buff.size());
+	// TODO, this is not a good approach - should rewrite to at least
+	// start from the most recent line and go backwards
+	int sum = 0;
+	std::for_each(p_buff.begin(), p_buff.end(), [&](const NCString &entry)
+	{
+		sum += (entry.size() > (getConfig().p_w-2)) ? (1 + ((entry.size() - 1) / (getConfig().p_w-2))) : (1);
+	} );
+	p_row = sum;
+	const int space = ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, getConfig().p_w-2, getConfig().p_h, [](const NCString&){});
+	p_row -= space;
+	if(p_row < 0) p_row = 0;
 }
 
 void NCWinScrollback::clear()
