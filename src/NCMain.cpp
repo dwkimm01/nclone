@@ -169,10 +169,9 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-
-	unsigned int offsMinorFirst = offs.second;
 	unsigned int offsMajor = vec.size() - offs.first;
 	unsigned int offsMinor = offs.second;
+	unsigned int offsMinorFirst = offs.second;
 
 
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
@@ -180,31 +179,25 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
 	for(auto lineItr = vec.rbegin() + (vec.size() - offs.first) /*+ std::min(vec.size(), (vec.size() - offs.first))*/; lineItr != vec.rend() && accum < lines; ++lineItr, ++offsMajor)
 	{
-		// TODO, shouldn't have to use split iterator
-		// could just calculate
-		// except it will probably make swapping out the LengthFinder for one that minds spaces
-		// easier
-//		auto BEGIN = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst;
-
+		// TODO, need to fix this so we just use a single templated LengthFinder for this calculation
+		// and for the rest of everything else
+		// TODO, should be able to factor out the for+itr and just loop through and do the calculation
+		// all at once - well actually use the split iterator and iterate right to the end then calculate
 		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
 		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
 		{
 			offsMinorFirst = 0;
-//			++offsMinor;
 			offsMinor = (--subLines);
 			++accum;
-			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << endl;
-
+//			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << endl;
 		}
 	}
-
 
 	// TODO, need to check somewhere if we have gone past the bottom
 	return std::pair<unsigned int, unsigned int>(vec.size() - offsMajor, offsMinor);
 }
 
-#if 0
 std::pair<unsigned int, unsigned int> getScrollDown
 	( std::vector<std::string> &vec
 	, const unsigned int maxWidth
@@ -212,30 +205,29 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-
-	unsigned int offsMajor = offs.first - 1;
-	unsigned int offsMinorInit = offs.second;
-
+	unsigned int offsMajor = vec.size() - offs.first;
+	unsigned int offsMinor = offs.second;
+	unsigned int offsMinorFirst = offs.second;
 
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
 	unsigned int accum = 0;
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = vec.begin() + std::min(vec.size(), offs.first); lineItr != vec.begin() && accum < lines; --lineItr)
+	for(auto lineItr = vec.rbegin() + (vec.size()-offs.first); lineItr != vec.rend() && accum < lines; ++lineItr, ++offsMajor)
 	{
-		if(offsMajor < 1) break;
-		--offsMajor;
-		offsMinorInit=0;
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < lines; ++subItr)
+		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
+
+		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
 		{
-			++offsMinorInit;
+			offsMinorFirst = 0;
+			offsMinor = (--subLines);
 			++accum;
+			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << endl;
 		}
 	}
 
 	// TODO, need to check somewhere if we have gone past the bottom
-	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinorInit);
+	return std::pair<unsigned int, unsigned int>(vec.size() - offsMajor, offsMinor);
 }
-#endif
 
 
 int doit(int argc, char* argv[])
@@ -306,21 +298,31 @@ int doit(int argc, char* argv[])
 
 #endif
 
-	auto b = getBottom(vec, MAXWIDTH, MAXHEIGHT);
-	cout << "BOTTOM WINDOW VEC " << b.first << ", " << b.second << endl;
+	auto a = getBottom(vec, MAXWIDTH, MAXHEIGHT);
+	auto b = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, 3, a);
+	cout << "BOTTOM WINDOW VEC (-3) " << b.first << ", " << b.second << endl;
 	printVec(vec, MAXWIDTH, MAXHEIGHT, b.first, b.second, print);
 
 
 int x = 0;
-while(x != -1)
+while(x != -999)
 {
 	// Page Down
-	const int LINESUP = x;
-	auto pageDownLine = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, LINESUP, b);
-	cout << endl << "ScrollUp " << LINESUP << " = " << pageDownLine.first << ", " << pageDownLine.second << endl;
-	printVec(vec, MAXWIDTH, MAXHEIGHT, pageDownLine.first, pageDownLine.second, print);
-
 	cin >> x;
+	const int LINESUP = x;
+	if(LINESUP > 0)
+	{
+		auto pageUpLine = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, LINESUP, b);
+		cout << endl << "ScrollUp " << LINESUP << " = " << pageUpLine.first << ", " << pageUpLine.second << endl;
+		printVec(vec, MAXWIDTH, MAXHEIGHT, pageUpLine.first, pageUpLine.second, print);
+
+	}
+	else
+	{
+		auto pageDownLine = getScrollDown(vec, MAXWIDTH, MAXHEIGHT, 0-LINESUP, b);
+		cout << endl << "ScrollDown " << 0-LINESUP << " = " << pageDownLine.first << ", " << pageDownLine.second << endl;
+		printVec(vec, MAXWIDTH, MAXHEIGHT, pageDownLine.first, pageDownLine.second, print);
+	}
 }
 
 	// Page Up
