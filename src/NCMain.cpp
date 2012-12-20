@@ -71,23 +71,6 @@ void fillWin(NCObject* obj)
 // Main method
 int doit(int argc, char* argv[])
 {
-
-#if 0
-		typedef ncclientpurple::NCClientPurple::String String;
-		ncclientpurple::NCClientPurple client
-			( "user@domain.com,domain\\user" 
-		   	, "Project6"
-		   	, "prpl-sipe"
-		   	, [&](const String &s, const int, const int) { }  // connectionStepCB
-			, [&](const String &s, const String &t) { std::cout << s << t << std::endl; }  // msgReceivedCB
-			, [&](const String &s, const String &t) { std::cout << s << t << std::endl; } // debugLogCB
-			);
-
-   int x;
-   cin >> x;
-   return 0;
-#endif
-
 	// Scope for NCApp
 	{
 
@@ -151,27 +134,19 @@ int doit(int argc, char* argv[])
 		winLog->append(NCString("Three",6));
 
 		const std::string testString = std::string("[time] ") + testexampletext::TestExampleText::get();
-		winLog->append(testString);
 		const int testStringCount = std::ceil(testString.size() / double(cfg.p_w));
+for(unsigned int i = 0; i < 5; ++i)
+{
+		winLog->append(testString);
 		winLog->append("Length " + boost::lexical_cast<string>(testStringCount));
+}
 
+for(unsigned int i = 0; i < 40; ++i)
+		winLog->append(testexampletext::TestExampleText::getOrig32());
 //		winLog->append("This is a long string that I hope will at least wrap a little big let's see what happens");
 
 		winLog->append("Four");
 		winLog->append("Five");
-
-#if 0
-		NCWinScrollback win3a(&win3, cfg);
-		fillWin(&win3a);
-
-		// Second chat window
-		cfg.p_title = "c2";
-		NCWinScrollback win3b(&win3, cfg);
-
-		// Third chat window
-		cfg.p_title = "c3";
-		NCWinScrollback win3c(&win3, cfg);
-#endif
 
 		// Message received signal connect
 		msgSignal.connect
@@ -208,9 +183,6 @@ int doit(int argc, char* argv[])
 								NCWinScrollback* addedWin = new NCWinScrollback(&win3, cfg);
 								addedWin->append(line.c_str());
 							}
-
-
-// std::function<bool(NCObject*)> func
 
 
 							// Refresh the top window to see newly added text

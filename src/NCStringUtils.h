@@ -12,6 +12,7 @@
 #include <cmath>
 #include <functional>
 #include "NCString.h"
+#include <boost/range.hpp>
 
 namespace ncpp
 {
@@ -34,7 +35,7 @@ public:
 
 	inline static bool splitByLength
 		( const ncpp::NCString &ncs
-		, const int length
+		, const std::string::size_type length
 		, std::function<bool(const ncpp::NCString &)> func )
 	{
 		const std::string &s = ncs.getString();
@@ -54,6 +55,7 @@ public:
 		}
 		return true;
 	}
+
 };
 
 } // namespace ncstringutils
