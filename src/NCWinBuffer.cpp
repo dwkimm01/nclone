@@ -37,6 +37,7 @@ int NCWinBuffer::size() const
 
 NCWinBuffer::Iterator NCWinBuffer::begin()
 {
+	// TODO, are these normal ones used??
 	return p_buff.begin();
 }
 
@@ -44,5 +45,16 @@ NCWinBuffer::Iterator NCWinBuffer::end()
 {
 	return p_buff.end();
 }
+
+NCWinBuffer::ReverseIterator NCWinBuffer::rbegin()
+{
+	return p_buff.rbegin();
+}
+
+NCWinBuffer::ReverseIterator NCWinBuffer::rend()
+{
+	return p_buff.rend();
+}
+
 
 } // namespace ncpp

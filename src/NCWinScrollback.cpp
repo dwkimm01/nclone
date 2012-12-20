@@ -7,6 +7,7 @@
 
 #include "NCWinScrollback.h"
 #include "NCStringUtils.h"
+#include "NCTextWinFormatter.h"
 
 namespace ncpp
 {
@@ -14,7 +15,7 @@ namespace ncpp
 NCWinScrollback::NCWinScrollback(NCObject* parent, NCWinCfg cfg, const int scrollback)
 	: NCWin(parent, cfg)
 	, p_buff(scrollback)
-	, p_row(0)
+	, p_offs(0, 0)
 {
 }
 
@@ -35,57 +36,57 @@ void NCWinScrollback::refresh()
 	// If there aren't enough lines, push down to start at bottom
 	const NCWinCfg cfg = getConfig();
 
-	ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, cfg.p_w-2, cfg.p_h, [&](const std::string &line)
+	// TODO, need to replace NCTextWinFormatter's usage of vector
+	// with just iterators... not going to be entirely easy
+	std::vector<std::string> vec;
+	vec.reserve(p_buff.size());
+	for(auto itr = p_buff.begin(); itr != p_buff.end(); ++itr)
 	{
-		NCWin::print(line.c_str());
-		NCWin::clearTillEnd();
-		NCWin::cursorNextLine();
-	});
+		vec.push_back(*itr);
+	}
+
+	printVec
+	   ( p_buff.begin()
+	   , p_buff.end()
+	   , cfg.p_w-2
+	   , cfg.p_h
+	   , p_offs.first
+	   , p_offs.second
+	   , [&](const std::string &line)
+	   {
+		  NCWin::print(line.c_str());
+		  NCWin::clearTillEnd();
+		  NCWin::cursorNextLine();
+	   });
 
 	NCWin::rRefresh();
 }
 
 void NCWinScrollback::append(const std::string &line)
 {
-	const int lineSplit = (line.size() > (getConfig().p_w-2)) ? (1 + ((line.size() - 1) / (getConfig().p_w-2))) : (1);
-
-	bool followingEnd = false;
-	// Get the end
-	int endOffs = 0;
-	std::for_each(p_buff.begin(), p_buff.end(), [&](const std::string &entry)
-	{
-		endOffs += (entry.size() > (getConfig().p_w-2)) ? (1 + ((entry.size() - 1) / (getConfig().p_w-2))) : (1);
-	} );
-	if( std::abs( endOffs - p_row) <= getConfig().p_h ) followingEnd = true;
+	const auto offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
+	const bool following = offs == p_offs;
 
 	p_buff.addRow(line);
 
-	if(followingEnd)
+	if(following)
 	{
-		// TODO, this still isn't working for startup with "lorem"
-		p_row += lineSplit;
-		// TODO, check overflow beyond container boundaries
+		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
 	}
 }
 
 void NCWinScrollback::scrollDown(const int n)
 {
-	p_row += n;
-	// Check to see if we've gone too far
-	const int space = ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, getConfig().p_w-2, getConfig().p_h, [](const std::string&){});
-	p_row -= space;
-	if(p_row < 0) p_row = 0;
+	p_offs = getScrollDown(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
 }
 
 void NCWinScrollback::scrollUp(const int n)
 {
-	p_row -= n;
-	if(p_row < 0) p_row = 0;
+	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
 }
 
 void NCWinScrollback::pageDown()
 {
-	// TODO, -3 is because the -1 gives us the previous line - but we also need to take into account the border..
 	const int pageSize = getConfig().p_h-1;
 	scrollDown(pageSize);
 }
@@ -98,22 +99,12 @@ void NCWinScrollback::pageUp()
 
 void NCWinScrollback::home()
 {
-	p_row = 0;
+	p_offs = ::ncpp::getTop(p_buff.begin(), p_buff.end());
 }
 
 void NCWinScrollback::end()
 {
-	// TODO, this is not a good approach - should rewrite to at least
-	// start from the most recent line and go backwards
-	int sum = 0;
-	std::for_each(p_buff.begin(), p_buff.end(), [&](const std::string &entry)
-	{
-		sum += (entry.size() > (getConfig().p_w-2)) ? (1 + ((entry.size() - 1) / (getConfig().p_w-2))) : (1);
-	} );
-	p_row = sum;
-	const int space = ncstringutils::NCStringUtils::forWindow(p_buff.begin(), p_buff.end(), p_row, getConfig().p_w-2, getConfig().p_h, [](const std::string&){});
-	p_row -= space;
-	if(p_row < 0) p_row = 0;
+	p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
 }
 
 void NCWinScrollback::clear()

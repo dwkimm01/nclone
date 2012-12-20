@@ -51,9 +51,13 @@ public:
 	// Iterators
 	typedef boost::circular_buffer<std::string> Container;
 	typedef Container::iterator Iterator;
+	typedef Container::reverse_iterator ReverseIterator;
 
 	Iterator begin();
 	Iterator end();
+
+	ReverseIterator rbegin();
+	ReverseIterator rend();
 
 private:
 	// Data elements

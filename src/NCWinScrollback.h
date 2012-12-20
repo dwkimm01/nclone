@@ -57,7 +57,7 @@ public:
 
 private:
 	NCWinBuffer p_buff;
-	int p_row;
+	std::pair<unsigned int, unsigned int> p_offs;
 };
 
 } // namespace ncpp

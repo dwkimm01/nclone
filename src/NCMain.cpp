@@ -40,200 +40,10 @@ keys that naim supported
 
 INSERT, DELETE: switch between connections
  */
-
-
-
-struct LengthFinder
-{
-	LengthFinder(const int length) : p_length(length) {}
-
-	template <typename ForwardItr>
-	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
-	{
-		ForwardItr n = Begin + p_length;
-
-		if(n >= End)
-		{
-			return boost::iterator_range<ForwardItr>(End, End);
-		}
-		return boost::iterator_range<ForwardItr>(n , n);
-	}
-
-private:
-	int p_length;
-};
-
-
-//struct RLengthFinder
-//{
-//	RLengthFinder(const int length) : p_length(length) {}
-//
-//	template <typename ForwardItr>
-//	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
-//	{
-//		ForwardItr n = End - p_length;
-//
-//		if(n <= Begin)
-//		{
-//			return boost::iterator_range<ForwardItr>(Begin, Begin);
-//		}
-//		return boost::iterator_range<ForwardItr>(n , n);
-//	}
-//
-//private:
-//	int p_length;
-//};
-
-// This isn't in there already?  using namespace boost::algorithm did not help
-template<typename T>
-boost::split_iterator<T> operator+=(boost::split_iterator<T> & lhs, const int addr)
-{
-	for(int i = 0; i < addr; ++i)
-	{
-		++lhs;
-	}
-	return lhs;
-}
-
-//template<typename T>
-//int operator-(boost::split_iterator<T> & lhs, boost::split_iterator<T> & rhs)
-//{
-//	boost::split_iterator<T> c = lhs;
-//	int res = 0;
-//	while(c != rhs)
-//	{
-//		res++;
-//		c-=1;
-//	}
-//	return res;
-//}
-
-typedef std::function<void(const std::string&)> PrinterType;
-void printVec
-   ( std::vector<std::string> &vec
-   , const unsigned int maxWidth
-   , const unsigned int maxHeight
-   , const unsigned int offsMajor  // TODO, change to an std::pair<unsigned int, unsigned int>
-   , const unsigned int offsMinor
-   , PrinterType print )
-{
-	unsigned int offsMinorInit = offsMinor;
-
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	unsigned int accum = 0;
-	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = vec.begin() + std::min(vec.size(), offsMajor); lineItr != vec.end() && accum < maxHeight; ++lineItr)
-	{
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < maxHeight; ++subItr)
-		{
-			offsMinorInit=0;
-			print(boost::copy_range<std::string>(*subItr));
-			++accum;
-		}
-	}
-}
-
-std::pair<unsigned int, unsigned int> getBottom( std::vector<std::string> &vec, const unsigned int maxWidth, const unsigned int maxHeight )
-{
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-
-	unsigned int accum = 0;
-	unsigned int offsMajor = vec.size();
-	unsigned int offsMinor = 0;
-
-	// Reverse
-	for(auto lineItr = vec.rbegin(); lineItr != vec.rend() && accum < maxHeight; ++lineItr)
-	{
-		--offsMajor;
-
-		offsMinor = 0;
-		const std::string entry = *lineItr;
-		const int subLines = (entry.size() > maxWidth) ? (1 + ((entry.size() - 1) / maxWidth)) : (1);
-		accum += subLines;
-
-		if(accum > maxHeight) offsMinor += (accum - maxHeight);
-	}
-
-	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
-}
-
-std::pair<unsigned int, unsigned int> getTop(std::vector<std::string> &vec)
-{
-	return std::pair<unsigned int, unsigned int>(0, 0);
-}
-
-std::pair<unsigned int, unsigned int> getScrollUp
-	( std::vector<std::string> &vec
-	, const unsigned int maxWidth
-	, const unsigned int maxHeight
-	, const unsigned int lines
-	, const std::pair<unsigned int, unsigned int> offs )
-{
-	unsigned int offsMajor = vec.size() - offs.first;
-	unsigned int offsMinor = offs.second;
-	unsigned int offsMinorFirst = offs.second;
-
-
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	unsigned int accum = 0;
-	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = vec.rbegin() + (vec.size() - offs.first) /*+ std::min(vec.size(), (vec.size() - offs.first))*/; lineItr != vec.rend() && accum < lines; ++lineItr, ++offsMajor)
-	{
-		// TODO, need to fix this so we just use a single templated LengthFinder for this calculation
-		// and for the rest of everything else
-		// TODO, should be able to factor out the for+itr and just loop through and do the calculation
-		// all at once - well actually use the split iterator and iterate right to the end then calculate
-		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
-
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
-		{
-			offsMinorFirst = 0;
-			offsMinor = (--subLines);
-			++accum;
-//			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << endl;
-		}
-	}
-
-	// TODO, need to check somewhere if we have gone past the bottom
-	return std::pair<unsigned int, unsigned int>(vec.size() - offsMajor, offsMinor);
-}
-
-std::pair<unsigned int, unsigned int> getScrollDown
-	( std::vector<std::string> &vec
-	, const unsigned int maxWidth
-	, const unsigned int maxHeight
-	, const unsigned int lines
-	, const std::pair<unsigned int, unsigned int> offs )
-{
-	unsigned int offsMajor = vec.size() - offs.first;
-	unsigned int offsMinor = offs.second;
-	unsigned int offsMinorFirst = offs.second;
-
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	unsigned int accum = 0;
-	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = vec.rbegin() + (vec.size()-offs.first); lineItr != vec.rend() && accum < lines; ++lineItr, ++offsMajor)
-	{
-		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
-
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
-		{
-			offsMinorFirst = 0;
-			offsMinor = (--subLines);
-			++accum;
-			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << endl;
-		}
-	}
-
-	// TODO, need to check somewhere if we have gone past the bottom
-	return std::pair<unsigned int, unsigned int>(vec.size() - offsMajor, offsMinor);
-}
-
-
+#if 0
 int doit(int argc, char* argv[])
 {
 	PrinterType print = [](const std::string &s) { cout << "   {{" << s << "}}" << endl; };
-
 	vector<string> vec = { "This is a sample string", "Here is the second line", "Third line", "Getting lazy now", "Adding another line", "Really?", "4", "3", "2", "1" };
 
 
@@ -260,7 +70,7 @@ int doit(int argc, char* argv[])
 
 	cout << endl << "ENTIRE BUFFER" << endl;
 	printVec(vec, MAXWIDTH, 200, offsMajor, offsMinor, print);
-
+#endif
 
 #if 0
 	printVec
@@ -298,6 +108,7 @@ int doit(int argc, char* argv[])
 
 #endif
 
+#if 0
 	auto a = getBottom(vec, MAXWIDTH, MAXHEIGHT);
 	auto b = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, 3, a);
 	cout << "BOTTOM WINDOW VEC (-3) " << b.first << ", " << b.second << endl;
@@ -324,6 +135,7 @@ while(x != -999)
 		printVec(vec, MAXWIDTH, MAXHEIGHT, pageDownLine.first, pageDownLine.second, print);
 	}
 }
+#endif
 
 	// Page Up
 //	auto pageUpLine = getScrollDown(vec, MAXWIDTH, MAXHEIGHT, 1, pageDownLine);
@@ -337,18 +149,17 @@ while(x != -999)
 	// Page Down - bottom line on screen becomes top line, everything else shifts accordingly
 	// Resize ... bottom line stays at bottom
 
-
+#if 0
 	return 0;
 }
+#endif
 
 
 
-
-#if 0
 //template<typename T, typename U>
 //void DYNCAST()
 
-
+#if 0
 // TODO, test code take out at some point
 void fillWin(NCObject* obj)
 {
@@ -368,6 +179,7 @@ void fillWin(NCObject* obj)
 		}
 	}
 }
+#endif
 
 
 // Main method
@@ -813,7 +625,6 @@ for(unsigned int i = 0; i < 40; ++i)
 	return 0;
 }
 
-#endif
 
 // Entry point
 int main(int argc, char* argv[])
