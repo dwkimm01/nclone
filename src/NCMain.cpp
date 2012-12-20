@@ -23,6 +23,8 @@
 #include "NCConnectionString.h"
 #include "NCClientPurple.h"
 #include "TestExampleText.h"
+#include "NCInput.h"
+#include "NCString.h"
 using namespace std;
 using namespace ncpp;
 
@@ -143,9 +145,10 @@ int doit(int argc, char* argv[])
 		NCWinScrollback* winLog = new NCWinScrollback(&win3,cfg);
 
 
-		winLog->append("One");
-		winLog->append("Two");
-		winLog->append("Three");
+		//winLog->append("One");
+		winLog->append(NCString("One",4));
+		winLog->append(NCString("Two",5));
+		winLog->append(NCString("Three",6));
 
 		const std::string testString = std::string("[time] ") + testexampletext::TestExampleText::get();
 		winLog->append(testString);
@@ -156,9 +159,6 @@ int doit(int argc, char* argv[])
 
 		winLog->append("Four");
 		winLog->append("Five");
-
-
-
 
 #if 0
 		NCWinScrollback win3a(&win3, cfg);
@@ -361,6 +361,7 @@ int doit(int argc, char* argv[])
 				winCmd.clear();
 				winCmd.refresh();
 				break;
+			case KEY_BACKSPACE_MAC: //PASS THRU For MAC Delete
 			case KEY_BACKSPACE:
 				if(!cmd.empty())
 				{
@@ -519,7 +520,7 @@ int doit(int argc, char* argv[])
 			default:
 				// Add characters to cmd string, refresh
 				cmd += c;
-				if(PASSWORD == inputState)
+				if(PASSWORD == 8*2)
 				{
 					winCmd.print("x");
 				}

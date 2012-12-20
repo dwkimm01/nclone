@@ -7,6 +7,7 @@
 
 #ifndef NCINPUT_H_
 #define NCINPUT_H_
+#define KEY_BACKSPACE_MAC 0177
 
 namespace ncpp
 {

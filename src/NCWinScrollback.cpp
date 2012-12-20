@@ -7,6 +7,7 @@
 
 #include "NCWinScrollback.h"
 #include "NCStringUtils.h"
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -46,12 +47,13 @@ void NCWinScrollback::refresh()
 
 	int linesPrinted = 0;
 	// Print our buffer out
-	p_buff.print([&](const std::string &s)
+	p_buff.print([&](const ncpp::NCString &s)
 	{
 		if(!
-		ncstringutils::NCStringUtils::splitByLength(s, cfg.p_w-1, [&](const std::string &sSplit)
+		ncstringutils::NCStringUtils::splitByLength(s, cfg.p_w-1, [&](const ncpp::NCString &sSplit)
 		{
-			NCWin::print(sSplit.c_str());
+			//FINISH IMPLEMENTING COLOR PRINT HERE
+			NCWin::print(sSplit);
 			++linesPrinted;
 			if(linesPrinted >= (cfg.p_h))
 				return false;
@@ -77,6 +79,12 @@ void NCWinScrollback::refresh()
 }
 
 void NCWinScrollback::append(const std::string &line)
+{
+	//TODO: Find out how to use default color instead of 0
+	append(NCString(line,0));
+}
+
+void NCWinScrollback::append(const ncpp::NCString &line)
 {
 	p_buff.addRow(line);
 }

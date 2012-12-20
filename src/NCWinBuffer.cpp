@@ -22,7 +22,7 @@ NCWinBuffer::NCWinBuffer(const int winSizeX, const int winSizeY, const int scrol
 
 NCWinBuffer::~NCWinBuffer() {}
 
-void NCWinBuffer::addRow(const std::string &line, const bool autoScroll)
+void NCWinBuffer::addRow(const ncpp::NCString &line, const bool autoScroll)
 {
 	// Determine if we are on the current line for autoScroll
 	const int bSize = static_cast<int>(p_buff.size());

@@ -11,6 +11,7 @@
 #include <string>
 #include <functional>
 #include <boost/circular_buffer.hpp>
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -39,7 +40,7 @@ public:
 	 * <b>Purpose:</b> Append a row to the buffer
 	 * Scroll if viewport is showing current (last) line
 	 */
-	void addRow(const std::string &line, const bool autoScroll = true);
+	void addRow(const ncpp::NCString &line, const bool autoScroll = true);
 
 	void scrollUp(const int i);
 	void scrollDown(const int i);
@@ -48,7 +49,7 @@ public:
 	int size() const;
 	int curLine() const;
 
-	typedef std::function<bool(const std::string&)> Func;
+	typedef std::function<bool(const ncpp::NCString&)> Func;
 	void print(Func fn);
 
 	void clear();
@@ -58,7 +59,7 @@ private:
 	int p_winSizeY;
 	int p_row;
 	int p_col;
-	typedef boost::circular_buffer<std::string> Container;
+	typedef boost::circular_buffer<ncpp::NCString> Container;
 	typedef Container::iterator Iterator;
 
 	Container p_buff;

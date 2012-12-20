@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "NCWin.h"
 #include "NCUtils.h"
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -158,6 +159,8 @@ public:
 		wmove(p_win, cy, cx);
 	}
 
+	WINDOW* p_win;
+
 
 private:
 //	int p_h;
@@ -167,8 +170,6 @@ private:
 //	bool p_hasBorder;
 //	std::string p_title;
 	NCWinCfg p_cfg;
-
-	WINDOW* p_win;
 
 
 };
@@ -217,6 +218,12 @@ void NCWin::print(const char* str)
 	p_data->print(str);
 }
 
+void NCWin::print(ncpp::NCString ncStr)
+{
+	//p_data->print(ncStr.getString().c_str());
+	ncStr.draw(this);
+}
+
 
 void NCWin::print(const char* str, const int x, const int y)
 {
@@ -256,6 +263,37 @@ int NCWin::winId() const
 // we need to up the size of this return here or use a 
 // different type altogether
 	return *((int*)(p_data.get()));
+}
+void NCWin::printColor(const char* str, const char* color){
+
+    WINDOW* win = p_data->p_win;
+//    if(win == NULL)
+//    {
+//    	win = stdscr;
+//    }
+
+    for (; *str != 0; ++str){
+    	int val = *str;
+    	if (*color != 0){
+    		val |= COLOR_PAIR(*color);
+    		++color;
+    	}
+    	waddch(win, val);
+    }
+
+	wrefresh(win);
+
+
+//    attron(COLOR_PAIR(1));
+//    mvwprintw(win, 1, 1, "%s", "HOWDY");
+//    attroff(COLOR_PAIR(1));
+//
+//    waddch(win, '\\');
+//    waddch(win, 'F' | A_UNDERLINE | COLOR_PAIR(1));
+//    waddch(win, 'i' | A_UNDERLINE | COLOR_PAIR(1));
+//    waddch(win, 'l' | A_UNDERLINE | COLOR_PAIR(1));
+//    waddch(win, 'e' | A_UNDERLINE | COLOR_PAIR(1));
+//    waddch(win, '/');
 }
 
 

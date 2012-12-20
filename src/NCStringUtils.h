@@ -11,6 +11,7 @@
 #include <string>
 #include <cmath>
 #include <functional>
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -32,20 +33,21 @@ public:
 	}
 
 	inline static bool splitByLength
-		( const std::string &s
+		( const ncpp::NCString &ncs
 		, const int length
-		, std::function<bool(const std::string &)> func )
+		, std::function<bool(const ncpp::NCString &)> func )
 	{
+		const std::string &s = ncs.getString();
 		if(s.size() < length)
 		{
-			return func(s);
+			return func(ncs);
 		}
 		// else
 		// TODO, change to just integer: q = (x % y) ? x / y + 1 : x / y);
 		const int count = std::ceil(s.size() / double(length));
 		for(int i = 0; i < count; ++i)
 		{
-			if(!func(s.substr(i*length, length)))
+			if(!func(ncs.substr(i*length, length)))
 			{
 				return false;
 			}
