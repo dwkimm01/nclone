@@ -225,8 +225,8 @@ int doit(int argc, char* argv[])
 		// Set of chat windows
 		cfg.p_title = "Chats";
 		cfg.p_h = 33;
-		cfg.p_w = 116; // 72;
-		cfg.p_x = 1;
+		cfg.p_w = 80; // 72;
+		cfg.p_x = 0;
 		cfg.p_y = 3;
 		cfg.p_hasBorder = true;
 		NCWinScrollback win3(&app, cfg);
@@ -526,12 +526,12 @@ int doit(int argc, char* argv[])
 						if(ncs)
 						{
 							const int max = ncs->getConfig().p_h;
-							for(unsigned int i = 0; i < max*5; ++i)
+							for(int i = 1; i < max*5; ++i)
 							{
 								std::string sToPrint;
-								for(unsigned int j = 1; j < i; ++j)
+								for(int j = 0; j < i; ++j)
 								{
-									sToPrint.push_back( 'a' + (i%26) );
+									sToPrint.push_back( 'a' + ((i-1)%26) );
 								}
 								ncs->append(">> " + sToPrint);
 							}
