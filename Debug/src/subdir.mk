@@ -10,6 +10,7 @@ CPP_SRCS += \
 ../src/NCEnvironmentVariables.cpp \
 ../src/NCMain.cpp \
 ../src/NCObject.cpp \
+../src/NCString.cpp \
 ../src/NCTimeUtils.cpp \
 ../src/NCWin.cpp \
 ../src/NCWinBuffer.cpp \
@@ -22,6 +23,7 @@ OBJS += \
 ./src/NCEnvironmentVariables.o \
 ./src/NCMain.o \
 ./src/NCObject.o \
+./src/NCString.o \
 ./src/NCTimeUtils.o \
 ./src/NCWin.o \
 ./src/NCWinBuffer.o \
@@ -34,6 +36,7 @@ CPP_DEPS += \
 ./src/NCEnvironmentVariables.d \
 ./src/NCMain.d \
 ./src/NCObject.d \
+./src/NCString.d \
 ./src/NCTimeUtils.d \
 ./src/NCWin.d \
 ./src/NCWinBuffer.d \
