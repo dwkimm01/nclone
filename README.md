@@ -13,6 +13,7 @@ Text Console Chat Client
 
     Add a indent and this will end up as code
 
+![Settings Window](https://raw.github.com/dwkimm01/nclone/master/screenshots/ncloneDec21.png)
 
 
 
