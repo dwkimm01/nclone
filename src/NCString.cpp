@@ -23,6 +23,11 @@ namespace ncpp{
 		return theString;
 	}
 
+	std::string& NCString::operator()()
+	{
+		return theString;
+	}
+
 	int NCString::getColor() const{
 		return cursesColor;
 	}

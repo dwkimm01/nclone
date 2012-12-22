@@ -27,6 +27,12 @@ public:
 	int size() const;
 
 	const std::string& getString() const;
+
+	// Warning, use this with great care because it could mess up the
+	// color matching with theString - but I had to add this hear to
+	// get boost::make_split_iterator work nicely again
+	std::string& operator()();
+
 	int getColor() const;
 
 	NCString substr(int pos, int length) const;

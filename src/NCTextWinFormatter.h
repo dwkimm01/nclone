@@ -12,6 +12,7 @@
 #include <vector>
 #include <utility>
 #include <boost/algorithm/string.hpp>
+#include "NCString.h"
 
 // ---------------------------------------------------------------------------
 // This isn't in there already?  using namespace boost::algorithm did not help
@@ -60,7 +61,7 @@ private:
 // ---------------------------------------------------------------------------
 // Print a string to a window breaking up the string based on a maxWidth,
 // maxHeight, and an initial offsMajor, offsMinor
-typedef std::function<void(const std::string&)> PrinterType;
+typedef std::function<void(const NCString&)> PrinterType;
 template <typename ForwardIterator>
 void printVec
    ( ForwardIterator begin
@@ -78,10 +79,12 @@ void printVec
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
 	for(ForwardIterator lineItr = begin + std::min((unsigned int)(end - begin), offsMajor); lineItr != end && accum < maxHeight; ++lineItr)
 	{
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < maxHeight; ++subItr)
+		for(auto subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < maxHeight; ++subItr)
 		{
-			offsMinorInit=0;
-			print(boost::copy_range<std::string>(*subItr));
+			offsMinorInit = 0;
+//			print(boost::copy_range<std::string>(*subItr));
+			const std::string val = boost::copy_range<std::string>(*subItr);
+			print(NCString(val, 0));  // TODO, fix color here
 			++accum;
 		}
 	}
@@ -110,7 +113,7 @@ std::pair<unsigned int, unsigned int> getBottom
 		--offsMajor;
 
 		offsMinor = 0;
-		const std::string entry = *lineItr;
+		const auto &entry = *lineItr;
 		const int subLines = (entry.size() > maxWidth) ? (1 + ((entry.size() - 1) / maxWidth)) : (1);
 		accum += subLines;
 
@@ -160,7 +163,7 @@ std::pair<unsigned int, unsigned int> getScrollUp
 		// all at once - well actually use the split iterator and iterate right to the end then calculate
 		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
+		for(auto subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
 		{
 			offsMinorFirst = 0;
 			offsMinor = (--subLines);
@@ -205,7 +208,7 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	{
 		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
-		for(auto subItr = boost::make_split_iterator(*lineItr, LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
+		for(auto subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
 		{
 			offsMinorFirst = 0;
 			offsMinor = (--subLines);
