@@ -18,7 +18,7 @@ NCWinBuffer::NCWinBuffer(const int scrollBack)
 
 NCWinBuffer::~NCWinBuffer() {}
 
-void NCWinBuffer::addRow(const std::string &line, const bool autoScroll)
+void NCWinBuffer::addRow(const ncpp::NCString &line, const bool autoScroll)
 {
 	// Add entry to buffer
 	p_buff.push_back(line);

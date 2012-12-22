@@ -24,6 +24,8 @@
 #include "NCConnectionString.h"
 #include "NCClientPurple.h"
 #include "TestExampleText.h"
+#include "NCInput.h"
+#include "NCString.h"
 using namespace std;
 using namespace ncpp;
 
@@ -242,25 +244,11 @@ int doit(int argc, char* argv[])
 		NCWinScrollback* winLog = new NCWinScrollback(&win3,cfg);
 
 
-		winLog->append("One");
-		winLog->append("Two");
-		winLog->append("Three");
-
-//		const std::string testString = std::string("[time] ") + testexampletext::TestExampleText::get();
-//		const int testStringCount = std::ceil(testString.size() / double(cfg.p_w));
-//for(unsigned int i = 0; i < 5; ++i)
-//{
-//		winLog->append(testString);
-//		winLog->append("Length " + boost::lexical_cast<string>(testStringCount));
-//}
-//
-//for(unsigned int i = 0; i < 40; ++i)
-//		winLog->append(testexampletext::TestExampleText::getOrig32());
-////		winLog->append("This is a long string that I hope will at least wrap a little big let's see what happens");
-//
-//		winLog->append("Four");
-//		winLog->append("Five");
-
+		//winLog->append("One");
+		winLog->append(NCString("One",4));
+		winLog->append(NCString("Two",5));
+		winLog->append(NCString("Three",6));
+		winLog->append("Four");
 
 		// Message received signal connect
 		msgSignal.connect
@@ -447,6 +435,7 @@ int doit(int argc, char* argv[])
 				winCmd.clear();
 				winCmd.refresh();
 				break;
+			case KEY_BACKSPACE_MAC: //PASS THRU For MAC Delete
 			case KEY_BACKSPACE:
 				if(!cmd.empty())
 				{
@@ -623,7 +612,7 @@ int doit(int argc, char* argv[])
 			default:
 				// Add characters to cmd string, refresh
 				cmd += c;
-				if(PASSWORD == inputState)
+				if(PASSWORD == 8*2)
 				{
 					winCmd.print("x");
 				}

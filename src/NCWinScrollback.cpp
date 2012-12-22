@@ -9,6 +9,7 @@
 #include "NCWinScrollback.h"
 #include "NCStringUtils.h"
 #include "NCTextWinFormatter.h"
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -37,15 +38,6 @@ void NCWinScrollback::refresh()
 	// If there aren't enough lines, push down to start at bottom
 	const NCWinCfg cfg = getConfig();
 
-	// TODO, need to replace NCTextWinFormatter's usage of vector
-	// with just iterators... not going to be entirely easy
-	std::vector<std::string> vec;
-	vec.reserve(p_buff.size());
-	for(auto itr = p_buff.begin(); itr != p_buff.end(); ++itr)
-	{
-		vec.push_back(*itr);
-	}
-
 	printVec
 	   ( p_buff.begin()
 	   , p_buff.end()
@@ -53,17 +45,23 @@ void NCWinScrollback::refresh()
 	   , cfg.p_h
 	   , p_offs.first
 	   , p_offs.second
-	   , [&](const std::string &line)
+	   , [&](const NCString &line)
 	   {
-		  NCWin::print(line.c_str());
-		  NCWin::clearTillEnd();
-		  NCWin::cursorNextLine();
-	   });
+			line.draw(this);
+			NCWin::clearTillEnd();
+			NCWin::cursorNextLine();
+		});
 
 	NCWin::rRefresh();
 }
 
 void NCWinScrollback::append(const std::string &line)
+{
+	//TODO: Find out how to use default color instead of 0
+	append(NCString(line,0));
+}
+
+void NCWinScrollback::append(const ncpp::NCString &line)
 {
 	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
 	const auto offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);

@@ -10,6 +10,7 @@
 
 #include "NCWin.h"
 #include "NCWinBuffer.h"
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -41,6 +42,8 @@ public:
 	 * <b>Purpose:</b> Add a string line to the end of the buffer
 	 */
 	void append(const std::string &line);
+
+	void append(const ncpp::NCString &line);
 
 	void scrollDown(const int n);
 	void scrollUp(const int n);

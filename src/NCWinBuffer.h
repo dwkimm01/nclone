@@ -11,6 +11,7 @@
 #include <string>
 #include <functional>
 #include <boost/circular_buffer.hpp>
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -35,12 +36,15 @@ public:
 	/**
 	 * <b>Purpose:</b> Append a row to the buffer
 	 */
-	void addRow(const std::string &line, const bool autoScroll = true);
+	void addRow(const ncpp::NCString &line, const bool autoScroll = true);
 
 	/**
 	 * <b>Purpose:</b> Remove all elements from container
 	 */
 	void clear();
+
+
+	typedef boost::circular_buffer<ncpp::NCString> Container;
 
 	/**
 	 * <b>Purpose:</b> Get the number of entries in the container
@@ -49,7 +53,6 @@ public:
 	int size() const;
 
 	// Iterators
-	typedef boost::circular_buffer<std::string> Container;
 	typedef Container::iterator Iterator;
 	typedef Container::reverse_iterator ReverseIterator;
 

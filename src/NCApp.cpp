@@ -49,32 +49,12 @@ NCApp::NCApp()
     use_default_colors();
     // -1 specifies "default" color, so this will put black over transparent background
     init_pair(1, COLOR_RED, -1); // COLOR_BLACK); // COLOR_BLACK);
-
-#if 0
-    WINDOW* win = 0;
-    if(win == NULL)
-    {
-    	win = stdscr;
-    }
-
-    attron(COLOR_PAIR(1));
-    mvwprintw(win, 1, 1, "%s", "HOWDY");
-    attroff(COLOR_PAIR(1));
-
-    waddch(win, '\\');
-    waddch(win, 'F' | A_UNDERLINE | COLOR_PAIR(1));
-    waddch(win, 'i' | A_UNDERLINE | COLOR_PAIR(1));
-    waddch(win, 'l' | A_UNDERLINE | COLOR_PAIR(1));
-    waddch(win, 'e' | A_UNDERLINE | COLOR_PAIR(1));
-    waddch(win, '/');
-
-
-    ::wrefresh(win);
-#endif
-
-	// TODO, Colors
-	// -------------------------------------------------------------
-
+    init_pair(2, COLOR_GREEN, -1);
+    init_pair(3, COLOR_YELLOW, -1);
+    init_pair(4, COLOR_BLUE, -1);
+    init_pair(5, COLOR_MAGENTA, -1);
+    init_pair(6, COLOR_CYAN, -1);
+    init_pair(7, COLOR_WHITE, -1);
 
 	// Disable line buffering
 	raw();

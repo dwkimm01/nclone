@@ -11,6 +11,7 @@
 #include <memory>
 #include "NCObject.h"
 #include "NCWinCfg.h"
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -48,6 +49,7 @@ public:
 
 	void print(const char* str);
 	void print(const char* str, const int x, const int y);
+	void print(NCString ncStr);
 
 	// Put cursor at the top left position
 	void cursorReset();
@@ -57,6 +59,8 @@ public:
 	void putChar(const char c, const int x, const int y);
 
 	int winId() const;
+
+	void printColor(const char* str, const char* color);
 
 private:
 	class NCWinData;
