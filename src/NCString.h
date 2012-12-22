@@ -33,6 +33,9 @@ public:
 	// get boost::make_split_iterator work nicely again
 	std::string& operator()();
 
+	// Create an NCString based on a substring
+	NCString extract(const std::string &s);
+
 	int getColor() const;
 
 	NCString substr(int pos, int length) const;

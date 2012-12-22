@@ -245,10 +245,12 @@ int doit(int argc, char* argv[])
 
 
 		//winLog->append("One");
-		winLog->append(NCString("One",4));
-		winLog->append(NCString("Two",5));
-		winLog->append(NCString("Three",6));
-		winLog->append("Four");
+		winLog->append(NCString("One",1));
+		winLog->append(NCString("Two",2));
+		winLog->append(NCString("Three",3));
+		winLog->append(NCString("Four", 4));
+		winLog->append(NCString("Five", 5));
+		winLog->append(NCString("Six", 6));
 
 		// Message received signal connect
 		msgSignal.connect

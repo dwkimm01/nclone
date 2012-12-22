@@ -84,7 +84,10 @@ void printVec
 			offsMinorInit = 0;
 //			print(boost::copy_range<std::string>(*subItr));
 			const std::string val = boost::copy_range<std::string>(*subItr);
-			print(NCString(val, 0));  // TODO, fix color here
+
+            // TODO, fix color here - or actually in NCString.cpp now
+			// if it's even possible to fix it there.
+			print(lineItr->extract(val));
 			++accum;
 		}
 	}

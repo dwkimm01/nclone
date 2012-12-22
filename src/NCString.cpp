@@ -28,6 +28,12 @@ namespace ncpp{
 		return theString;
 	}
 
+	NCString NCString::extract(const std::string &s)
+	{
+		return NCString(s, cursesColor);
+	}
+
+
 	int NCString::getColor() const{
 		return cursesColor;
 	}
