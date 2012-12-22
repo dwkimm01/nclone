@@ -87,7 +87,15 @@ void printVec
 
             // TODO, fix color here - or actually in NCString.cpp now
 			// if it's even possible to fix it there.
-			print(lineItr->extract(val));
+//			boost::iterator_range<std::string::iterator> xyz = *subItr;
+//			std::string::iterator beg = xyz.begin();
+//			beg - (*lineItr).begin();
+//			boost::iterator_range<std::string::iterator> beg((*lineItr)());
+//			xyz - xyz.begin();
+//			lineItr->sub(boost::begin(subItr), boost::end(subItr));
+
+//			print(lineItr->extract(val));
+			print(lineItr->substr( (*subItr).begin(), (*subItr).end() ));
 			++accum;
 		}
 	}

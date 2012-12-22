@@ -15,11 +15,17 @@ namespace ncpp{
 // Forward declarations
 class NCWin;
 
-class NCString{
-
+class NCString
+{
 public:
+	/**
+	 * <b>Purpose:</b> CTOR
+	 */
 	NCString(const std::string& pString, const int pColor);
 
+	/**
+	 * <b>Purpose:</b> DTOR
+	 */
 	~NCString();
 
 	void draw(NCWin* win) const;
@@ -29,25 +35,18 @@ public:
 	const std::string& getString() const;
 
 	// Warning, use this with great care because it could mess up the
-	// color matching with theString - but I had to add this hear to
+	// color matching with theString - but I had to add this here to
 	// get boost::make_split_iterator work nicely again
 	std::string& operator()();
 
 	// Create an NCString based on a substring
-	NCString extract(const std::string &s);
-
-	int getColor() const;
-
-	NCString substr(int pos, int length) const;
+	NCString substr(std::string::iterator begin, std::string::iterator end);
 
 private:
 	std::string theString;
-	int cursesColor;
-
-
+	std::string colorString;
 
 };
-
 
 }  //end ncpp
 

@@ -26,9 +26,17 @@
 #include "TestExampleText.h"
 #include "NCInput.h"
 #include "NCString.h"
+#include "NCException.h"
 using namespace std;
 using namespace ncpp;
 
+
+std::string SWAPNAME(const std::string &name)
+{
+	std::string r(name);
+	boost::replace_all(r, "davidwkimmel", "REDACTED");
+	return r;
+}
 
 /**
 keys that naim supported
@@ -260,12 +268,8 @@ int doit(int argc, char* argv[])
 						[&](const std::string &s, const std::string &t)
 						{
 							const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
+							const std::string line = nMsg + SWAPNAME(s) + " " + t;
 
-							const std::string line = nMsg + s + " " + t;
-
-//							win3c.append(line.c_str());
-//							NCWinScrollback win3a(&win3, cfg);
-//							win3.
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
 							win3.forEachChild([&](NCObject* o)
@@ -273,7 +277,7 @@ int doit(int argc, char* argv[])
 								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
 								if(winMsg && s == winMsg->getConfig().p_title)
 								{
-									winMsg->append(line.c_str());
+									winMsg->append(NCString(line, 2));
 									msgAdded = true;
 									return false;
 								}
@@ -552,7 +556,7 @@ int doit(int argc, char* argv[])
 								client->msgSend(buddyName, cmd);
 							}
 
-							ncs->append(nMsg + "  (to " + buddyName + ")");
+							ncs->append(NCString(nMsg + "  (to " + SWAPNAME(buddyName) + ")", 1));
 							ncs->refresh();
 						}
 						else if(PROTOCOL == inputState)
@@ -608,13 +612,14 @@ int doit(int argc, char* argv[])
 				break;
 			case KEY_RESIZE:
 				// TODO, handle window resizing
-				ncs->append(" Window was resized!");
-				ncs->refresh();
+//				ncs->append(" Window was resized!");
+//				ncs->refresh();
+				app.refresh();
 				break;
 			default:
 				// Add characters to cmd string, refresh
 				cmd += c;
-				if(PASSWORD == 8*2)
+				if(PASSWORD == inputState)
 				{
 					winCmd.print("x");
 				}

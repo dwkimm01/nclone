@@ -8,6 +8,7 @@ CPP_SRCS += \
 ../src/NCClientIf.cpp \
 ../src/NCClientPurple.cpp \
 ../src/NCEnvironmentVariables.cpp \
+../src/NCException.cpp \
 ../src/NCMain.cpp \
 ../src/NCObject.cpp \
 ../src/NCString.cpp \
@@ -21,6 +22,7 @@ OBJS += \
 ./src/NCClientIf.o \
 ./src/NCClientPurple.o \
 ./src/NCEnvironmentVariables.o \
+./src/NCException.o \
 ./src/NCMain.o \
 ./src/NCObject.o \
 ./src/NCString.o \
@@ -34,6 +36,7 @@ CPP_DEPS += \
 ./src/NCClientIf.d \
 ./src/NCClientPurple.d \
 ./src/NCEnvironmentVariables.d \
+./src/NCException.d \
 ./src/NCMain.d \
 ./src/NCObject.d \
 ./src/NCString.d \

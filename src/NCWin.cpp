@@ -57,6 +57,18 @@ public:
 		int y = 0;
 		getyx(p_win, y, x);
 
+
+		// Determine if our size needs fixing
+		int maxH = 0;
+		int maxW = 0;
+		getmaxyx(stdscr, maxH, maxW);
+
+		if( (p_cfg.p_w + p_cfg.p_x) > maxW )
+		{
+			p_cfg.p_w -= (maxW - (p_cfg.p_w + p_cfg.p_x));
+		}
+
+
 //		wclear(p_win);
 
 		// Draw border
@@ -218,7 +230,7 @@ void NCWin::print(const char* str)
 	p_data->print(str);
 }
 
-void NCWin::print(ncpp::NCString ncStr)
+void NCWin::print(const ncpp::NCString &ncStr)
 {
 	//p_data->print(ncStr.getString().c_str());
 	ncStr.draw(this);

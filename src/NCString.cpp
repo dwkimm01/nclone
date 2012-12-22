@@ -6,51 +6,65 @@
  */
 #include "NCString.h"
 #include "NCWin.h"
+#include "NCException.h"
 
+namespace ncpp
+{
 
-namespace ncpp{
-
-	NCString::NCString(const std::string& pString, const int pColor){
-		theString = pString;
-		cursesColor = pColor;
-	}
-
-	NCString::~NCString(){
-
-	}
-
-	const std::string& NCString::getString() const{
-		return theString;
-	}
-
-	std::string& NCString::operator()()
+NCString::NCString(const std::string& pString, const int pColor)
+   : theString(pString)
+{
+	for(unsigned int i = 0; i < theString.size(); ++i)
 	{
-		return theString;
-	}
-
-	NCString NCString::extract(const std::string &s)
-	{
-		return NCString(s, cursesColor);
-	}
-
-
-	int NCString::getColor() const{
-		return cursesColor;
-	}
-
-	int NCString::size() const{
-		return theString.size();
-	}
-
-	NCString NCString::substr(int pos, int length) const{
-		return NCString(theString.substr(pos, length), cursesColor);
-	}
-
-	void NCString::draw(NCWin* win) const{
-		char colors[theString.size()];
-		for(int i = 0; i < theString.size(); i++){
-			colors[i] = cursesColor;
-		}
-		win->printColor(theString.c_str(), colors);
+		// TODO, this is not really working - sign issue?
+//		char c = ((unsigned char)i + (unsigned char)pColor) % 7;
+//		colorString.push_back( c );
+		colorString.push_back(pColor);
 	}
 }
+
+NCString::~NCString()
+{
+}
+
+const std::string& NCString::getString() const
+{
+	return theString;
+}
+
+std::string& NCString::operator()()
+{
+	return theString;
+}
+
+NCString NCString::substr(std::string::iterator begin, std::string::iterator end)
+{
+	const unsigned int offs = begin - theString.begin();
+	const int count = end - begin;
+	if(offs >= colorString.size())
+	{
+		throw ncexception::NCException("Offset greater than color string size", FLINFO);
+	}
+
+	std::string s(begin, end);
+	std::string c(colorString.begin() + offs, colorString.begin() + offs + count);
+
+	if(s.size() != c.size())
+	{
+		throw ncexception::NCException("String and color string size do not match", FLINFO);
+	}
+
+	return NCString(s, c[0]);
+}
+
+int NCString::size() const
+{
+	return theString.size();
+}
+
+void NCString::draw(NCWin* win) const
+{
+	win->printColor(theString.c_str(), colorString.c_str());
+}
+
+} // namespace ncpp

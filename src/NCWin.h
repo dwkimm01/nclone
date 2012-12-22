@@ -49,7 +49,7 @@ public:
 
 	void print(const char* str);
 	void print(const char* str, const int x, const int y);
-	void print(NCString ncStr);
+	void print(const NCString &ncStr);
 
 	// Put cursor at the top left position
 	void cursorReset();
@@ -61,6 +61,7 @@ public:
 	int winId() const;
 
 	void printColor(const char* str, const char* color);
+
 
 private:
 	class NCWinData;
