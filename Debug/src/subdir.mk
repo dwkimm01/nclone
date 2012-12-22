@@ -9,6 +9,8 @@ CPP_SRCS += \
 ../src/NCClientPurple.cpp \
 ../src/NCEnvironmentVariables.cpp \
 ../src/NCException.cpp \
+../src/NCExceptionCurses.cpp \
+../src/NCExceptionOutOfRange.cpp \
 ../src/NCMain.cpp \
 ../src/NCObject.cpp \
 ../src/NCString.cpp \
@@ -23,6 +25,8 @@ OBJS += \
 ./src/NCClientPurple.o \
 ./src/NCEnvironmentVariables.o \
 ./src/NCException.o \
+./src/NCExceptionCurses.o \
+./src/NCExceptionOutOfRange.o \
 ./src/NCMain.o \
 ./src/NCObject.o \
 ./src/NCString.o \
@@ -37,6 +41,8 @@ CPP_DEPS += \
 ./src/NCClientPurple.d \
 ./src/NCEnvironmentVariables.d \
 ./src/NCException.d \
+./src/NCExceptionCurses.d \
+./src/NCExceptionOutOfRange.d \
 ./src/NCMain.d \
 ./src/NCObject.d \
 ./src/NCString.d \

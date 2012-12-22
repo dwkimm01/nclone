@@ -6,7 +6,7 @@
  */
 #include "NCString.h"
 #include "NCWin.h"
-#include "NCException.h"
+#include "NCExceptionOutOfRange.h"
 
 namespace ncpp
 {
@@ -39,11 +39,13 @@ std::string& NCString::operator()()
 
 NCString NCString::substr(std::string::iterator begin, std::string::iterator end)
 {
+	using namespace ncexceptionoutofrange;
+
 	const unsigned int offs = begin - theString.begin();
 	const int count = end - begin;
 	if(offs >= colorString.size())
 	{
-		throw ncexception::NCException("Offset greater than color string size", FLINFO);
+		throw NCExceptionOutOfRange("Offset greater than color string size", FLINFO);
 	}
 
 	std::string s(begin, end);
@@ -51,7 +53,7 @@ NCString NCString::substr(std::string::iterator begin, std::string::iterator end
 
 	if(s.size() != c.size())
 	{
-		throw ncexception::NCException("String and color string size do not match", FLINFO);
+		throw NCExceptionOutOfRange("String and color string size do not match", FLINFO);
 	}
 
 	return NCString(s, c[0]);

@@ -7,6 +7,7 @@
 #include <ncurses.h>
 #include "NCApp.h"
 #include "NCUtils.h"
+#include "NCExceptionCurses.h"
 
 /**
  * *Notes:
@@ -34,14 +35,12 @@ NCApp::NCApp()
 	initscr();
 
 	// -------------------------------------------------------------
-	// TODO, Colors
-//#if 0
     // Turn color on
     if(has_colors() == FALSE)
     {
     	endwin();
     	printf("Your terminal does not support color\n");
-    	throw int(2);  // TODO throw something reasonable
+    	throw ncexceptioncurses::NCExceptionCurses("Your terminal does not support color", FLINFO);
     }
     // Color startup
     start_color();
@@ -62,7 +61,6 @@ NCApp::NCApp()
 	keypad(stdscr, TRUE);
 	// Don't echo characters
 	noecho();
-
 }
 
 NCApp::~NCApp()
@@ -90,7 +88,6 @@ NCApp& NCApp::operator>>(int &c)
 	return *this;
 }
 
-
 int NCApp::maxHeight() const
 {
 	int h = 0;
@@ -107,6 +104,5 @@ int NCApp::maxWidth() const
 	getmaxyx(stdscr, h, w);
 	return w;
 }
-
 
 } // namespace ncpp
