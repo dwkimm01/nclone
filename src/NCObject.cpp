@@ -134,5 +134,4 @@ void NCObject::forEachChild(std::function<bool(NCObject*)> func)
 }
 
 
-
 } // namespace ncpp

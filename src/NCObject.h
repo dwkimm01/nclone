@@ -60,9 +60,9 @@ public:
 
 	/**
 	 * <b>Purpose:</b> Provide way to iterator over all child objects
+	 * TODO, deprecate in favor of begin/end?
 	 */
 	void forEachChild(std::function<bool(NCObject*)> func);
-
 
 protected:
 	// In the future might be nice to pull these out

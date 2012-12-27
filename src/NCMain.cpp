@@ -473,6 +473,7 @@ int doit(int argc, char* argv[])
 						ncs->append("      protocol		username");
 						ncs->append("      prpl-sipe	user@domain.com,domain\\user");
 						ncs->append("      prpl-jabber	user@gmail.com");
+						ncs->append("  /newwin name  create a window named name");
 						ncs->append("  /d1       print debug output");
 						ncs->refresh();
 					}
@@ -515,6 +516,25 @@ int doit(int argc, char* argv[])
 						// Clear top buffer
 						ncs->clear();
 						ncs->refresh();
+					}
+					else if(cmd.find("/newwin") == 0)
+					{
+						typedef boost::split_iterator<std::string::iterator> ItrType;
+				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+				             i != ItrType();
+				             ++i)
+				        {
+				        	// TODO, make sure there isn't a window with that name already?
+				        	const std::string winName = boost::copy_range<std::string>(*i);
+				        	if("/newwin" != winName)
+				        	{
+				        		cfg.p_title = winName;
+				        		ncs->append("Creating new window " + cfg.p_title);
+				        		new NCWinScrollback(&win3, cfg, 50000);
+				        		ncs->refresh();
+				        		// TODO, does this put these new windows on top???
+				        	}
+				        }
 					}
 					else if(cmd == "/d1")
 					{
