@@ -224,13 +224,13 @@ int doit(int argc, char* argv[])
 		NCWin winCmd(&app, cfg);
 
 		// List 2 - buddy list
-		cfg.p_title = "Contacts";
-		cfg.p_h = 23;
-		cfg.p_w = 18;
-		cfg.p_x = app.maxWidth() - cfg.p_w;
-		cfg.p_y = 0;
-		cfg.p_hasBorder = true;
-		NCWin win2(&app, cfg);
+//		cfg.p_title = "Contacts";
+//		cfg.p_h = 23;
+//		cfg.p_w = 18;
+//		cfg.p_x = app.maxWidth() - cfg.p_w;
+//		cfg.p_y = 0;
+//		cfg.p_hasBorder = true;
+//		NCWin win2(&app, cfg);
 
 		// Set of chat windows
 		cfg.p_title = "Chats";
@@ -530,9 +530,10 @@ int doit(int argc, char* argv[])
 				        	{
 				        		cfg.p_title = winName;
 				        		ncs->append("Creating new window " + cfg.p_title);
-				        		new NCWinScrollback(&win3, cfg, 50000);
+				        		auto myNewWin = new NCWinScrollback(&win3, cfg, 50000);
 				        		ncs->refresh();
-				        		// TODO, does this put these new windows on top???
+				        		myNewWin->append("Opened win " + cfg.p_title);
+				        		win3.refresh();
 				        	}
 				        }
 					}

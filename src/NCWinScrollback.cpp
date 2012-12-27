@@ -28,7 +28,7 @@ void NCWinScrollback::refresh()
 	// Clear
 	NCWin::clear();
 
-	// Refresh parent (while will refresh any child objects)
+	// Refresh parent (refresh any child objects)
 	NCWin::refresh();
 
 	// Reset our cursor position
@@ -57,7 +57,7 @@ void NCWinScrollback::refresh()
 
 void NCWinScrollback::append(const std::string &line)
 {
-	//TODO: Find out how to use default color instead of 0
+	// TODO: Find out how to use a default color instead of 0
 	append(NCString(line,0));
 }
 
@@ -124,6 +124,5 @@ void NCWinScrollback::clear()
 //  This might be different for other windows but for the
 //  chat window that's what we want
 // So maybe the best approach is to calculate from the bottom up?
-
 
 } // namespace ncpp

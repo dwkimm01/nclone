@@ -111,8 +111,12 @@ Run notes
 --------------
 - Note for sipe you still have to add this to your run command
     NSS_SSL_CBC_RANDOM_IV=0 ./hw
-- Or set it in your environment export NSS_SSL_CBC_RANDOM_IV=0 for it to connect
-
+ - Or set it in your environment export NSS_SSL_CBC_RANDOM_IV=0 for it to connect
+- Eclipse debugging
+ - Allow less secure attaching to non-child process
+    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+ - Set back to more secure setting 
+    echo 1 | sudo tee /proc/sys/kernel/yama/ptrace_scope
 
 Components to build
 --------------

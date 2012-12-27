@@ -65,7 +65,17 @@ public:
 
 		if( (p_cfg.p_w + p_cfg.p_x) > maxW )
 		{
-			p_cfg.p_w -= (maxW - (p_cfg.p_w + p_cfg.p_x));
+			const unsigned int delta = ((p_cfg.p_w + p_cfg.p_x) - maxW);
+			p_cfg.p_w -= delta;
+			if(x > delta)
+			{
+				x -= delta;
+			}
+			else
+			{
+				x = 1;
+			}
+
 		}
 
 
@@ -91,7 +101,6 @@ public:
 		wmove(p_win, y, x);
 
 		wrefresh(p_win);
-
 	}
 
 	void rRefresh()
