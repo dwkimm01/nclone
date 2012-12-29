@@ -10,7 +10,8 @@
 
 #include <string>
 
-namespace ncpp{
+namespace ncpp
+{
 
 // Forward declarations
 class NCWin;
@@ -30,7 +31,7 @@ public:
 
 	void draw(NCWin* win) const;
 
-	int size() const;
+	std::string::size_type size() const;
 
 	const std::string& getString() const;
 
@@ -48,6 +49,6 @@ private:
 
 };
 
-}  //end ncpp
+}  // namespace ncpp
 
 #endif // NCSTRING_H_

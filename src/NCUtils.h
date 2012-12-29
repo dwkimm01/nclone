@@ -14,10 +14,12 @@ namespace ncpp
 namespace ncutils
 {
 
+/**
+ * <b>Purpose:</b> Prevent compilation complaints
+ * int var;
+ * UNUSED(var);
+ */
 #define UNUSED(x) ((void)(x))
-
-//int var;
-//UNUSED(var);
 
 } // namespace ncutils
 

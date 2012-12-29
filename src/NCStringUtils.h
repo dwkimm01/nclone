@@ -25,11 +25,7 @@ public:
 
 	inline static std::string nullIsEmpty(const char* cstr)
 	{
-		if(cstr)
-		{
-			return std::string(cstr);
-		}
-		return std::string();
+		return std::string( (cstr)?(cstr):("") );
 	}
 
 };

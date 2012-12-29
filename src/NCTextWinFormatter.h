@@ -114,20 +114,19 @@ std::pair<unsigned int, unsigned int> getBottom
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
 
 	unsigned int accum = 0;
-	unsigned int offsMajor = end - begin; // vec.size();
+	unsigned int offsMajor = end - begin;
 	unsigned int offsMinor = 0;
 
-	// Reverse
-//	for(auto lineItr = vec.rbegin(); lineItr != vec.rend() && accum < maxHeight; ++lineItr)
+	// Reversed already, start at begin and continue till maxHeight filled
 	for(auto lineItr = begin; lineItr != end && accum < maxHeight; ++lineItr)
 	{
+		// Keep track of how far we have gone
 		--offsMajor;
-
+		// Each new entry restarts the sub line (split) iterator
 		offsMinor = 0;
 		const auto &entry = *lineItr;
-		const int subLines = (entry.size() > maxWidth) ? (1 + ((entry.size() - 1) / maxWidth)) : (1);
+		const auto subLines = (entry.size() > maxWidth) ? (1 + ((entry.size() - 1) / maxWidth)) : (1);
 		accum += subLines;
-
 		if(accum > maxHeight) offsMinor += (accum - maxHeight);
 	}
 

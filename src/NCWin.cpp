@@ -58,14 +58,16 @@ public:
 		getyx(p_win, y, x);
 
 
+		// TODO, need to make this configurable
 		// Determine if our size needs fixing
 		int maxH = 0;
+		UNUSED(maxH);
 		int maxW = 0;
 		getmaxyx(stdscr, maxH, maxW);
 
 		if( (p_cfg.p_w + p_cfg.p_x) > maxW )
 		{
-			const unsigned int delta = ((p_cfg.p_w + p_cfg.p_x) - maxW);
+			const int delta = ((p_cfg.p_w + p_cfg.p_x) - maxW);
 			p_cfg.p_w -= delta;
 			if(x > delta)
 			{
@@ -180,7 +182,36 @@ public:
 		wmove(p_win, cy, cx);
 	}
 
-	WINDOW* p_win;
+
+	void printColor(const char* str, const char* color)
+	{
+	//    if(win == NULL)
+	//    {
+	//    	win = stdscr;
+	//    }
+
+	    for (; *str != 0; ++str){
+	    	int val = *str;
+	    	if (*color != 0){
+	    		val |= COLOR_PAIR(*color);
+	    		++color;
+	    	}
+	    	waddch(p_win, val);
+	    }
+
+//		wrefresh(p_win);
+
+	//    attron(COLOR_PAIR(1));
+	//    mvwprintw(win, 1, 1, "%s", "HOWDY");
+	//    attroff(COLOR_PAIR(1));
+	//
+	//    waddch(win, '\\');
+	//    waddch(win, 'F' | A_UNDERLINE | COLOR_PAIR(1));
+	//    waddch(win, 'i' | A_UNDERLINE | COLOR_PAIR(1));
+	//    waddch(win, 'l' | A_UNDERLINE | COLOR_PAIR(1));
+	//    waddch(win, 'e' | A_UNDERLINE | COLOR_PAIR(1));
+	//    waddch(win, '/');
+	}
 
 
 private:
@@ -191,7 +222,7 @@ private:
 //	bool p_hasBorder;
 //	std::string p_title;
 	NCWinCfg p_cfg;
-
+	WINDOW* p_win;
 
 };
 
@@ -285,36 +316,11 @@ int NCWin::winId() const
 // different type altogether
 	return *((int*)(p_data.get()));
 }
-void NCWin::printColor(const char* str, const char* color){
-
-    WINDOW* win = p_data->p_win;
-//    if(win == NULL)
-//    {
-//    	win = stdscr;
-//    }
-
-    for (; *str != 0; ++str){
-    	int val = *str;
-    	if (*color != 0){
-    		val |= COLOR_PAIR(*color);
-    		++color;
-    	}
-    	waddch(win, val);
-    }
-
-	wrefresh(win);
 
 
-//    attron(COLOR_PAIR(1));
-//    mvwprintw(win, 1, 1, "%s", "HOWDY");
-//    attroff(COLOR_PAIR(1));
-//
-//    waddch(win, '\\');
-//    waddch(win, 'F' | A_UNDERLINE | COLOR_PAIR(1));
-//    waddch(win, 'i' | A_UNDERLINE | COLOR_PAIR(1));
-//    waddch(win, 'l' | A_UNDERLINE | COLOR_PAIR(1));
-//    waddch(win, 'e' | A_UNDERLINE | COLOR_PAIR(1));
-//    waddch(win, '/');
+void NCWin::printColor(const char* str, const char* color)
+{
+	p_data->printColor(str, color);
 }
 
 

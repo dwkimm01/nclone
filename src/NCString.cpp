@@ -59,7 +59,7 @@ NCString NCString::substr(std::string::iterator begin, std::string::iterator end
 	return NCString(s, c[0]);
 }
 
-int NCString::size() const
+std::string::size_type NCString::size() const
 {
 	return theString.size();
 }
