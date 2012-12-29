@@ -12,18 +12,31 @@ Text Console Chat Client
 
 Next up (TODO list)
 --------------
+- Get refresh for resize working
 - Improvement: push text down in window at beginning when window not full
+- Upgrade: text wrapping to mind spaces
+- Get color settings working for msgs, timestamps, etc
+- Window background color
 - Start command line parsing 
+ - Text entry line wrapping
+ - Text entry line editing with cursor/arrow keys
+ - Text entry history, ctrl-r search
+- Status bar
 - Decide on license (GPL for libpurple)
 - Cleanup headers and footers, add license
+- Buddy list window
+- Drop down console window
 - Split into modules:
  - Utils
  - Ncurses
  - System
-- Cleanup code
+-Cleanup
+ - take out unused code
+ - fix refresh vs draw vs rRefresh
+ - comments and code documentation
 - Get into version control (GIT)
 - Put online (Google Code or Sourceforge)
-- Fix diplaying lines that wrap in the view window
+- Fix displaying lines that wrap in the view window
 - Fix editing lines that wrap in the command window
 - Test out keyboard layout for Mac
 - Improve build scripts, use autotools
@@ -40,7 +53,7 @@ Next up (TODO list)
 - Char 8 bit
  - int 32/64 bit 8 chars could stuff a color attr per each char
  - look at ncurses.h also has a "pad" full window type.
-
+- Configuration type system
 
 Research list
 --------------
