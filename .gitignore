@@ -3,15 +3,20 @@
 *.lo
 *.o
 
-# Compiled Dynamic libraries
+# Dynamic libraries
 *.so
 *.dylib
 
-# Compiled Static libraries
+# Static libraries
 *.lai
 *.la
 *.a
 
+# Binary files
 Debug/*
 *.d
+
+# Swap files
+*.swp
 *~
+

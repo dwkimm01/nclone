@@ -12,46 +12,43 @@ Text Console Chat Client
 
 Next up (TODO list)
 --------------
-- Get refresh for resize working
+- Make windows resize and refresh properly based on terminal size
 - Improvement: push text down in window at beginning when window not full
 - Upgrade: text wrapping to mind spaces
+- Wrap NCString with Msg with additional enum (INFO, MSG, WARNING, etc) to help aid color coding
 - Get color settings working for msgs, timestamps, etc
+ - Char is only 8 bits we could
+ - int 32/64 bit 8 chars could stuff a color attr per each char
+ - would require more parsing routines
 - Window background color
 - Start command line parsing 
  - Text entry line wrapping
  - Text entry line editing with cursor/arrow keys
- - Text entry history, ctrl-r search
+ - Text entry history, CTRL-r search
 - Status bar
 - Decide on license (GPL for libpurple)
-- Cleanup headers and footers, add license
 - Buddy list window
 - Drop down console window
 - Split into modules:
  - Utils
  - Ncurses
  - System
--Cleanup
+- Cleanup
+ - Add headers, footers, license
  - take out unused code
  - fix refresh vs draw vs rRefresh
  - comments and code documentation
-- Get into version control (GIT)
-- Put online (Google Code or Sourceforge)
-- Fix displaying lines that wrap in the view window
+ - Change .h to .hh
 - Fix editing lines that wrap in the command window
-- Test out keyboard layout for Mac
-- Improve build scripts, use autotools
+- Fix keyboard layout for Mac
+- Improve build scripts, use autotools to configure build
 - Need some feature requirement type things...
  - Command completion like bash: up for last command
  - Command completion like web browser/naim: auto-completes while type and leaves the auto-completed portion to the right of the text cursor in a slightly greyed out state
 - Future functionality: string handling routines such as right justify, pad with spaces/zeroes, fill line to (with dashes)
-- Change .h to .hh
 - Make chats full screen
-- Make windows respond to resize signal
 - Take away chat window border
 - Get "OK" input from user for cert problems
-- Use autotools to configure build
-- Char 8 bit
- - int 32/64 bit 8 chars could stuff a color attr per each char
  - look at ncurses.h also has a "pad" full window type.
 - Configuration type system
 
