@@ -52,10 +52,13 @@ Next up (TODO list)
  - look at ncurses.h also has a "pad" full window type.
 - Configuration type system
 
+
 Research list
 --------------
+- In case I want help wrapping lines: http://people.sc.fsu.edu/~jburkardt/cpp_src/wrap2/wrap2.html
 - Overview
- - Google coding standards
+ - Google coding standards (style guide) http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
+ - Fast Streams: https://groups.google.com/forum/?fromgroups=#!topic/perfo/QmCHANgr_V8
  - More of a stream "editor" / viewer
  - Plugin for everything: like regex for reverse search through conversations and cmd hist
  - Encryption, automatic message queueing, incoming message modification (spellings mistakes, /filter)
@@ -105,8 +108,8 @@ Research list
     │ection: ltr">balls</DIV>   
 - There is a PurpleConnectionFlags enum that has PURPLE_CONNECTION_HTML to not that we need to decode HTML
 - ncurses, BOOST, libpurple, pidgin-sipe, gcc 4.7 -> OSX, Windows?
-
-
+- Collection Oriented Programming??  http://c2.com/cgi/wiki?CollectionOrientedProgramming
+- Iterator Reverse: http://searchco.de/codesearch/view/16979256
  
 
 Build notes
@@ -127,6 +130,7 @@ Run notes
     echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
  - Set back to more secure setting 
     echo 1 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+
 
 Components to build
 --------------
@@ -197,17 +201,22 @@ Use Cases
  should be made
 - Automatically retry a connection
 
+Look and Feel
+--------------
+What about windows with title on bottom?  (Title should be underlined)i
 
-
-
+<pre>
     |
     |
     |
     |        _____________
     \ David / 
+</pre>
 
 
-
+Random Code Sample that needs cleanup?
+--------------
+<pre>
     // Indented lines format code
     msgSignal.connect
         ( boost::bind<void>
@@ -248,3 +257,4 @@ Use Cases
         )
         , _1
 
+</pre>

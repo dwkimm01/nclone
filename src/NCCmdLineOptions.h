@@ -20,7 +20,9 @@ namespace ncpp
 namespace nccmdlineoptions
 {
 
-// Used with action_map
+/**
+ * <b>Purpose:</b> Used with action_map
+ */
 struct type_info_compare
 {
      bool operator () ( const ::std::type_info* lhs ,
@@ -28,10 +30,12 @@ struct type_info_compare
      {
          return lhs->before( * rhs ) ;
      }
-} ;
+};
 
 
-
+/**
+ * <b>Purpose:</b> Parse command line options
+ */
 class NCCmdLineOptions
 {
 public:
@@ -84,8 +88,7 @@ public:
 		}
 		catch(const std::exception &e)
 		{
-			// TODO, use cerr instead?
-			std::cout << "Exception parsing command line: " << e.what() << std::endl;
+			std::cerr << "Exception parsing command line: " << e.what() << std::endl;
 			p_shouldExit = true;
 		}
 	}

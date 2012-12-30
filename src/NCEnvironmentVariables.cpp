@@ -28,14 +28,7 @@ void NCEnvironmentVariables::setEnv(const std::string &var, const std::string &v
 
 bool NCEnvironmentVariables::isSet(const std::string &var)
 {
-	const char* c = std::getenv(var.c_str());
-
-	if(c)
-	{
-		return true;
-	}
-
-	return false;
+	return (0 != std::getenv(var.c_str()));
 }
 
 } // namespace ncenvironmentvariables
