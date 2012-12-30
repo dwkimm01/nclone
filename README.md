@@ -110,7 +110,7 @@ Research list
 - ncurses, BOOST, libpurple, pidgin-sipe, gcc 4.7 -> OSX, Windows?
 - Collection Oriented Programming??  http://c2.com/cgi/wiki?CollectionOrientedProgramming
 - Iterator Reverse: http://searchco.de/codesearch/view/16979256
- 
+- "Iterators Must Go" Range: Chain, Zip, Stride, Radial,  
 
 Build notes
 --------------
@@ -213,6 +213,10 @@ What about windows with title on bottom?  (Title should be underlined)i
     \ David / 
 </pre>
 
+
+Notes
+--------------
+GitHub Markup formatting: http://github.github.com/github-flavored-markdown/sample_content.html
 
 Random Code Sample that needs cleanup?
 --------------
