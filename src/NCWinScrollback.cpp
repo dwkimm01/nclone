@@ -77,25 +77,25 @@ void NCWinScrollback::append(const ncpp::NCString &line)
 
 void NCWinScrollback::scrollDown(const int n)
 {
-	p_offs = getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n+2, p_offs);
+	p_offs = getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
 //	p_buff.addRow("<DW> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
 void NCWinScrollback::scrollUp(const int n)
 {
-	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n+2, p_offs);
+	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
 //	p_buff.addRow("<UP> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
 void NCWinScrollback::pageDown()
 {
-	const int pageSize = getConfig().p_h-3;
+	const int pageSize = getConfig().p_h-1;
 	scrollDown(pageSize);
 }
 
 void NCWinScrollback::pageUp()
 {
-	const int pageSize = getConfig().p_h-3;
+	const int pageSize = getConfig().p_h-1;
 	scrollUp(pageSize);
 }
 

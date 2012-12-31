@@ -12,6 +12,8 @@
 #include <cmath>
 #include <functional>
 #include <boost/range.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "NCString.h"
 
 namespace ncpp
@@ -26,6 +28,13 @@ public:
 	inline static std::string nullIsEmpty(const char* cstr)
 	{
 		return std::string( (cstr)?(cstr):("") );
+	}
+
+	inline static std::string replace(const std::string &text, const std::string &find, const std::string &replacement)
+	{
+		std::string r(text);
+		boost::replace_all(r, find, replacement);
+		return r;
 	}
 
 };

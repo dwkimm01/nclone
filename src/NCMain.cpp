@@ -31,165 +31,17 @@ using namespace std;
 using namespace ncpp;
 
 
-std::string SWAPNAME(const std::string &name)
-{
-	std::string r(name);
-	boost::replace_all(r, "davidwkimmel", "REDACTED");
-	return r;
-}
 
-/**
-keys that naim supported
- HOME, ALT-TAB, SHIFT-TAB: cycle backwards through buddy list
- Typing:
-        loadkeys -d
-        keycode 15 = Tab Tab
-        alt keycode 15 = Meta_Tab
-        shift keycode 15 = F26
-        string F26 ="\033[Z"
-
-INSERT, DELETE: switch between connections
- */
-#if 0
-int doit(int argc, char* argv[])
-{
-	PrinterType print = [](const std::string &s) { cout << "   {{" << s << "}}" << endl; };
-	vector<string> vec = { "This is a sample string", "Here is the second line", "Third line", "Getting lazy now", "Adding another line", "Really?", "4", "3", "2", "1" };
-
-
-	/** at maxwidth 10, maxheight 4
-
-{{This is a }}
-{{sample str}}
-{{ing}}
-{{Here is th}}
-{{e second l}}
-{{ine}}   <--   bottom of 10x4::  major 2, 3 -> 1, 2
-{{Third line}}
-{{Getting la}}
-{{zy now}}
-
-	 */
-
-	// Window limits: width x height
-	const unsigned int MAXHEIGHT = 4;
-	const unsigned int MAXWIDTH = 10;
-
-	const int offsMajor = 0;
-	const int offsMinor = 0;
-
-	cout << endl << "ENTIRE BUFFER" << endl;
-	printVec(vec, MAXWIDTH, 200, offsMajor, offsMinor, print);
-#endif
-
-#if 0
-	printVec
-	   ( vec
-	   , MAXWIDTH
-	   , MAXHEIGHT
-	   , offsMajor
-	   , offsMinor
-	   , print );
-
-
-	cout << endl;
-	// BOTTOM / END
-	auto b = getBottom(vec, MAXWIDTH, MAXHEIGHT);
-	cout << "Bottom = " << b.first << ", " << b.second << endl << endl;
-
-	printVec
-	   ( vec
-	   , MAXWIDTH
-	   , MAXHEIGHT
-	   , b.first
-	   , b.second
-	   , print );
-
-	// TOP / HOME
-	b = getTop(vec);
-	cout << endl << "Top = " << b.first << ", " << b.second << endl;
-	printVec
-		   ( vec
-		   , MAXWIDTH
-		   , MAXHEIGHT
-		   , b.first
-		   , b.second
-		   , print );
-
-#endif
-
-#if 0
-	auto a = getBottom(vec, MAXWIDTH, MAXHEIGHT);
-	auto b = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, 3, a);
-	cout << "BOTTOM WINDOW VEC (-3) " << b.first << ", " << b.second << endl;
-	printVec(vec, MAXWIDTH, MAXHEIGHT, b.first, b.second, print);
-
-
-int x = 0;
-while(x != -999)
-{
-	// Page Down
-	cin >> x;
-	const int LINESUP = x;
-	if(LINESUP > 0)
-	{
-		auto pageUpLine = getScrollUp(vec, MAXWIDTH, MAXHEIGHT, LINESUP, b);
-		cout << endl << "ScrollUp " << LINESUP << " = " << pageUpLine.first << ", " << pageUpLine.second << endl;
-		printVec(vec, MAXWIDTH, MAXHEIGHT, pageUpLine.first, pageUpLine.second, print);
-
-	}
-	else
-	{
-		auto pageDownLine = getScrollDown(vec, MAXWIDTH, MAXHEIGHT, 0-LINESUP, b);
-		cout << endl << "ScrollDown " << 0-LINESUP << " = " << pageDownLine.first << ", " << pageDownLine.second << endl;
-		printVec(vec, MAXWIDTH, MAXHEIGHT, pageDownLine.first, pageDownLine.second, print);
-	}
-}
-#endif
-
-	// Page Up
-//	auto pageUpLine = getScrollDown(vec, MAXWIDTH, MAXHEIGHT, 1, pageDownLine);
-//	cout << endl << "Up one = " << pageUpLine.first << ", " << pageUpLine.second << endl;
-//	printVec(vec, MAXWIDTH, MAXHEIGHT, pageUpLine.first, pageUpLine.second, print);
-
-
-
-	// Follow newly added line (if bigger than screen just stay at the bottom and cutoff top - edge edge case)
-	// Page Up - top line on screen becomes bottom line, everything else shifts accordingly
-	// Page Down - bottom line on screen becomes top line, everything else shifts accordingly
-	// Resize ... bottom line stays at bottom
-
-#if 0
-	return 0;
-}
-#endif
-
-
-
-//template<typename T, typename U>
-//void DYNCAST()
-
-#if 0
-// TODO, test code take out at some point
-void fillWin(NCObject* obj)
-{
-	NCWinScrollback* w = dynamic_cast<NCWinScrollback*>(obj);
-	if(w)
-	{
-		const NCWinCfg cfg = w->getConfig();
-		w->append(  (cfg.p_title ) ); // + " " + boost::lexical_cast<std::string>(i) ).c_str());
-		for(int i = 0; i < 100; ++i)
-		{
-			std::string tmp = boost::lexical_cast<std::string>(i) + " ";
-			for(int i = 0; cfg.p_w-2; ++i)
-			{
-				tmp += "x";
-			}
-			w->append(tmp);
-		}
-	}
-}
-#endif
+//keys that naim supported
+// HOME, ALT-TAB, SHIFT-TAB: cycle backwards through buddy list
+// Typing:
+//        loadkeys -d
+//        keycode 15 = Tab Tab
+//        alt keycode 15 = Meta_Tab
+//        shift keycode 15 = F26
+//        string F26 ="\033[Z"
+//
+//INSERT, DELETE: switch between connections
 
 
 // Main method
@@ -197,7 +49,6 @@ int doit(int argc, char* argv[])
 {
 	// Scope for NCApp
 	{
-
 		// Parse command line options
 		nccmdlineoptions::NCCmdLineOptions progArgs(argc, argv);
 		if(progArgs.shouldExit()) return 0;
@@ -206,14 +57,13 @@ int doit(int argc, char* argv[])
 		// Signals connects client APIs to windows/backend
 		boost::signal<void(const std::string&, const std::string&)> msgSignal;
 
-
 		// Start up application
 		NCApp app;
 
 		// Config used to give settings to all of the windows
 		NCWinCfg cfg;
 
-		// Command line
+		// Command window
 		cfg.p_title = "Command";
 		cfg.p_hasBorder = false;
 		cfg.p_h = 3;
@@ -269,7 +119,7 @@ int doit(int argc, char* argv[])
 						{
 							const int incomingMsgColor = 2;
 							const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
-							const std::string line = nMsg + SWAPNAME(s) + " " + t;
+							const std::string line = nMsg + s + " " + t;
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
@@ -293,13 +143,12 @@ int doit(int argc, char* argv[])
 								addedWin->append(NCString(line, incomingMsgColor));
 							}
 
-
 							// Refresh the top window to see newly added text
 							// if we are the top window yaay
 							// TODO, do we want to just skip this if we're not on top?
-							NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
-							if(ncs) ncs->refresh();
-							// put cursor back to cmd window
+							auto nObj = win3.getTop();
+							if(nObj) nObj->refresh();
+							// Put cursor back to cmd window
 							winCmd.refresh();
 						}
 					)
@@ -307,7 +156,6 @@ int doit(int argc, char* argv[])
 				, _2
 				)
 			);
-
 
 
 		// Client map: string name of connection
@@ -366,31 +214,11 @@ int doit(int argc, char* argv[])
 			// Get user input
 			int c = 0;
 			app >> c;
+			// Uncomment this to show what the numeric values of each keystroke are
 //			std::string tmp;
 //			tmp.push_back(c);
 //			app << "char(" << tmp.c_str() << ")";
 //			app << "char(" << boost::lexical_cast<std::string>((int)c).c_str() << ") ";
-
-/*
-			const int cInt = c;
-			const std::string cStr = boost::lexical_cast<std::string>(cInt);
-			app << "CHAR(" << cStr.c_str() << ")";
-
-			if('a' == c)
-			{
-				NCWinScrollback* topWin = dynamic_cast<NCWinScrollback*>(win3.getTop());
-				if(topWin)
-				{
-					topWin->append("A NEW CHAR A");
-//					app.refresh();
-					topWin->putChar('X', 1, 1);
-					topWin->refresh();
-				}
-//				win.print("MY NEW CHARS");
-//				app.refresh();
-//				win.refresh();
-			}
-*/
 
 
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
@@ -442,21 +270,24 @@ int doit(int argc, char* argv[])
 				winCmd.clear();
 				winCmd.refresh();
 				break;
-			case KEY_BACKSPACE_MAC: //PASS THRU For MAC Delete
+			case KEY_BACKSPACE_MAC: // PASS THRU For MAC Delete
 			case KEY_BACKSPACE:
 				if(!cmd.empty())
 				{
 					cmd.erase(cmd.end() - 1);
 					winCmd.clear();
-					winCmd.print(cmd.c_str());
+					if(PASSWORD == inputState)
+					{
+						// If this is a password print x's instead
+						std::for_each(cmd.begin(), cmd.end(), [&](const char ) { winCmd.print("x"); } );
+					}
+					else
+					{
+						winCmd.print(cmd.c_str());
+					}
 					winCmd.refresh();
 				}
 				break;
-//			case '1':
-//				static int x = 0;
-//				ncs->append( boost::lexical_cast<std::string>(++x));
-//				ncs->refresh();
-//				break;
 			case 10:
 			case KEY_ENTER:
 				if(!cmd.empty())
@@ -617,7 +448,7 @@ int doit(int argc, char* argv[])
 								client->msgSend(buddyName, cmd);
 							}
 
-							ncs->append(NCString(nMsg + "  (to " + SWAPNAME(buddyName) + ")", 1));
+							ncs->append(NCString(nMsg + "  (to " + buddyName + ")", 1));
 							ncs->refresh();
 						}
 						else if(PROTOCOL == inputState)
@@ -672,9 +503,6 @@ int doit(int argc, char* argv[])
 				// TODO, find next window with update we want to see
 				break;
 			case KEY_RESIZE:
-				// TODO, handle window resizing
-//				ncs->append(" Window was resized!");
-//				ncs->refresh();
 				app.refresh();
 				break;
 			default:
