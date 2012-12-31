@@ -43,7 +43,7 @@ NCString NCString::substr(std::string::iterator begin, std::string::iterator end
 
 	const unsigned int offs = begin - theString.begin();
 	const int count = end - begin;
-	if(offs >= colorString.size())
+	if(offs > colorString.size())
 	{
 		throw NCExceptionOutOfRange("Offset greater than color string size", FLINFO);
 	}
@@ -64,7 +64,7 @@ std::string::size_type NCString::size() const
 	return theString.size();
 }
 
-void NCString::draw(NCWin* win) const
+void NCString::draw(ncwin::NCWin* win) const
 {
 	win->printColor(theString.c_str(), colorString.c_str());
 }

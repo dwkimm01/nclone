@@ -14,7 +14,10 @@ namespace ncpp
 {
 
 // Forward declarations
+namespace ncwin
+{
 class NCWin;
+} // namespace ncwin
 
 class NCString
 {
@@ -29,7 +32,7 @@ public:
 	 */
 	~NCString();
 
-	void draw(NCWin* win) const;
+	void draw(ncwin::NCWin* win) const;
 
 	std::string::size_type size() const;
 

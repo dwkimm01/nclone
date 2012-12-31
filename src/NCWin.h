@@ -15,8 +15,10 @@
 
 namespace ncpp
 {
+namespace ncwin
+{
 
-class NCWin : public NCObject
+class NCWin : public ncobject::NCObject
 {
 public:
 	/**
@@ -75,6 +77,7 @@ private:
 
 };
 
+} // namespace ncwin
 } // namespace ncpp
 
 #endif // NCWIN_H_

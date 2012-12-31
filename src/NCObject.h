@@ -13,6 +13,8 @@
 
 namespace ncpp
 {
+namespace ncobject
+{
 
 // Base type that specs: refresh
 class NCObject
@@ -75,6 +77,7 @@ private:
 	std::vector<NCObject*> p_objVec;
 };
 
+} // namespace ncobject
 } // namespace ncpp
 
 #endif // NCOBJECT_H_

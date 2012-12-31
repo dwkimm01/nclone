@@ -15,6 +15,8 @@
 
 namespace ncpp
 {
+namespace ncwin
+{
 
 class NCWin::NCWinData
 {
@@ -229,7 +231,7 @@ private:
 
 
 NCWin::NCWin(NCObject* parent, NCWinCfg cfg)
-	: NCObject(parent)
+	: ncobject::NCObject(parent)
 	, p_data(new NCWinData(cfg))
 {
 }
@@ -325,5 +327,5 @@ void NCWin::printColor(const char* str, const char* color)
 	p_data->printColor(str, color);
 }
 
-
+} // namespace ncwin
 } // namespace ncpp

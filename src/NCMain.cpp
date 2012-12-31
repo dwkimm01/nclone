@@ -71,7 +71,7 @@ int doit(int argc, char* argv[])
 		cfg.p_x = 0;
 		cfg.p_y = app.maxHeight() - cfg.p_h;
 		cfg.p_hasBorder = true;
-		NCWin winCmd(&app, cfg);
+		ncwin::NCWin winCmd(&app, cfg);
 
 		// List 2 - buddy list
 //		cfg.p_title = "Contacts";
@@ -122,7 +122,7 @@ int doit(int argc, char* argv[])
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
-							win3.forEachChild([&](NCObject* o)
+							win3.forEachChild([&](ncobject::NCObject* o)
 							{
 								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
 								if(winMsg && s == winMsg->getConfig().p_title)
@@ -296,8 +296,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
-							ncs->append(" help menu:");
+							ncs->append(cmd + ", help menu:");
 							ncs->append("  /exit     quit application");
 							ncs->append("  /clear    empty current window");
 							ncs->append("  /help     print this information");
@@ -310,6 +309,7 @@ int doit(int argc, char* argv[])
 							ncs->append("      prpl-jabber	user@gmail.com");
 							ncs->append("  /newwin name  create a window named name");
 							ncs->append("  /d1       print debug output");
+							ncs->append("");
 							ncs->refresh();
 						}
 					}
@@ -317,12 +317,12 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
-							ncs->append(" command history:");
+							ncs->append(cmd + ", command history:");
 							for(auto x : cmdHistory)
 							{
 								ncs->append(" " + x);
 							}
+							ncs->append("");
 							ncs->refresh();
 						}
 					}
@@ -345,17 +345,17 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
-							ncs->append(" Window list: ");
-							app.forEachChild([&](NCObject* obj)
+							ncs->append(cmd + ", Window list:");
+							app.forEachChild([&](ncobject::NCObject* obj)
 							{
-								NCWin* lwin = dynamic_cast<NCWin*>(obj);
+								ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
 								if(lwin)
 								{
 									ncs->append("  " + lwin->getConfig().p_title);
 								}
 								return true;  // keep going
 							});
+							ncs->append("");
 							ncs->refresh();
 						}
 					}
@@ -364,6 +364,7 @@ int doit(int argc, char* argv[])
 						if(ncs)
 						{
 							ncs->append(cmd);
+							ncs->append("");
 						}
 						app.refresh();
 					}

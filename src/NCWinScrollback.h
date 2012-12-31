@@ -15,7 +15,7 @@
 namespace ncpp
 {
 
-class NCWinScrollback : public NCWin
+class NCWinScrollback : public ncwin::NCWin
 {
 public:
 	/**
@@ -24,7 +24,7 @@ public:
 	 * could add things like scrollback to the config
 	 */
 	NCWinScrollback
-		( NCObject* parent = 0
+		( ncobject::NCObject* parent = 0
 		, NCWinCfg cfg = NCWinCfg()
 		, const int scrollback = 200 );
 

@@ -29,7 +29,7 @@ namespace ncpp
 {
 
 NCApp::NCApp()
-	: NCObject(0)
+	: ncobject::NCObject(0)
 {
 	// Start up ncurses
 	initscr();
@@ -73,7 +73,7 @@ void NCApp::refresh()
 	// Refresh self first
 	::refresh();
 	// Assume children are on top
-	NCObject::refresh();
+	ncobject::NCObject::refresh();
 }
 
 NCApp& NCApp::operator<<(const char* str)

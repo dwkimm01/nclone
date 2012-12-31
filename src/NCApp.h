@@ -13,7 +13,7 @@
 namespace ncpp
 {
 
-class NCApp : public NCObject
+class NCApp : public ncobject::NCObject
 {
 public:
 	/**

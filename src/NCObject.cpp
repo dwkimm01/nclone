@@ -20,6 +20,8 @@
 
 namespace ncpp
 {
+namespace ncobject
+{
 
 NCObject::NCObject(NCObject* parent) : p_parent(parent)
 {
@@ -133,5 +135,5 @@ void NCObject::forEachChild(std::function<bool(NCObject*)> func)
 	}
 }
 
-
+} // namespace ncobject
 } // namespace ncpp
