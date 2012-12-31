@@ -111,6 +111,10 @@ Research list
 - Collection Oriented Programming??  http://c2.com/cgi/wiki?CollectionOrientedProgramming
 - Iterator Reverse: http://searchco.de/codesearch/view/16979256
 - "Iterators Must Go" Range: Chain, Zip, Stride, Radial,  
+- Allow for more generic window packing
+ - 2D Bin Packing Algorithm
+ - https://github.com/juj/RectangleBinPack
+
 
 Build notes
 --------------

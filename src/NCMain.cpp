@@ -87,7 +87,7 @@ int doit(int argc, char* argv[])
 		cfg.p_h = 33;
 		cfg.p_w = 80; // 72;
 		cfg.p_x = 0;
-		cfg.p_y = 3;
+		cfg.p_y = 0;
 		cfg.p_hasBorder = true;
 		NCWinScrollback win3(&app, cfg);
 
@@ -100,7 +100,6 @@ int doit(int argc, char* argv[])
 		cfg.p_hasBorder = false;
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(&win3,cfg);
-
 
 		//winLog->append("One");
 		winLog->append(NCString("One",1));

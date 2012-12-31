@@ -57,7 +57,7 @@ public:
 		int y = 0;
 		getyx(p_win, y, x);
 
-
+// ---------------------------------------------------------------------------
 		// TODO, need to make this configurable
 		// Determine if our size needs fixing
 		int maxH = 0;
@@ -77,8 +77,9 @@ public:
 			{
 				x = 1;
 			}
-
 		}
+
+// ---------------------------------------------------------------------------
 
 
 //		wclear(p_win);
@@ -259,7 +260,7 @@ void NCWin::clear()
 }
 
 
-NCWinCfg NCWin::getConfig() const
+const NCWinCfg& NCWin::getConfig() const
 {
 	return p_data->getConfig();
 }
@@ -269,6 +270,7 @@ void NCWin::print(const char* str)
 {
 	p_data->print(str);
 }
+
 
 void NCWin::print(const ncpp::NCString &ncStr)
 {

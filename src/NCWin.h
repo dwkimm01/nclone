@@ -39,7 +39,7 @@ public:
 	/**
 	 * <b>Purpose:</b> Config get
 	 */
-	NCWinCfg getConfig() const;
+	const NCWinCfg& getConfig() const;
 
 	/**
 	 * <b>Purpose:</b> Scroll window up one level
@@ -61,6 +61,12 @@ public:
 	int winId() const;
 
 	void printColor(const char* str, const char* color);
+
+	// Resizing automatically functions
+	typedef std::function<int(NCWin*)> SFunc;
+	SFunc resizeHeight;
+	SFunc resizeWidth;
+
 
 
 private:

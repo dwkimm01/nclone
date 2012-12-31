@@ -46,7 +46,6 @@ public:
 
 	// Has border
 	bool p_hasBorder;
-
 };
 
 } // namespace ncpp
