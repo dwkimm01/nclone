@@ -267,6 +267,7 @@ int doit(int argc, char* argv[])
 					(
 						[&](const std::string &s, const std::string &t)
 						{
+							const int incomingMsgColor = 2;
 							const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
 							const std::string line = nMsg + SWAPNAME(s) + " " + t;
 
@@ -277,7 +278,7 @@ int doit(int argc, char* argv[])
 								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
 								if(winMsg && s == winMsg->getConfig().p_title)
 								{
-									winMsg->append(NCString(line, 2));
+									winMsg->append(NCString(line, incomingMsgColor));
 									msgAdded = true;
 									return false;
 								}
@@ -289,7 +290,7 @@ int doit(int argc, char* argv[])
 							{
 								cfg.p_title = s;
 								NCWinScrollback* addedWin = new NCWinScrollback(&win3, cfg);
-								addedWin->append(line.c_str());
+								addedWin->append(NCString(line, incomingMsgColor));
 							}
 
 
@@ -463,62 +464,92 @@ int doit(int argc, char* argv[])
 					if(cmd == "/exit") return 0;
 					if(cmd == "/help")
 					{
-						ncs->append(" help menu:");
-						ncs->append("  /exit     quit application");
-						ncs->append("  /clear    empty current window");
-						ncs->append("  /help     print this information");
-						ncs->append("  /history  print command history");
-						ncs->append("  /list     print windows open");
-						ncs->append("  /newconn  create a new connection");
-						ncs->append("      protocol		username");
-						ncs->append("      prpl-sipe	user@domain.com,domain\\user");
-						ncs->append("      prpl-jabber	user@gmail.com");
-						ncs->append("  /newwin name  create a window named name");
-						ncs->append("  /d1       print debug output");
-						ncs->refresh();
+						if(ncs)
+						{
+							ncs->append(cmd);
+							ncs->append(" help menu:");
+							ncs->append("  /exit     quit application");
+							ncs->append("  /clear    empty current window");
+							ncs->append("  /help     print this information");
+							ncs->append("  /history  print command history");
+							ncs->append("  /list     print windows open");
+							ncs->append("  /refresh  refresh all windows");
+							ncs->append("  /newconn  create a new connection");
+							ncs->append("      protocol		username");
+							ncs->append("      prpl-sipe	user@domain.com,domain\\user");
+							ncs->append("      prpl-jabber	user@gmail.com");
+							ncs->append("  /newwin name  create a window named name");
+							ncs->append("  /d1       print debug output");
+							ncs->refresh();
+						}
 					}
 					else if(cmd == "/history")
 					{
-						ncs->append(" command history:");
-						for(auto x : cmdHistory)
+						if(ncs)
 						{
-							ncs->append(" " + x);
+							ncs->append(cmd);
+							ncs->append(" command history:");
+							for(auto x : cmdHistory)
+							{
+								ncs->append(" " + x);
+							}
+							ncs->refresh();
 						}
-						ncs->refresh();
 					}
 					else if(cmd == "/newconn")
 					{
-						// Collect up user information:
-						//  protocol: prpl-jabber
-						//  login: user@gmail.com
-						//  password: xxxx
-						inputState = PROTOCOL;
-						ncs->append(" Creating new connection");
-						ncs->append("   Enter protocol (e.g. prpl-jabber)");
-						ncs->refresh();
+						if(ncs)
+						{
+							ncs->append(cmd);
+							// Collect up user information:
+							//  protocol: prpl-jabber
+							//  login: user@gmail.com
+							//  password: xxxx
+							inputState = PROTOCOL;
+							ncs->append(" Creating new connection");
+							ncs->append("   Enter protocol (e.g. prpl-jabber)");
+							ncs->refresh();
+						}
 					}
 					else if(cmd == "/list")
 					{
-						ncs->append(" Window list: ");
-						app.forEachChild([&](NCObject* obj)
+						if(ncs)
 						{
-							NCWin* lwin = dynamic_cast<NCWin*>(obj);
-							if(lwin)
+							ncs->append(cmd);
+							ncs->append(" Window list: ");
+							app.forEachChild([&](NCObject* obj)
 							{
-								ncs->append("  " + lwin->getConfig().p_title);
-							}
-							return true;  // keep going
-						});
-						ncs->refresh();
+								NCWin* lwin = dynamic_cast<NCWin*>(obj);
+								if(lwin)
+								{
+									ncs->append("  " + lwin->getConfig().p_title);
+								}
+								return true;  // keep going
+							});
+							ncs->refresh();
+						}
+					}
+					else if(cmd == "/refresh")
+					{
+						if(ncs)
+						{
+							ncs->append(cmd);
+						}
+						app.refresh();
 					}
 					else if(cmd == "/clear")
 					{
-						// Clear top buffer
-						ncs->clear();
-						ncs->refresh();
+						if(ncs)
+						{
+							ncs->append(cmd);
+							// Clear top buffer
+							ncs->clear();
+							ncs->refresh();
+						}
 					}
 					else if(cmd.find("/newwin") == 0)
 					{
+						ncs->append(cmd);
 						typedef boost::split_iterator<std::string::iterator> ItrType;
 				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
 				             i != ItrType();
@@ -541,6 +572,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
+							ncs->append(cmd);
 							const int max = ncs->getConfig().p_h;
 							for(int i = 1; i < max*5; ++i)
 							{
@@ -551,6 +583,14 @@ int doit(int argc, char* argv[])
 								}
 								ncs->append(">> " + sToPrint);
 							}
+							ncs->refresh();
+						}
+					}
+					else if(cmd.find("/") == 0)
+					{
+						if(ncs)
+						{
+							ncs->append(cmd + ", unknown command");
 							ncs->refresh();
 						}
 					}
