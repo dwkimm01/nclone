@@ -115,7 +115,7 @@ int doit(int argc, char* argv[])
 
 
 		// First chat window
-		cfg.p_title = "chat 1";
+		cfg.p_title = "chat1";
 		cfg.p_h -= 2;
 		cfg.p_w -= 3;
 		cfg.p_x += 1;
@@ -163,11 +163,12 @@ int doit(int argc, char* argv[])
 								addedWin->append(NCString(line, incomingMsgColor));
 							}
 
-							// Refresh the top window to see newly added text
-							// if we are the top window yaay
+							// Refresh the top window to see newly added text ... if we are the top window yaay
 							// TODO, do we want to just skip this if we're not on top?
-							auto nObj = win3.getTop();
-							if(nObj) nObj->refresh();
+							// Only issue is that sometimes windows underneath seemed to show through - maybe
+							// it's an NCURSES prob though.
+							win3.refresh();
+
 							// Put cursor back to cmd window
 							winCmd.refresh();
 						}

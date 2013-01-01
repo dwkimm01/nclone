@@ -35,7 +35,7 @@ void NCWinScrollback::refresh()
 	// Clear
 	NCWin::clear();
 
-	// Refresh parent (refresh any child objects)
+	// Refresh (base and) any child objects
 	NCWin::refresh();
 
 	// Reset our cursor position

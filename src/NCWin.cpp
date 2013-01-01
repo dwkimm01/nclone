@@ -107,10 +107,10 @@ public:
 			p_cfg.p_h = heightN;
 			p_cfg.p_x = xN;
 			p_cfg.p_y = yN;
-
+			// TODO, window resize isn't taking into account the X, Y position
+			// perhaps we need to do a "mvwin"
 			wresize(p_win, p_cfg.p_h, p_cfg.p_w);
 		}
-
 
 		x = std::min(x, p_cfg.p_w-2);
 //		if(x > p_cfg.p_w) { x = p_cfg.p_w; ++y; }
