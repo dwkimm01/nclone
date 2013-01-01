@@ -57,7 +57,7 @@ void NCWinScrollback::refresh()
 	}
 
 	// Print the buffer to the window
-	printVec
+	printWindow
 	   ( p_buff.begin()
 	   , p_buff.end()
 	   , cfg.p_w - 1  // TODO, was 2, is it for the border?? why cant we go all the way to the end?

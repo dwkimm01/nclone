@@ -63,7 +63,7 @@ private:
 // maxHeight, and an initial offsMajor, offsMinor
 typedef std::function<void(const NCString&)> PrinterType;
 template <typename ForwardIterator>
-void printVec
+void printWindow
    ( ForwardIterator begin
    , ForwardIterator end
    , const unsigned int maxWidth
