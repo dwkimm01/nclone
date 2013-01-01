@@ -258,7 +258,7 @@ public:
 
 	    for (; *str != 0; ++str){
 	    	int val = *str;
-	    	if (*color != 0){
+	    	if (color && *color != 0){
 	    		val |= COLOR_PAIR(*color);
 	    		++color;
 	    	}
@@ -315,6 +315,7 @@ NCWin::~NCWin()
 
 void NCWin::refresh()
 {
+// TODO, will want this when cmdWin is scrollable or a diff class	p_data->clear();
 	p_data->refresh();
 	NCObject::refresh();
 }

@@ -13,7 +13,9 @@ Text Console Chat Client
 Next up (TODO list)
 --------------
 - Make windows resize and refresh properly based on terminal size
+- Improvement: shorter buddy names to make reading easier
 - Improvement: push text down in window at beginning when window not full
+- Improvement: remove leading and trailing whitespace from commands
 - Upgrade: text wrapping to mind spaces
 - Wrap NCString with Msg with additional enum (INFO, MSG, WARNING, etc) to help aid color coding
 - Get color settings working for msgs, timestamps, etc

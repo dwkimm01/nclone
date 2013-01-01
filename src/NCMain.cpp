@@ -127,12 +127,16 @@ int doit(int argc, char* argv[])
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
-		winLog->append(NCString("One",1));
-		winLog->append(NCString("Two",2));
-		winLog->append(NCString("Three",3));
-		winLog->append(NCString("Four", 4));
-		winLog->append(NCString("Five", 5));
-		winLog->append(NCString("Six", 6));
+		winLog->append("Colors:");
+		winLog->append(NCString(" One",1));
+		winLog->append(NCString(" Two",2));
+		winLog->append(NCString(" Three",3));
+		winLog->append(NCString(" Four", 4));
+		winLog->append(NCString(" Five", 5));
+		winLog->append(NCString(" Six", 6));
+		winLog->append(NCString(" Seven", 7));
+		winLog->append("");
+
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
@@ -140,9 +144,9 @@ int doit(int argc, char* argv[])
 					(
 						[&](const std::string &s, const std::string &t)
 						{
-							const int incomingMsgColor = 2;
+							const int incomingMsgColor = 1;
 							const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
-							const std::string line = nMsg + s + " " + t;
+							const std::string line = nMsg + t + " (from " + s + ")";
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
@@ -505,7 +509,8 @@ int doit(int argc, char* argv[])
 								client->msgSend(buddyName, cmd);
 							}
 
-							ncs->append(NCString(nMsg + "  (to " + buddyName + ")", 1));
+							const int outgoingMsgColor = 3;
+							ncs->append(NCString(nMsg + "  (to " + buddyName + ")", outgoingMsgColor));
 							ncs->refresh();
 						}
 						else if(PROTOCOL == inputState)
