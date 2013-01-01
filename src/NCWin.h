@@ -21,10 +21,19 @@ namespace ncwin
 class NCWin : public ncobject::NCObject
 {
 public:
+	// Typedefs
+	typedef std::function<int(NCWin*)> ResizeFuncs;
+
 	/**
 	 * <b>Purpose:</b> CTOR
 	 */
-	NCWin(NCObject* parent, NCWinCfg cfg = NCWinCfg());
+	NCWin
+		( NCObject* parent
+		, NCWinCfg cfg = NCWinCfg()
+		, ResizeFuncs resizeWidth = ResizeFuncs()
+		, ResizeFuncs resizeHeight = ResizeFuncs()
+		, ResizeFuncs resizeX = ResizeFuncs()
+		, ResizeFuncs resizeY = ResizeFuncs() );
 
 	/**
 	 * <b>Purpose:</b> DTOR
@@ -39,7 +48,8 @@ public:
 	virtual void clear();
 
 	/**
-	 * <b>Purpose:</b> Config get
+	 * <b>Purpose:</b> Configuration getter
+	 * @return const reference NCWinCfg
 	 */
 	const NCWinCfg& getConfig() const;
 
@@ -62,14 +72,15 @@ public:
 
 	int winId() const;
 
+	/**
+	 * <b>Purpose:</b> Print a const char* string and paint it
+	 * based on the color const char* string.  Both must be
+	 * NULL terminated.  The color string probably has to be
+	 * the exact same length
+	 * @param const char* string to print to the window
+	 * @param const char* string representing the color to print
+	 */
 	void printColor(const char* str, const char* color);
-
-	// Resizing automatically functions
-	typedef std::function<int(NCWin*)> SFunc;
-	SFunc resizeHeight;
-	SFunc resizeWidth;
-
-
 
 private:
 	class NCWinData;

@@ -41,8 +41,19 @@ public:
 	 */
 	NCApp& operator>>(int &c);
 
-	// getters
+	// -----------------------------------------------------------------------
+	// Getters
+
+	/**
+	 * <b>Purpose:</b> Max height
+	 * @return int representing the maximum height of the window
+	 */
 	int maxHeight() const;
+
+	/**
+	 * <b>Purpose:</b> Max width
+	 * @return int representing the maximum width of the window
+	 */
 	int maxWidth() const;
 
 };

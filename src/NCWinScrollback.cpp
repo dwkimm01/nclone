@@ -14,8 +14,15 @@
 namespace ncpp
 {
 
-NCWinScrollback::NCWinScrollback(NCObject* parent, NCWinCfg cfg, const int scrollback)
-	: NCWin(parent, cfg)
+NCWinScrollback::NCWinScrollback
+	( NCObject* parent
+	, NCWinCfg cfg
+	, const int scrollback
+	, ncwin::NCWin::ResizeFuncs resizeWidth
+	, ncwin::NCWin::ResizeFuncs resizeHeight
+	, ncwin::NCWin::ResizeFuncs resizeX
+	, ncwin::NCWin::ResizeFuncs resizeY )
+	: NCWin(parent, cfg, resizeWidth, resizeHeight, resizeX, resizeY)
 	, p_buff(scrollback)
 	, p_offs(0, 0)
 {
@@ -41,7 +48,7 @@ void NCWinScrollback::refresh()
 	printVec
 	   ( p_buff.begin()
 	   , p_buff.end()
-	   , cfg.p_w-2
+	   , cfg.p_w - 2  // TODO, for the border??
 	   , cfg.p_h
 	   , p_offs.first
 	   , p_offs.second
@@ -50,7 +57,7 @@ void NCWinScrollback::refresh()
 			line.draw(this);
 			NCWin::clearTillEnd();
 			NCWin::cursorNextLine();
-		});
+	   });
 
 	NCWin::rRefresh();
 }

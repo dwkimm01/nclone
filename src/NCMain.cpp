@@ -60,6 +60,16 @@ int doit(int argc, char* argv[])
 		// Start up application
 		NCApp app;
 
+		// Resize functions
+		ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 2 - ncwin->getConfig().p_x; } );
+		ncwin::NCWin::ResizeFuncs borderResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 3; } );
+		ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 3 - ncwin->getConfig().p_x; } );
+		ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 6; } );
+
+
+		// Default settings
+		const int defaultScrollback = 200;
+
 		// Config used to give settings to all of the windows
 		NCWinCfg cfg;
 
@@ -84,31 +94,42 @@ int doit(int argc, char* argv[])
 
 		// Set of chat windows
 		cfg.p_title = "Chats";
-		cfg.p_h = 33;
-		cfg.p_w = 80; // 72;
+		cfg.p_h = app.maxHeight()-4;
+		cfg.p_w = app.maxWidth()-2;
 		cfg.p_x = 0;
 		cfg.p_y = 0;
 		cfg.p_hasBorder = true;
-		NCWinScrollback win3(&app, cfg);
+		NCWinScrollback win3(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
+
+//		{
+//			auto xxxCfg = cfg;
+//			xxxCfg.p_title = "SampleWindow";
+//			xxxCfg.p_x = 5;
+//			xxxCfg.p_y = 5;
+//			auto xxxWin = new NCWinScrollback(&app, xxxCfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
+//			xxxWin->append("Howdy");
+//			xxxWin->append("Howdy 2");
+//			xxxWin->append(NCString("Howdy 3", 2));
+//
+//		}
+
 
 		// First chat window
 		cfg.p_title = "chat 1";
 		cfg.p_h -= 2;
-		cfg.p_w -= 2;
+		cfg.p_w -= 3;
 		cfg.p_x += 1;
 		cfg.p_y += 1;
 		cfg.p_hasBorder = false;
 		// TODO, forced to have one window here since there is no null check later on... fix this
-		NCWinScrollback* winLog = new NCWinScrollback(&win3,cfg);
+		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
-		//winLog->append("One");
 		winLog->append(NCString("One",1));
 		winLog->append(NCString("Two",2));
 		winLog->append(NCString("Three",3));
 		winLog->append(NCString("Four", 4));
 		winLog->append(NCString("Five", 5));
 		winLog->append(NCString("Six", 6));
-
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
@@ -138,7 +159,7 @@ int doit(int argc, char* argv[])
 							if(!msgAdded)
 							{
 								cfg.p_title = s;
-								NCWinScrollback* addedWin = new NCWinScrollback(&win3, cfg);
+								NCWinScrollback* addedWin = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 								addedWin->append(NCString(line, incomingMsgColor));
 							}
 
@@ -308,6 +329,7 @@ int doit(int argc, char* argv[])
 							ncs->append("      prpl-sipe	user@domain.com,domain\\user");
 							ncs->append("      prpl-jabber	user@gmail.com");
 							ncs->append("  /newwin name  create a window named name");
+							ncs->append("  /info win   get info about a window");
 							ncs->append("  /d1       print debug output");
 							ncs->append("");
 							ncs->refresh();
@@ -378,6 +400,37 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
+					else if(cmd.find("/info") == 0)
+					{
+						ncs->append(cmd);
+
+						typedef boost::split_iterator<std::string::iterator> ItrType;
+				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+				             i != ItrType();
+				             ++i)
+				        {
+				        	const std::string winName = boost::copy_range<std::string>(*i);
+				        	if(winName != "/info")
+				        	{
+				        		app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				        		{
+				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
+				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
+				        			{
+				        				ncs->append("  found " + winName);
+				        				ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
+				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
+				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
+				        				ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
+
+
+				        			}
+				        			return true;
+				        		});
+				        	}
+				        }
+				        ncs->refresh();
+					}
 					else if(cmd.find("/newwin") == 0)
 					{
 						ncs->append(cmd);
@@ -392,7 +445,7 @@ int doit(int argc, char* argv[])
 				        	{
 				        		cfg.p_title = winName;
 				        		ncs->append("Creating new window " + cfg.p_title);
-				        		auto myNewWin = new NCWinScrollback(&win3, cfg, 50000);
+				        		auto myNewWin = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 				        		ncs->refresh();
 				        		myNewWin->append("Opened win " + cfg.p_title);
 				        		win3.refresh();

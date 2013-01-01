@@ -21,9 +21,21 @@ namespace ncwin
 class NCWin::NCWinData
 {
 public:
-	NCWinData(const NCWinCfg& cfg)
-		: p_cfg(cfg)
+	NCWinData
+		( NCWin* ncWin
+		, const NCWinCfg& cfg
+		, NCWin::ResizeFuncs resizeWidth
+		, NCWin::ResizeFuncs resizeHeight
+		, NCWin::ResizeFuncs resizeX
+		, NCWin::ResizeFuncs resizeY )
+		: p_ncWin(ncWin)
+		, p_cfg(cfg)
 		, p_win(newwin(cfg.p_h, cfg.p_w, cfg.p_y, cfg.p_x))
+		, p_resizeWidth(resizeWidth)
+		, p_resizeHeight(resizeHeight)
+		, p_resizeX(resizeX)
+		, p_resizeY(resizeY)
+
 	{
 //        idlok(p_win, TRUE);
 //        scrollok(p_win, TRUE);
@@ -59,6 +71,51 @@ public:
 		int y = 0;
 		getyx(p_win, y, x);
 
+		int widthN = p_cfg.p_w;
+		int heightN = p_cfg.p_h;
+		int xN = p_cfg.p_x;
+		int yN = p_cfg.p_y;
+
+		if(p_resizeWidth)
+		{
+			// p_cfg.p_w
+			widthN = p_resizeWidth(p_ncWin);
+		}
+
+		if(p_resizeHeight)
+		{
+			// p_cfg.p_h
+			heightN = p_resizeHeight(p_ncWin);
+		}
+
+		if(p_resizeX)
+		{
+			// p_cfg.p_x
+			xN = p_resizeX(p_ncWin);
+		}
+
+		if(p_resizeY)
+		{
+			// p_cfg.p_y
+			yN = p_resizeY(p_ncWin);
+		}
+
+		// Resize window if need be
+		if(widthN != p_cfg.p_w || heightN != p_cfg.p_h || xN != p_cfg.p_x || yN != p_cfg.p_y)
+		{
+			p_cfg.p_w = widthN;
+			p_cfg.p_h = heightN;
+			p_cfg.p_x = xN;
+			p_cfg.p_y = yN;
+
+			wresize(p_win, p_cfg.p_h, p_cfg.p_w);
+		}
+
+
+		x = std::min(x, p_cfg.p_w-2);
+//		if(x > p_cfg.p_w) { x = p_cfg.p_w; ++y; }
+
+#if 0
 // ---------------------------------------------------------------------------
 		// TODO, need to make this configurable
 		// Determine if our size needs fixing
@@ -82,7 +139,7 @@ public:
 		}
 
 // ---------------------------------------------------------------------------
-
+#endif
 
 //		wclear(p_win);
 
@@ -218,28 +275,35 @@ public:
 
 
 private:
-//	int p_h;
-//	int p_w;
-//	int p_y;
-//	int p_x;
-//	bool p_hasBorder;
-//	std::string p_title;
+	NCWin* p_ncWin;
 	NCWinCfg p_cfg;
 	WINDOW* p_win;
-
+	NCWin::ResizeFuncs p_resizeWidth;
+	NCWin::ResizeFuncs p_resizeHeight;
+	NCWin::ResizeFuncs p_resizeX;
+	NCWin::ResizeFuncs p_resizeY;
 };
 
 
-NCWin::NCWin(NCObject* parent, NCWinCfg cfg)
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+NCWin::NCWin
+	( NCObject* parent
+	, NCWinCfg cfg
+	, ResizeFuncs resizeWidth
+	, ResizeFuncs resizeHeight
+	, ResizeFuncs resizeX
+	, ResizeFuncs resizeY )
 	: ncobject::NCObject(parent)
-	, p_data(new NCWinData(cfg))
+	, p_data(new NCWinData(this, cfg, resizeWidth, resizeHeight, resizeX, resizeY))
 {
 }
 
 
 NCWin::~NCWin()
 {
-	// p_data deleted automatically by shared_ptr
+	// p_data deleted automatically by auto_ptr
 }
 
 

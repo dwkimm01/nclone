@@ -26,7 +26,11 @@ public:
 	NCWinScrollback
 		( ncobject::NCObject* parent = 0
 		, NCWinCfg cfg = NCWinCfg()
-		, const int scrollback = 200 );
+		, const int scrollback = 200
+		, ncwin::NCWin::ResizeFuncs resizeWidth = ResizeFuncs()
+		, ncwin::NCWin::ResizeFuncs resizeHeight = ResizeFuncs()
+		, ncwin::NCWin::ResizeFuncs resizeX = ResizeFuncs()
+		, ncwin::NCWin::ResizeFuncs resizeY = ResizeFuncs() );
 
 	/**
 	 * <b>Purpose:</b> DTOR

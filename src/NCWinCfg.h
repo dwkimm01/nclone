@@ -28,7 +28,6 @@ public:
 		, p_x(10)
 		, p_title("Window")
 		, p_hasBorder(false)
-
 	{
 	}
 
