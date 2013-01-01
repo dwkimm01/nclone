@@ -101,15 +101,21 @@ public:
 		}
 
 		// Resize window if need be
-		if(widthN != p_cfg.p_w || heightN != p_cfg.p_h || xN != p_cfg.p_x || yN != p_cfg.p_y)
+		if(widthN != p_cfg.p_w || heightN != p_cfg.p_h)
 		{
 			p_cfg.p_w = widthN;
 			p_cfg.p_h = heightN;
-			p_cfg.p_x = xN;
-			p_cfg.p_y = yN;
 			// TODO, window resize isn't taking into account the X, Y position
 			// perhaps we need to do a "mvwin"
 			wresize(p_win, p_cfg.p_h, p_cfg.p_w);
+		}
+
+		// Move window if need be
+		if(xN != p_cfg.p_x || yN != p_cfg.p_y)
+		{
+			p_cfg.p_x = xN;
+			p_cfg.p_y = yN;
+			mvwin(p_win, p_cfg.p_y, p_cfg.p_x);
 		}
 
 		x = std::min(x, p_cfg.p_w-2);

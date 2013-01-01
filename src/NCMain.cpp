@@ -66,6 +66,9 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 3 - ncwin->getConfig().p_x; } );
 		ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 6; } );
 
+		ncwin::NCWin::ResizeFuncs cmdResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );
+		ncwin::NCWin::ResizeFuncs cmdResizeHeight([&](ncwin::NCWin* ncwin) { return 3; } );
+		ncwin::NCWin::ResizeFuncs cmdResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 3; } );
 
 		// Default settings
 		const int defaultScrollback = 200;
@@ -81,7 +84,7 @@ int doit(int argc, char* argv[])
 		cfg.p_x = 0;
 		cfg.p_y = app.maxHeight() - cfg.p_h;
 		cfg.p_hasBorder = true;
-		ncwin::NCWin winCmd(&app, cfg);
+		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 
 		// List 2 - buddy list
 //		cfg.p_title = "Contacts";
