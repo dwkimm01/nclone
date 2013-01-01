@@ -114,8 +114,10 @@ Research list
 - Allow for more generic window packing
  - 2D Bin Packing Algorithm
  - https://github.com/juj/RectangleBinPack
+ - http://en.wikipedia.org/wiki/Knapsack_problem
+ - http://en.wikipedia.org/wiki/Bin_packing_problem
 
-
+  
 Build notes
 --------------
 - Note: building BOOST on OS X with clang++
