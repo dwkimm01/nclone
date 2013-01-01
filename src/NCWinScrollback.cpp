@@ -32,6 +32,11 @@ NCWinScrollback::~NCWinScrollback() {}
 
 void NCWinScrollback::refresh()
 {
+	// Would be nice to have a more generic way of keeping track of where we are in the
+	// buffer but for now it's nice enough to be able to track the bottom (latest) if
+	// that's where we are
+	const bool following = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h) == p_offs;
+
 	// Clear
 	NCWin::clear();
 
@@ -45,10 +50,17 @@ void NCWinScrollback::refresh()
 	// If there aren't enough lines, push down to start at bottom
 	const NCWinCfg cfg = getConfig();
 
+	// Recalculate offset
+	if(following)
+	{
+		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
+	}
+
+	// Print the buffer to the window
 	printVec
 	   ( p_buff.begin()
 	   , p_buff.end()
-	   , cfg.p_w - 2  // TODO, for the border??
+	   , cfg.p_w - 1  // TODO, was 2, is it for the border?? why cant we go all the way to the end?
 	   , cfg.p_h
 	   , p_offs.first
 	   , p_offs.second
