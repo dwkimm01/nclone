@@ -17,7 +17,8 @@
 // ---------------------------------------------------------------------------
 // This isn't in there already?  using namespace boost::algorithm did not help
 template<typename T>
-boost::split_iterator<T> operator+=(boost::split_iterator<T> & lhs, const int addr)
+// boost::split_iterator<T> operator+=(boost::split_iterator<T> & lhs, const int addr)
+boost::split_iterator<T> ADDSPL(boost::split_iterator<T> lhs, const int addr)
 {
 	for(int i = 0; i < addr; ++i)
 	{
@@ -79,7 +80,7 @@ void printWindow
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
 	for(ForwardIterator lineItr = begin + std::min((unsigned int)(end - begin), offsMajor); lineItr != end && accum < maxHeight; ++lineItr)
 	{
-		for(auto subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)) + offsMinorInit; subItr != Itr() && accum < maxHeight; ++subItr)
+		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)), offsMinorInit); subItr != Itr() && accum < maxHeight; ++subItr)
 		{
 			offsMinorInit = 0;
 //			print(boost::copy_range<std::string>(*subItr));
@@ -173,7 +174,7 @@ std::pair<unsigned int, unsigned int> getScrollUp
 		// all at once - well actually use the split iterator and iterate right to the end then calculate
 		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
-		for(auto subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
+		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)), offsMinorFirst); subItr != Itr() && accum < lines; ++subItr)
 		{
 			offsMinorFirst = 0;
 			offsMinor = (--subLines);
@@ -218,7 +219,7 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	{
 		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
-		for(auto subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)) + offsMinorFirst; subItr != Itr() && accum < lines; ++subItr)
+		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)), offsMinorFirst); subItr != Itr() && accum < lines; ++subItr)
 		{
 			offsMinorFirst = 0;
 			offsMinor = (--subLines);

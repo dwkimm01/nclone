@@ -71,7 +71,7 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs cmdResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 3; } );
 
 		// Default settings
-		const int defaultScrollback = 200;
+		const int defaultScrollback = 500;
 
 		// Config used to give settings to all of the windows
 		NCWinCfg cfg;
