@@ -231,9 +231,10 @@ int doit(int argc, char* argv[])
 
 		// Input collector
 		std::string cmd;
+                bool stillRunning = true;
 
 		// Loop forever until input tells us to return
-		while(true)
+		while(stillRunning)
 		{
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
@@ -290,7 +291,7 @@ int doit(int argc, char* argv[])
 				break;
 			case 27: // Escape
 			case 3: // CTRL-c
-				return 0;
+				stillRunning = false; // return 0;
 				break;
 			case 21: // CTRL-u
 				// TODO
@@ -320,13 +321,16 @@ int doit(int argc, char* argv[])
 			case KEY_ENTER:
 				if(!cmd.empty())
 				{
-					if(cmd == "/exit") return 0;
+					if(cmd == "/exit") stillRunning = false; // return 0;
+					if(cmd == "/quit") stillRunning = false; // return 0;
 					if(cmd == "/help")
 					{
 						if(ncs)
 						{
 							ncs->append(cmd + ", help menu:");
+							ncs->append(" Commands");
 							ncs->append("  /exit     quit application");
+							ncs->append("  /quit     quit application");
 							ncs->append("  /clear    empty current window");
 							ncs->append("  /help     print this information");
 							ncs->append("  /history  print command history");
@@ -338,7 +342,18 @@ int doit(int argc, char* argv[])
 							ncs->append("      prpl-jabber	user@gmail.com");
 							ncs->append("  /newwin name  create a window named name");
 							ncs->append("  /info win   get info about a window");
-							ncs->append("  /d1       print debug output");
+							ncs->append("  /d1       print debug output to test text wrapping");
+							ncs->append("");
+							ncs->append(" Shortcuts");
+							ncs->append("  CTRL-c     quit");
+							ncs->append("  TAB        go to next window");
+							ncs->append("  SHIFT-TAB  go to previous window");
+							ncs->append("  CTRL-u     clear input window");
+							ncs->append("  PAGE-Up    Scroll up a window length");
+							ncs->append("  PAGE-Down  Scroll down a window length");
+							ncs->append("  Home       Scroll to top of scrollback");
+							ncs->append("  End        Scroll to bottom of scrollback");
+							ncs->append("  Enter      Send Message or process command");
 							ncs->append("");
 							ncs->refresh();
 						}
@@ -587,6 +602,7 @@ int doit(int argc, char* argv[])
 		}
 	} // end NCApp scope
 
+	std::cout << "nclone exiting successfully" << std::endl;
 	return 0;
 }
 

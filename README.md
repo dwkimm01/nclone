@@ -10,6 +10,16 @@ Text Console Chat Client
 ![Screenshot](https://raw.github.com/dwkimm01/nclone/master/screenshots/ncloneDec21.png)
 
 
+Dependencies
+--------------
+- g++ 4.7 or higher
+- BOOST 1.51 or higher (program_options, date_time, regex, system, signals)
+- libncurses
+- libpurple
+- glib
+- pthread
+
+
 Next up (TODO list)
 --------------
 - Make windows resize and refresh properly based on terminal size
@@ -138,6 +148,10 @@ Run notes
     echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
  - Set back to more secure setting 
     echo 1 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+ - Debugging glib issues
+  - export G_DEBUG=fatal_warnings
+  - gdb ./hw
+  - run, bt, continue
 
 
 Components to build

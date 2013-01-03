@@ -63,7 +63,7 @@ public:
 		{
 			NULL,
 			NULL,
-			ui_init,  // TODO, i don't think this really works
+			ui_init,
 			NULL,
 			// padding
 			NULL,
