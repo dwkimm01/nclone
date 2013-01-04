@@ -14,6 +14,8 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
+#include <stdio.h>
+#include <ctype.h>
 
 #include "NCApp.h"
 #include "NCWin.h"
@@ -127,14 +129,19 @@ int doit(int argc, char* argv[])
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
+		NCString one(" One", 1);
+		NCString two(" Two", 2);
+		NCString oneTwo = one + two;
+
 		winLog->append("Colors:");
-		winLog->append(NCString(" One",1));
-		winLog->append(NCString(" Two",2));
+		winLog->append(one);//NCString(" One",1));
+		winLog->append(two);//NCString(" Two",2));
 		winLog->append(NCString(" Three",3));
 		winLog->append(NCString(" Four", 4));
 		winLog->append(NCString(" Five", 5));
 		winLog->append(NCString(" Six", 6));
 		winLog->append(NCString(" Seven", 7));
+		winLog->append(oneTwo);
 		winLog->append("");
 
 		// Message received signal connect
@@ -568,18 +575,26 @@ int doit(int argc, char* argv[])
 				app.refresh();
 				break;
 			default:
-				// Add characters to cmd string, refresh
-				cmd += c;
-				if(PASSWORD == inputState)
+				//Filter out non-printable characters
+//				if ((c >= 'a' && c <= 'z') ||
+//					(c >= 'A' && c <= 'Z') ||
+//					(c >= '0' && c <= '9'))
+				//TODO, implement as boost ns::print
+				if (isprint(c))
 				{
-					winCmd.print("x");
+					// Add characters to cmd string, refresh
+					cmd += c;
+					if(PASSWORD == inputState)
+					{
+						winCmd.print("x");
+					}
+					else
+					{
+						char ca[] = {(char)c, 0};
+						winCmd.print(ca);
+					}
+					winCmd.refresh();
 				}
-				else
-				{
-					char ca[] = {(char)c, 0};
-					winCmd.print(ca);
-				}
-				winCmd.refresh();
 				break;
 				// nothing
 			}

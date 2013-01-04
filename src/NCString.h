@@ -23,9 +23,14 @@ class NCString
 {
 public:
 	/**
-	 * <b>Purpose:</b> CTOR
+	 * <b>Purpose:</b> CTOR takes an integer color value
 	 */
 	NCString(const std::string& pString, const int pColor);
+
+	/**
+	 * <b>Purpose:</b> CTOR takes a prepopulated color string
+	 */
+	NCString(const std::string& pString, const std::string& pColor);
 
 	/**
 	 * <b>Purpose:</b> DTOR
@@ -37,11 +42,15 @@ public:
 	std::string::size_type size() const;
 
 	const std::string& getString() const;
+	const std::string& getColor() const;
 
 	// Warning, use this with great care because it could mess up the
 	// color matching with theString - but I had to add this here to
 	// get boost::make_split_iterator work nicely again
 	std::string& operator()();
+
+	//Concatenation operator
+	NCString operator+(const NCString& rhs);
 
 	// Create an NCString based on a substring
 	NCString substr(std::string::iterator begin, std::string::iterator end);
