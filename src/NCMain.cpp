@@ -86,15 +86,6 @@ int doit(int argc, char* argv[])
 		cfg.p_hasBorder = true;
 		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 
-		// List 2 - buddy list
-//		cfg.p_title = "Contacts";
-//		cfg.p_h = 23;
-//		cfg.p_w = 18;
-//		cfg.p_x = app.maxWidth() - cfg.p_w;
-//		cfg.p_y = 0;
-//		cfg.p_hasBorder = true;
-//		NCWin win2(&app, cfg);
-
 		// Set of chat windows
 		cfg.p_title = "Chats";
 		cfg.p_h = app.maxHeight()-4;
@@ -126,6 +117,20 @@ int doit(int argc, char* argv[])
 		cfg.p_hasBorder = false;
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+
+		// Buddy list window
+		auto blCfg = cfg;
+		blCfg.p_title = "Contacts";
+		blCfg.p_h = 10;
+		blCfg.p_w = 18;
+		blCfg.p_x = app.maxWidth() - blCfg.p_w;
+		blCfg.p_y = 0;
+		blCfg.p_hasBorder = true;
+		// TODO, add X,Y position resize functions
+		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
+		ncwin::NCWin::ResizeFuncs emptyResize;
+		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
+
 
 		winLog->append("Colors:");
 		winLog->append(NCString(" One",1));
@@ -236,9 +241,32 @@ int doit(int argc, char* argv[])
 		// Loop forever until input tells us to return
 		while(stillRunning)
 		{
+
+			// Update Buddly List
+			if(winBl)
+			{
+				winBl->clear();
+				win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				{
+					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
+					if(ncw)
+					{
+						winBl->append(NCString(ncw->getConfig().p_title, 2));
+					}
+					else
+					{
+						winBl->append("Non window");
+					}
+					return true;
+				});
+				winBl->end();
+				winBl->refresh();
+			}
+
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
 			winCmd.refresh();
+
 
 			// Get user input
 			// TODO, would be nice to periodically break out of this and be able to get control
