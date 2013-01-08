@@ -241,6 +241,8 @@ int doit(int argc, char* argv[])
 			winCmd.refresh();
 
 			// Get user input
+			// TODO, would be nice to periodically break out of this and be able to get control
+			// of this thread back to do some housekeeping type chores (idle timestamp printing etc)
 			int c = 0;
 			app >> c;
 			// Uncomment this to show what the numeric values of each keystroke are
@@ -278,6 +280,28 @@ int doit(int argc, char* argv[])
 				ncs->scrollDown(1);
 				ncs->refresh();
 				break;
+			case KEY_LEFT:
+				if(ncs)
+				{
+					// TODO, winCmd editing
+					ncs->append("<LEFT>");
+					ncs->refresh();
+					cmd.clear();
+					winCmd.clear();
+					winCmd.refresh();
+				}
+				break;
+			case KEY_RIGHT:
+				if(ncs)
+				{
+					// TODO, winCmd editing
+					ncs->append("<RIGHT>");
+					ncs->refresh();
+					cmd.clear();
+					winCmd.clear();
+					winCmd.refresh();
+				}
+				break;
 			case '\t':
 				win3.rotate();
 				win3.refresh();
@@ -299,6 +323,16 @@ int doit(int argc, char* argv[])
 				winCmd.clear();
 				winCmd.refresh();
 				break;
+//			case KEY_IL: // TODO, INSERT doesn't seem to work on laptop
+//				if(ncs)
+//				{
+//					ncs->append("<Insert>");
+//					ncs->refresh();
+//					cmd.clear();
+//					winCmd.clear();
+//					winCmd.refresh();
+//				}
+//				break;
 			case KEY_BACKSPACE_MAC: // PASS THRU For MAC Delete
 			case KEY_BACKSPACE:
 				if(!cmd.empty())
@@ -445,8 +479,6 @@ int doit(int argc, char* argv[])
 				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
 				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
 				        				ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
-
-
 				        			}
 				        			return true;
 				        		});
@@ -591,7 +623,7 @@ int doit(int argc, char* argv[])
 				}
 				else
 				{
-					char ca[] = {(char)c, 0};
+					const char ca[] = {(char)c, 0};
 					winCmd.print(ca);
 				}
 				winCmd.refresh();

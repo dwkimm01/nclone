@@ -256,6 +256,7 @@ public:
 	//    	win = stdscr;
 	//    }
 
+		// TODO, implement with iterators as an exercise
 	    for (; *str != 0; ++str){
 	    	int val = *str;
 	    	if (color && *color != 0){
@@ -315,7 +316,8 @@ NCWin::~NCWin()
 
 void NCWin::refresh()
 {
-// TODO, will want this when cmdWin is scrollable or a diff class	p_data->clear();
+// TODO, will want this when cmdWin is scrollable or a diff class
+// :	p_data->clear();
 	p_data->refresh();
 	NCObject::refresh();
 }

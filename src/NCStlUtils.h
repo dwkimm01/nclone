@@ -34,19 +34,6 @@ std::pair<Iter, Iter> gather(Iter first, Iter last, Iter p, Predicate pred)
 	);
 }
 
-/**
- * <b>Purpose:</b> Create sub-range that is of a given size (windowSize) starting
- * at iterator (start) and if possible favors the region between start and end.
- */
-template <typename Itr>
-std::pair<Itr, Itr> getWindowDown(Itr begin, Itr end, Itr start, const int windowSize)
-{
-	// Down first, then up if need be
-	const Itr bottom = (end - start > windowSize) ? (start + windowSize) : (end);
-	const Itr top = (bottom - begin > windowSize) ? (bottom - windowSize) : (begin);
-	return make_pair(top, bottom);
-}
-
 // For each but uses an std::pair as a range (for input)
 template<typename T, typename Function>
   Function foreach(std::pair<T, T> range, Function f)
