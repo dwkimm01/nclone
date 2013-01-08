@@ -139,7 +139,6 @@ Build notes
 - Building on OSX
  - Dependencies can mostly be installed with Homebrew: http://mxcl.github.com/homebrew/
  - BOOST needed to be installed with the clang++ instead since the brew recipe didn't give that option before
- - Don't forget to set the -std=c++11 and stdlib etc like for boost when building in Eclipse or XCode
 
 Run notes
 --------------
