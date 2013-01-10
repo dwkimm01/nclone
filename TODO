@@ -47,9 +47,10 @@ TODO list
 - Command parsing improvements
  . Up/Down command line history
  . Left/Right move cursor
+ . Text wrapping for commands/text that is too long for one window width
  . CTRL-r reverse search through command line history
  . Don't wait forever for a key to be entered (thread reuse)
- . Auto complete (suggestions) with dimmed text
+ . Auto complete (suggestions) with dimmed text - and info/help about command
 
 - Log chats
  . Write conversations (and commands) to (text) files

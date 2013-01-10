@@ -197,7 +197,7 @@ int doit(int argc, char* argv[])
 		// new connection here?
 
 		// Command history
-		const int CmdHistoryMax = 100;
+		const int CmdHistoryMax = 100;  // TODO, make configurable
 		typedef boost::circular_buffer<std::string> CmdHistory;
 		CmdHistory cmdHistory(CmdHistoryMax);
 
