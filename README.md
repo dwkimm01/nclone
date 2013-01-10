@@ -116,8 +116,10 @@ Research list
  - Google Protocol Buffers
  - Web Service
 - Need to be able to parse this from MS Office Communicator
+<pre>
     │[14:56:41] (sip:jmyslinski@illumina.com) <DIV style="font-size: 9pt;font-family: MS Shell Dlg 2;color: #000000;di*│
     │ection: ltr">balls</DIV>   
+</pre>
 - There is a PurpleConnectionFlags enum that has PURPLE_CONNECTION_HTML to not that we need to decode HTML
 - ncurses, BOOST, libpurple, pidgin-sipe, gcc 4.7 -> OSX, Windows?
 - Collection Oriented Programming??  http://c2.com/cgi/wiki?CollectionOrientedProgramming
@@ -133,8 +135,10 @@ Research list
 Build notes
 --------------
 - Note: building BOOST on OS X with clang++
-    ./bootstrap.sh --with-toolset=clang --prefix=/Users/dwkimm01/.libs/BOOST_1_52_0
+<pre>
+    ./bootstrap.sh --with-toolset=clang --prefix=/PATH/TO/DEPS/BOOST_1_52_0
     ./b2 toolset=clang cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++" -j4 install
+</pre>
 - These same flags should be used to build against these BOOST libraries
 - Building on OSX
  - Dependencies can mostly be installed with Homebrew: http://mxcl.github.com/homebrew/
