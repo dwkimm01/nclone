@@ -46,6 +46,8 @@ public:
 	virtual void refresh();
 	virtual void rRefresh(); // TODO, redo how this is being done
 	virtual void clear();
+	// TODO, this should be cleaned up along with the refresh, rRefresh, clear, etc...
+	virtual void updateSize();
 
 	/**
 	 * <b>Purpose:</b> Configuration getter

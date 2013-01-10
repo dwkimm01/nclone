@@ -71,52 +71,7 @@ public:
 		int y = 0;
 		getyx(p_win, y, x);
 
-		int widthN = p_cfg.p_w;
-		int heightN = p_cfg.p_h;
-		int xN = p_cfg.p_x;
-		int yN = p_cfg.p_y;
-
-		if(p_resizeWidth)
-		{
-			// p_cfg.p_w
-			widthN = p_resizeWidth(p_ncWin);
-		}
-
-		if(p_resizeHeight)
-		{
-			// p_cfg.p_h
-			heightN = p_resizeHeight(p_ncWin);
-		}
-
-		if(p_resizeX)
-		{
-			// p_cfg.p_x
-			xN = p_resizeX(p_ncWin);
-		}
-
-		if(p_resizeY)
-		{
-			// p_cfg.p_y
-			yN = p_resizeY(p_ncWin);
-		}
-
-		// Resize window if need be
-		if(widthN != p_cfg.p_w || heightN != p_cfg.p_h)
-		{
-			p_cfg.p_w = widthN;
-			p_cfg.p_h = heightN;
-			// TODO, window resize isn't taking into account the X, Y position
-			// perhaps we need to do a "mvwin"
-			wresize(p_win, p_cfg.p_h, p_cfg.p_w);
-		}
-
-		// Move window if need be
-		if(xN != p_cfg.p_x || yN != p_cfg.p_y)
-		{
-			p_cfg.p_x = xN;
-			p_cfg.p_y = yN;
-			mvwin(p_win, p_cfg.p_y, p_cfg.p_x);
-		}
+		updateSize();
 
 		x = std::min(x, p_cfg.p_w-2);
 //		if(x > p_cfg.p_w) { x = p_cfg.p_w; ++y; }
@@ -180,6 +135,57 @@ public:
 	{
 		wclear(p_win);
 		cursorReset();
+	}
+
+	void updateSize()
+	{
+		int widthN = p_cfg.p_w;
+		int heightN = p_cfg.p_h;
+		int xN = p_cfg.p_x;
+		int yN = p_cfg.p_y;
+
+		if(p_resizeWidth)
+		{
+			// p_cfg.p_w
+			widthN = p_resizeWidth(p_ncWin);
+		}
+
+		if(p_resizeHeight)
+		{
+			// p_cfg.p_h
+			heightN = p_resizeHeight(p_ncWin);
+		}
+
+		if(p_resizeX)
+		{
+			// p_cfg.p_x
+			xN = p_resizeX(p_ncWin);
+		}
+
+		if(p_resizeY)
+		{
+			// p_cfg.p_y
+			yN = p_resizeY(p_ncWin);
+		}
+
+		// Resize window if need be
+		if(widthN != p_cfg.p_w || heightN != p_cfg.p_h)
+		{
+			p_cfg.p_w = widthN;
+			p_cfg.p_h = heightN;
+			// TODO, window resize isn't taking into account the X, Y position
+			// perhaps we need to do a "mvwin"
+			wresize(p_win, p_cfg.p_h, p_cfg.p_w);
+		}
+
+		// Move window if need be
+		if(xN != p_cfg.p_x || yN != p_cfg.p_y)
+		{
+			p_cfg.p_x = xN;
+			p_cfg.p_y = yN;
+			mvwin(p_win, p_cfg.p_y, p_cfg.p_x);
+		}
+
 	}
 
 // TODO, decide if we want to use this
@@ -332,6 +338,12 @@ void NCWin::rRefresh()
 void NCWin::clear()
 {
 	p_data->clear();
+}
+
+
+void NCWin::updateSize()
+{
+	p_data->updateSize();
 }
 
 

@@ -32,13 +32,27 @@ NCWinScrollback::~NCWinScrollback() {}
 
 void NCWinScrollback::refresh()
 {
-	// TODO, replace all these cfg.h - 2 with this???
-	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+	// Calculate old text area width and height
+	const NCWinCfg cfgOld = getConfig();
+	const int widthOld =  (cfgOld.p_hasBorder)?(cfgOld.p_w - 2):(cfgOld.p_w) - 1;
+	const int heightOld = (cfgOld.p_hasBorder)?(cfgOld.p_h - 2):(cfgOld.p_h);
+// TODO, replace all these conditional calls with getters:  getTextWidth, getTextHeight
 
 	// Would be nice to have a more generic way of keeping track of where we are in the
 	// buffer but for now it's nice enough to be able to track the bottom (latest) if
 	// that's where we are
-	const bool following = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h) == p_offs;
+	const bool following = getBottom(p_buff.rbegin(), p_buff.rend(), widthOld, heightOld) == p_offs;
+
+	// TODO, need to call the base class refresh first since it will do the window resizing
+	// so that we will know what the new cfg.p_h/w/x/y are going to be
+	NCWin::updateSize();
+
+	// TODO, add back in pushing down lines for buffers that don't fill the height
+	// If there aren't enough lines, push down to start at bottom
+	// Calculate text area width and height
+	const NCWinCfg& cfg = getConfig();
+	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
+	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
 	// Clear
 	NCWin::clear();
@@ -49,23 +63,18 @@ void NCWinScrollback::refresh()
 	// Reset our cursor position
 	NCWin::cursorReset();
 
-	// TODO, add back in pushing down lines for buffers that don't fill the height
-	// If there aren't enough lines, push down to start at bottom
-	const NCWinCfg cfg = getConfig();
-
 	// Recalculate offset
 	if(following)
 	{
-		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
+		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
-
 
 	// Print the buffer to the window
 	printWindow
 	   ( p_buff.begin()
 	   , p_buff.end()
-	   , cfg.p_w - 1  // TODO, was 2, is it for the border?? why cant we go all the way to the end?
-	   , height // cfg.p_h
+	   , width
+	   , height
 	   , p_offs.first
 	   , p_offs.second
 	   , [&](const NCString &line)
@@ -86,39 +95,55 @@ void NCWinScrollback::append(const std::string &line)
 
 void NCWinScrollback::append(const ncpp::NCString &line)
 {
+	// Calculate text area width and height
+	const NCWinCfg& cfg = getConfig();
+	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
+	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+
 	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
-	const auto offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
-	const bool following = offs == p_offs;
+	const bool following = getBottom(p_buff.rbegin(), p_buff.rend(), width, height) == p_offs;
 
 	p_buff.addRow(line);
 
 	if(following)
 	{
-		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
+		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 }
 
 void NCWinScrollback::scrollDown(const int n)
 {
-	p_offs = getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
+	// Calculate text area width and height
+	const NCWinCfg& cfg = getConfig();
+	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
+	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+
+	p_offs = getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
 //	p_buff.addRow("<DW> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
 void NCWinScrollback::scrollUp(const int n)
 {
-	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h, n, p_offs);
+	// Calculate text area width and height
+	const NCWinCfg& cfg = getConfig();
+	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
+	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+
+	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
 //	p_buff.addRow("<UP> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
 void NCWinScrollback::pageDown()
 {
-	const int pageSize = getConfig().p_h-1;
+	const int delta = (getConfig().p_hasBorder)?(3):(1);
+	const int pageSize = getConfig().p_h-delta;
 	scrollDown(pageSize);
 }
 
 void NCWinScrollback::pageUp()
 {
-	const int pageSize = getConfig().p_h-1;
+	const int delta = (getConfig().p_hasBorder)?(3):(1);
+	const int pageSize = getConfig().p_h-delta;
 	scrollUp(pageSize);
 }
 

@@ -379,6 +379,17 @@ int doit(int argc, char* argv[])
 					winCmd.refresh();
 				}
 				break;
+			case KEY_F(2):
+				if(ncs)
+				{
+					// TODO, toggle visible dropdown (from top) console window
+					ncs->append("<Console window toggle>");
+					ncs->refresh();
+				}
+				break;
+			case KEY_F(5):
+				winCmd.refresh();
+				break;
 			case 10:
 			case KEY_ENTER:
 				if(!cmd.empty())
@@ -405,6 +416,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  /newwin name  create a window named name");
 							ncs->append("  /info win   get info about a window");
 							ncs->append("  /d1       print debug output to test text wrapping");
+							ncs->append("  /d2       print debug shorter string output to test page up/down");
 							ncs->append("");
 							ncs->append(" Shortcuts");
 							ncs->append("  CTRL-c     quit");
@@ -549,6 +561,17 @@ int doit(int argc, char* argv[])
 									sToPrint.push_back( 'a' + ((i-1)%26) );
 								}
 								ncs->append(">> " + sToPrint);
+							}
+							ncs->refresh();
+						}
+					}
+					else if(cmd == "/d2")
+					{
+						if(ncs)
+						{
+							for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
+							{
+								ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
 							}
 							ncs->refresh();
 						}
