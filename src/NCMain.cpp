@@ -152,8 +152,9 @@ int doit(int argc, char* argv[])
 						[&](const std::string &s, const std::string &t)
 						{
 							const int incomingMsgColor = 1;
-							const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
-							const std::string line = nMsg + t + " (from " + s + ")";
+							//const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
+							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
+							const NCString line = nMsg + NCString(t + " (from " + s + ")", incomingMsgColor);
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
@@ -162,7 +163,7 @@ int doit(int argc, char* argv[])
 								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
 								if(winMsg && s == winMsg->getConfig().p_title)
 								{
-									winMsg->append(NCString(line, incomingMsgColor));
+									winMsg->append(line);
 									msgAdded = true;
 									return false;
 								}
@@ -174,7 +175,7 @@ int doit(int argc, char* argv[])
 							{
 								cfg.p_title = s;
 								NCWinScrollback* addedWin = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
-								addedWin->append(NCString(line, incomingMsgColor));
+								addedWin->append(line);
 							}
 
 							// Refresh the top window to see newly added text ... if we are the top window yaay
@@ -497,9 +498,6 @@ int doit(int argc, char* argv[])
 					{
 						if(NORMAL == inputState)
 						{
-							// Add msg to top (front) buffer
-							const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] " + cmd;
-
 							ncclientif::NCClientIf* client = 0;
 
 							// TODO, need to fix the way this connection is picked
@@ -516,8 +514,10 @@ int doit(int argc, char* argv[])
 								client->msgSend(buddyName, cmd);
 							}
 
-							const int outgoingMsgColor = 3;
-							ncs->append(NCString(nMsg + "  (to " + buddyName + ")", outgoingMsgColor));
+							const int outgoingMsgColor = 4;
+							// Add msg to top (front) buffer
+							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + cmd, outgoingMsgColor);
+							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
 							ncs->refresh();
 						}
 						else if(PROTOCOL == inputState)

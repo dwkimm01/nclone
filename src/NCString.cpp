@@ -41,7 +41,8 @@ const std::string& NCString::getColor() const
 	return colorString;
 }
 
-NCString NCString::operator+(const NCString& rhs){
+NCString NCString::operator+(const NCString& rhs) const
+{
 	std::string concatString = theString + rhs.getString();
 	std::string concatColorString = colorString + rhs.getColor();
 	NCString value(concatString, concatColorString);

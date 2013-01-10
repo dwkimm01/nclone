@@ -50,7 +50,7 @@ public:
 	std::string& operator()();
 
 	//Concatenation operator
-	NCString operator+(const NCString& rhs);
+	NCString operator+(const NCString& rhs) const;
 
 	// Create an NCString based on a substring
 	NCString substr(std::string::iterator begin, std::string::iterator end);
