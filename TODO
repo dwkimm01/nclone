@@ -1,0 +1,102 @@
+TODO list
+
+- Window background color
+- Text attributes
+ . A_BOLD, A_STANDOUT, A_BLINKING, etc
+ . Create an enum in NCWin.h maybe to use as an additional CTOR param?
+- Cleanup NCWin::NCWinData::printColor to use std::string::iterator
+
+- Need a more MVC type architecture
+ . Separate Window from data
+ . Create data store to group Text Buffer, Connection, Buddy Name
+ . Possibly use a BOOST::multi_map
+
+- Fix page up/down scrolling
+ . Cleanup NCTextWinFormatter
+ . Improve functions in NCTextWinFormatter so they calculate line counts better
+ . Page up goes up too far when there are wrapping lines
+
+- Fix initial text windows when there isn't enough text to fill window
+ . Right now we start from top but I want the text entered down near the cmd window
+ . Might want to be able to make this configurable
+
+- Buddy List
+ . Needs window size (too small) protection
+ . text wrapping should just cutoff instead (maybe add ...'s)
+ . Add plus sign and color to buddy who has typed something
+ . CTRL-n takes you to next buddy who has sent something
+ . Animate hiding and showing of the window if config says to
+
+- Console window
+ . F1 type drop down kind of like quake had
+ . Should show first "chat1" contents right now
+ . Make sure general debug statements go to console
+ . Try to get more debug info out of Chat client lib
+ . Animate hiding and showing of the window if config says to 
+
+- Configuration object
+ . Use to help create windows by supplying config attributes
+ . Use to persist data between sessions
+ . Want to script things like connecting sessions
+ . Want to keep text color settings: timestamp, buddy names, text, Status line
+
+- Status line
+ . One line window with updating and useful information
+ .  TIME   INFO_COMMENT   CONNECTION STATUS
+
+- Command parsing improvements
+ . Up/Down command line history
+ . Left/Right move cursor
+ . CTRL-r reverse search through command line history
+ . Don't wait forever for a key to be entered (thread reuse)
+ . Auto complete (suggestions) with dimmed text
+
+- Log chats
+ . Write conversations (and commands) to (text) files
+ . ~/.nclone/chats/<BUDDYNAME>-<TIME>.log
+ . Use configuration for turning on/off and settings like maybe file type
+ 
+- Command processing loop improvements
+ . (std::map<std::string,std::function<>)
+
+- NCMAin breakup
+ . Getting too big
+ . Command parsing and executing could go somewhere else
+ . Window setup could probably happen in an NCApp child
+
+- NCTextWinFormatter spaces aware
+ . Want to be able to split the lines on spaces where possible
+ . Turn NCTextWinFormatter into a class probably
+ . Then maybe write a LengthSpaceFinder (LengthFinder brother) class
+ . Make NCTextWinFormatter a templated class on FINDER (maybe?)
+
+- NCWin refeshes too much
+ . add lots of new windows: blinks too often
+ . logon to chat service with buddies onlien: doesn't always redraw fully
+
+- NCWin/NCObject refresh and draw cleanup
+ . Currently there is refresh, rRefresh, clear, and updateSize
+ . Seems like that should be cleaned up into refresh and draw methods
+
+- General cleanup
+ . Remove TODOs where possible
+ . Make more meaningful comments/design note where not possible and delete TODO
+
+- Better chat client integration
+ . be able to log off (and delete connection)
+ . buddy names should always be consistent (gchat adds things to the end)
+ . buddy names should use a shorter version
+ . accept new buddy or chat request
+ . be able to log onto multiple services simultaneously
+
+- Load chat clients through plugin libraries
+
+- Be able to parse old ascii (ansi) color art 
+ . Maybe be able to write it to logs too
+
+- Build improvements 
+ . Auto tool build environment
+ . Use auto tools and cmake possibly
+ . Still want to be able to use Eclipse, XCode, Linux, OSX, etc
+ . Build in deps statically
+
