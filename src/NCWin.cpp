@@ -266,7 +266,7 @@ public:
 	    for (; *str != 0; ++str){
 	    	int val = *str;
 	    	if (color && *color != 0){
-	    		val |= COLOR_PAIR(*color);
+	    		val |= COLOR_PAIR((unsigned int)*color);
 	    		++color;
 	    	}
 	    	waddch(p_win, val);

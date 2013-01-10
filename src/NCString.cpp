@@ -7,6 +7,7 @@
 #include "NCString.h"
 #include "NCWin.h"
 #include "NCExceptionOutOfRange.h"
+#include <iostream>
 
 namespace ncpp
 {
@@ -16,11 +17,14 @@ NCString::NCString(const std::string& pString, const int pColor)
 {
 	for(unsigned int i = 0; i < theString.size(); ++i)
 	{
-		// TODO, this is not really working - sign issue?
-//		char c = ((unsigned char)i + (unsigned char)pColor) % 7;
-//		colorString.push_back( c );
-		colorString.push_back(pColor);
+		char c = ((unsigned char)pColor);
+		colorString.push_back( c );
 	}
+}
+
+NCString::NCString(const std::string& pString, const std::string& pColor)
+	: theString(pString), colorString(pColor)
+{
 }
 
 NCString::~NCString()
@@ -30,6 +34,20 @@ NCString::~NCString()
 const std::string& NCString::getString() const
 {
 	return theString;
+}
+
+const std::string& NCString::getColor() const
+{
+	return colorString;
+}
+
+NCString NCString::operator+(const NCString& rhs) const
+{
+	std::string concatString = theString + rhs.getString();
+	std::string concatColorString = colorString + rhs.getColor();
+	NCString value(concatString, concatColorString);
+
+	return value;
 }
 
 std::string& NCString::operator()()
@@ -48,15 +66,15 @@ NCString NCString::substr(std::string::iterator begin, std::string::iterator end
 		throw NCExceptionOutOfRange("Offset greater than color string size", FLINFO);
 	}
 
-	std::string s(begin, end);
-	std::string c(colorString.begin() + offs, colorString.begin() + offs + count);
+	const std::string s(begin, end);
+	const std::string c(colorString.begin() + offs, colorString.begin() + offs + count);
 
 	if(s.size() != c.size())
 	{
 		throw NCExceptionOutOfRange("String and color string size do not match", FLINFO);
 	}
 
-	return NCString(s, c[0]);
+	return NCString(s, c);
 }
 
 std::string::size_type NCString::size() const
