@@ -89,6 +89,16 @@ TODO list
  . buddy names should use a shorter version
  . accept new buddy or chat request
  . be able to log onto multiple services simultaneously
+ . be able to see offline buddies
+ . queue up messages to send to buddies when they are online
+ . group chat
+ . away message
+ . auto away message (after timeout)
+ . personalized away message (with buddy's name, etc)
+
+- System/OS notification integration
+ . be able to notify the system when events happen (messages come in)
+ . would be annoying if it happens even when window is in focus
 
 - Load chat clients through plugin libraries
 
