@@ -47,6 +47,7 @@ public:
 	// Warning, use this with great care because it could mess up the
 	// color matching with theString - but I had to add this here to
 	// get boost::make_split_iterator work nicely again
+	// TODO, in the future maybe this should be cleaned up 
 	std::string& operator()();
 
 	//Concatenation operator

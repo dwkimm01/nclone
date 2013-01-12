@@ -568,7 +568,7 @@ int doit(int argc, char* argv[])
 								{
 									sToPrint.push_back( 'a' + ((i-1)%26) );
 								}
-								ncs->append(">> " + sToPrint);
+								ncs->append(">> " + boost::lexical_cast<std::string>(i) + " " + sToPrint);
 							}
 							ncs->refresh();
 						}

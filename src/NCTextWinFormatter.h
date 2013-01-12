@@ -13,6 +13,8 @@
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include "NCString.h"
+#include "NCExceptionOutOfRange.h"
+#include <boost/lexical_cast.hpp>
 
 // ---------------------------------------------------------------------------
 // This isn't in there already?  using namespace boost::algorithm did not help
@@ -162,26 +164,94 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	unsigned int offsMinor = offs.second;
 	unsigned int offsMinorFirst = offs.second;
 
+//	int XXX = -97;
 
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
 	unsigned int accum = 0;
-	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = begin + (beginOffs) /*+ std::min(vec.size(), (vec.size() - offs.first))*/; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
+	// Start at offsMajor + offsMinor, count at most "lines" lines
+	for(auto lineItr = begin + beginOffs; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
 	{
 		// TODO, need to fix this so we just use a single templated LengthFinder for this calculation
 		// and for the rest of everything else
 		// TODO, should be able to factor out the for+itr and just loop through and do the calculation
 		// all at once - well actually use the split iterator and iterate right to the end then calculate
-		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
 
+
+		// Calculate how many sub lines we have here
+		int minorLines = 0;
+		for(Itr subItr = boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)); subItr != Itr() && accum < lines; ++subItr)
+		{
+			minorLines++;
+		}
+
+		// Take into account initial offset
+		if(offsMinorFirst)
+		{
+			minorLines -= offsMinorFirst;
+			offsMinorFirst = 0;
+		}
+
+		// Add to accumulator
+		accum += minorLines;
+
+		// Test to see if we can get to the desired count accum
+		if(accum > lines)
+		{
+//			XXX = minorLines;   // minorLines = 2, accum = 31, lines = 31,
+			offsMinor = minorLines - (accum - lines);
+
+		}
+		else if(accum == lines)
+		{
+			if(minorLines > 1)
+			{
+				offsMinor--;
+				offsMajor--;
+			}
+			else
+			{
+				offsMinor = 0;
+//				offsMajor--;
+//				offsMajor++;
+//				throw (1);
+			}
+		}
+	}
+
+//	if(offsMinor > 1)
+//		throw ncexception::NCException("XXX = " + boost::lexical_cast<std::string>(XXX), FLINFO);
+//		throw ncexception::NCException("offsMinor = " + boost::lexical_cast<std::string>(offsMinor), FLINFO);
+
+#if 0
+		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1) ;
+		const int maxsl = subLines;
+		subLines=0;
+
+//		throw ncexception::NCException("offsMinorFirst = " + boost::lexical_cast<std::string>(offsMinorFirst), FLINFO);
+//		throw ncexception::NCException("subLines = " + boost::lexical_cast<std::string>(subLines), FLINFO);
+
+		if(aa) { aa = false;   offsMinorFirst = subLines - offsMinorFirst /*- 1*/; }
+		else
+		{
+			offsMinor = maxsl;
+		}
+//		aa = false;
 		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)), offsMinorFirst); subItr != Itr() && accum < lines; ++subItr)
 		{
+
 			offsMinorFirst = 0;
-			offsMinor = (--subLines);
+//			offsMinor = (--subLines);
+//			++offsMinor;
+//			offsMinor = maxsl - (++subLines);
+			--offsMinor;
 			++accum;
 //			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << std::endl;
 		}
+
+		if(accum >= lines)
+			offsMinor = maxsl - offsMinor; // + 1;
 	}
+#endif
 
 	// TODO, need to check somewhere if we have gone past the bottom
 	if(offsMajor < cSize)
