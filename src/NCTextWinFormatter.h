@@ -150,11 +150,11 @@ std::pair<unsigned int, unsigned int> getTop(ForwardIterator begin, ForwardItera
 
 // ---------------------------------------------------------------------------
 // Calculate number of minor lines in string
-unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth)
+unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth, const unsigned int initialOffset = 0)
 {
 	unsigned int minorLines = 0;
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	for(Itr subItr = boost::make_split_iterator(s, LengthFinder(maxWidth)); subItr != Itr(); ++subItr)
+	for(Itr subItr = ADDSPL(boost::make_split_iterator(s, LengthFinder(maxWidth)), initialOffset); subItr != Itr(); ++subItr)
 	{
 		++minorLines;
 	}
@@ -188,13 +188,21 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	unsigned int accum = 0;
 
 	// Take care of initial minor offset first
-	accum += offs.second;  if(accum > lines) throw(1); // TODO, took care of scrolling in a single big ENTRY's minor lines
+	accum += offs.second;
+	if(accum > lines)
+	{
+		offsMajor = beginOffs;
+		offsMinor = offs.second - (accum - lines);
+		// TODO, this needs testing
+//		throw(1); // TODO, took care of scrolling in a single big ENTRY's minor lines
+	}
 	offsMinor = 0;
 
 	// Start at offsMajor, count at most "lines" lines
 	for(auto lineItr = begin + beginOffs /*- 1*/; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
 	{
-		unsigned int wrapCount = getWrappedLines((*lineItr)(), maxWidth);
+		// Calculate number of wrapped lines in this entry
+		const unsigned int wrapCount = getWrappedLines((*lineItr)(), maxWidth);
 		accum += wrapCount;
 
 		offsMinor = 0;
@@ -234,6 +242,54 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
+	// Return values
+	unsigned int offsMajor = offs.first + 1;
+	unsigned int offsMinor = offs.second;
+
+	// Accumulator to compare against lines
+	unsigned int accum = 0;
+
+
+	int initialOffset = offs.second;
+
+	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	// Start at offsMajor + offsMinor, counting at most MAXHEIGHT lines
+	for(auto lineItr = begin + offs.first; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
+	{
+		// Calculate number of wrapped lines in this entry
+		const unsigned int wrapCount = getWrappedLines((*lineItr)(), maxWidth, initialOffset);
+		initialOffset = 0;
+
+		// Update accumulator
+		accum += wrapCount;
+		offsMinor = wrapCount;
+
+		if(accum > lines)
+		{
+			const int diff = accum - lines;
+			offsMinor -= diff;
+//			offsMajor--;
+		}
+		else if(accum == lines)
+		{
+
+		}
+
+
+
+	}
+
+	// Check if we have gone past the bottom
+	// TODO, would be nice to rewrite and take this out as well as the addition reverse iterators...
+	const auto bottom = getBottom(rbegin, rend, maxWidth, maxHeight);
+	if(bottom.first < offsMajor || (bottom.first == offsMajor && bottom.second < offsMinor))
+	{
+		return bottom;
+	}
+	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
+
+
+#if 0
 //	const unsigned int cSize = (end - begin);
 	const auto beginOffs = offs.first;
 	unsigned int offsMajor = beginOffs;
@@ -265,6 +321,7 @@ std::pair<unsigned int, unsigned int> getScrollDown
 		return bottom;
 	}
 	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
+#endif
 }
 
 
