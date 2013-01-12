@@ -162,7 +162,6 @@ unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth)
 }
 
 
-
 // ---------------------------------------------------------------------------
 // Scroll Up offset calculation based on vector, maxWidth, maxHeight, lines to
 // scroll up, and initial offset

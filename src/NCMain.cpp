@@ -159,7 +159,7 @@ int doit(int argc, char* argv[])
 							const int incomingMsgColor = 1;
 							//const std::string nMsg = "[" + NCTimeUtils::getTimeStamp() + "] ";
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
-							const NCString line = nMsg + NCString(t + " (from " + s + ")", incomingMsgColor);
+							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", incomingMsgColor);
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
@@ -650,7 +650,7 @@ int doit(int argc, char* argv[])
 								, [&](const String &s, const int, const int) { }  // connectionStepCB
 								, [&](const String &s, const String &t) { msgSignal(s, t); }  // msgReceivedCB
 								, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
-								, [&](const String &t) { msgSignal(t, " logged on"); } // buddySignedOnCB 
+								, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
 								) );
 
 							// TODO, no indication if connection failed or for what reason
