@@ -421,8 +421,9 @@ int doit(int argc, char* argv[])
 							ncs->append("      protocol		username");
 							ncs->append("      prpl-sipe	user@domain.com,domain\\user");
 							ncs->append("      prpl-jabber	user@gmail.com");
-							ncs->append("  /newwin name  create a window named name");
-							ncs->append("  /info win   get info about a window");
+							ncs->append("  /newwin name(s)  create a window named name");
+							ncs->append("  /info win(s)   get info about a window");
+							ncs->append("  /jump win(s)   jump to window (reorder)");
 							ncs->append("  /d1       print debug output to test text wrapping");
 							ncs->append("  /d2       print debug shorter string output to test page up/down");
 							ncs->append("");
@@ -508,7 +509,6 @@ int doit(int argc, char* argv[])
 					else if(cmd.find("/info") == 0)
 					{
 						ncs->append(cmd);
-
 						typedef boost::split_iterator<std::string::iterator> ItrType;
 				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
 				             i != ItrType();
@@ -527,6 +527,32 @@ int doit(int argc, char* argv[])
 				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
 				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
 				        				ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
+				        				const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
+				        				ncs->append(std::string("     border: ") + borderVal);
+				        			}
+				        			return true;
+				        		});
+				        	}
+				        }
+				        ncs->refresh();
+					}
+					else if(cmd.find("/jump") == 0)
+					{
+						ncs->append(cmd);
+						typedef boost::split_iterator<std::string::iterator> ItrType;
+				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+				             i != ItrType();
+				             ++i)
+				        {
+				        	const std::string winName = boost::copy_range<std::string>(*i);
+				        	if(winName != "/jump")
+				        	{
+				        		win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				        		{
+				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
+				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
+				        			{
+				        				win3.bringToFront(nobj);  // TODO, do we want to reorder the list like this?
 				        			}
 				        			return true;
 				        		});
