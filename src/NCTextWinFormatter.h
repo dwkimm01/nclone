@@ -13,8 +13,10 @@
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include "NCString.h"
-#include "NCExceptionOutOfRange.h"
+
+#include <fstream>
 #include <boost/lexical_cast.hpp>
+#include "NCExceptionOutOfRange.h"
 
 // ---------------------------------------------------------------------------
 // This isn't in there already?  using namespace boost::algorithm did not help
@@ -147,6 +149,21 @@ std::pair<unsigned int, unsigned int> getTop(ForwardIterator begin, ForwardItera
 
 
 // ---------------------------------------------------------------------------
+// Calculate number of minor lines in string
+unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth)
+{
+	unsigned int minorLines = 0;
+	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	for(Itr subItr = boost::make_split_iterator(s, LengthFinder(maxWidth)); subItr != Itr(); ++subItr)
+	{
+		++minorLines;
+	}
+	return minorLines;
+}
+
+
+
+// ---------------------------------------------------------------------------
 // Scroll Up offset calculation based on vector, maxWidth, maxHeight, lines to
 // scroll up, and initial offset
 template <typename ReverseIterator>
@@ -158,6 +175,58 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
+	static std::ofstream oFile("info.txt");
+
+	// Convert offset to reverse offset
+	const unsigned int cSize = end - begin;
+	const unsigned int beginOffs = (offs.first < cSize)?(cSize - offs.first):(0);
+
+	// Return values
+	unsigned int offsMajor = beginOffs;
+	unsigned int offsMinor = offs.second;
+
+	// Accumulator to compare against lines
+	unsigned int accum = 0;
+
+	// Take care of initial minor offset first
+	accum += offs.second;  if(accum > lines) throw(1); // TODO, took care of scrolling in a single big ENTRY's minor lines
+
+	// Start at offsMajor, count at most "lines" lines
+	for(auto lineItr = begin + beginOffs /*- 1*/; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
+	{
+		unsigned int wrapCount = getWrappedLines((*lineItr)(), maxWidth);
+		accum += wrapCount;
+
+		offsMinor = 0;
+		if(accum > lines)
+		{
+			oFile << "wrapCount = " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
+			offsMinor = wrapCount - (accum-lines);
+			oFile << "     offsMinor = " << offsMinor << std::endl;
+			accum = lines;
+		}
+		else if(lines == accum)
+		{
+			oFile << "wrapCount == " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
+
+		}
+
+	}
+
+
+	// Check to see if out of bounds has been reached
+	if(offsMajor < cSize)
+	{
+//		oFile << "RET: csize(" << cSize << ") offsMajor(" << offsMajor << ") offsMinor(" << offsMinor << ")" << std::endl;
+		return std::pair<unsigned int, unsigned int>(cSize - offsMajor, offsMinor);
+	}
+//	throw ncexception::NCException("offsMajor " + boost::lexical_cast<std::string>(offsMajor), FLINFO);
+
+	return std::pair<unsigned int, unsigned int>(0, 0);
+
+
+
+#if 0
 	const unsigned int cSize = end - begin;
 	const auto beginOffs = (offs.first < cSize)?(cSize - offs.first):(0);
 	unsigned int offsMajor = beginOffs;
@@ -217,6 +286,7 @@ std::pair<unsigned int, unsigned int> getScrollUp
 			}
 		}
 	}
+#endif
 
 //	if(offsMinor > 1)
 //		throw ncexception::NCException("XXX = " + boost::lexical_cast<std::string>(XXX), FLINFO);
@@ -253,12 +323,14 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	}
 #endif
 
+#if 0
 	// TODO, need to check somewhere if we have gone past the bottom
 	if(offsMajor < cSize)
 	{
 		return std::pair<unsigned int, unsigned int>(cSize - offsMajor, offsMinor);
 	}
 	return std::pair<unsigned int, unsigned int>(0, 0);
+#endif
 }
 
 
