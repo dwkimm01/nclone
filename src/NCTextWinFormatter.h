@@ -14,9 +14,9 @@
 #include <boost/algorithm/string.hpp>
 #include "NCString.h"
 
-#include <fstream>
+// #include <fstream>
 #include <boost/lexical_cast.hpp>
-#include "NCExceptionOutOfRange.h"
+// #include "NCExceptionOutOfRange.h"
 
 // ---------------------------------------------------------------------------
 // This isn't in there already?  using namespace boost::algorithm did not help
@@ -174,8 +174,8 @@ std::pair<unsigned int, unsigned int> getScrollUp
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-	static std::ofstream oFile("info.txt");
 
+//	static std::ofstream oFile("info.txt");
 	// Convert offset to reverse offset
 	const unsigned int cSize = end - begin;
 	const unsigned int beginOffs = (offs.first < cSize)?(cSize - offs.first):(0);
@@ -208,14 +208,14 @@ std::pair<unsigned int, unsigned int> getScrollUp
 		offsMinor = 0;
 		if(accum > lines)
 		{
-			oFile << "wrapCount = " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
+//			oFile << "wrapCount = " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
 			offsMinor = wrapCount - (accum-lines);
-			oFile << "     offsMinor = " << offsMinor << std::endl;
+//			oFile << "     offsMinor = " << offsMinor << std::endl;
 			accum = lines;
 		}
 		else if(lines == accum)
 		{
-			oFile << "wrapCount == " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
+//			oFile << "wrapCount == " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
 		}
 	}
 
@@ -242,14 +242,16 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
+// static std::ofstream oFile("info.txt");
 	// Return values
-	unsigned int offsMajor = offs.first + 1;
-	unsigned int offsMinor = offs.second;
+	unsigned int offsMajor = offs.first -1;
+	unsigned int offsMinor = 0; // offs.second;
 
 	// Accumulator to compare against lines
 	unsigned int accum = 0;
 
-
+// oFile << "DWN, init: " << offs.first << ", " << offs.second << std::endl;
+// oFile << "   lines = " << lines << std::endl;
 	int initialOffset = offs.second;
 
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
@@ -268,17 +270,17 @@ std::pair<unsigned int, unsigned int> getScrollDown
 		{
 			const int diff = accum - lines;
 			offsMinor -= diff;
-//			offsMajor--;
+// oFile << "   a>l mod " << std::endl; 
 		}
 		else if(accum == lines)
 		{
-
+// oFile << "   a==l mod " << std::endl; 
+                        offsMinor = 0;
+                        ++offsMajor;
 		}
-
-
-
 	}
 
+// oFile << "   final:: " << offsMajor << ", " << offsMinor << std::endl;
 	// Check if we have gone past the bottom
 	// TODO, would be nice to rewrite and take this out as well as the addition reverse iterators...
 	const auto bottom = getBottom(rbegin, rend, maxWidth, maxHeight);
@@ -288,40 +290,6 @@ std::pair<unsigned int, unsigned int> getScrollDown
 	}
 	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
 
-
-#if 0
-//	const unsigned int cSize = (end - begin);
-	const auto beginOffs = offs.first;
-	unsigned int offsMajor = beginOffs;
-	unsigned int offsMinor = offs.second;
-	unsigned int offsMinorFirst = offs.second;
-
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	unsigned int accum = 0;
-	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(auto lineItr = begin + beginOffs; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
-	{
-		int subLines = ((*lineItr).size() > maxWidth) ? (1 + (((*lineItr).size() - 1) / maxWidth)) : (1);
-
-		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)), offsMinorFirst); subItr != Itr() && accum < lines; ++subItr)
-		{
-			offsMinorFirst = 0;
-			offsMinor = (--subLines);
-			++accum;
-//			std::cout << "    " << accum << " << " << (*subItr) << " >> " << offs.first << ":: " << offsMinor << std::endl;
-		}
-	}
-
-	// TODO, it would be nice to get rid of the getBottom call and not have to pass in
-	// the reverse iterators too
-	// Check if we have gone past the bottom
-	const auto bottom = getBottom(rbegin, rend, maxWidth, maxHeight);
-	if(bottom.first < offsMajor || (bottom.first == offsMajor && bottom.second < offsMinor))
-	{
-		return bottom;
-	}
-	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
-#endif
 }
 
 
