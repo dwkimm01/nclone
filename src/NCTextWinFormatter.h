@@ -37,7 +37,7 @@ namespace ncpp
 {
 
 // ---------------------------------------------------------------------------
-// Functor used to actually split a string based on a max length
+// Functor used to split a string based on a max length
 // TODO, should be able to just replace this with one that splits the
 // string but is aware of spaces and tries to keep words together
 struct LengthFinder
@@ -99,6 +99,40 @@ struct LengthSpaceFinder
 private:
 	int p_length;
 };
+
+
+// ---------------------------------------------------------------------------
+// Functor used to split a string based on a max length, cuts off anything
+// longer than length
+struct LengthMaxFinder
+{
+	LengthMaxFinder(const int length) : p_length(length), p_once(false) {}
+
+	template <typename ForwardItr>
+	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
+	{
+		if(p_once)
+		{
+			return boost::iterator_range<ForwardItr>(Begin, End);
+		}
+
+		const ForwardItr n = Begin + p_length;
+		if(n >= End)
+		{
+			return boost::iterator_range<ForwardItr>(End, End);
+		}
+
+		p_once = true;
+//		Begin = End;
+		*n = '+';
+		return boost::iterator_range<ForwardItr>(n, n);
+	}
+
+private:
+	int p_length;
+	mutable bool p_once;
+};
+
 
 
 
