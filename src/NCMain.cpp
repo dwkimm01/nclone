@@ -552,6 +552,9 @@ int doit(int argc, char* argv[])
 				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
 				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
 				        			{
+				        				// TODO, replace this logic for refreshing with more generic NCWin usage (refresh)
+				        				auto nobjsb = dynamic_cast<NCWinScrollback*>(nobjwin);
+				        				if(nobjsb) ncs = nobjsb;
 				        				win3.bringToFront(nobj);  // TODO, do we want to reorder the list like this?
 				        			}
 				        			return true;
