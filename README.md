@@ -61,7 +61,7 @@ Next up (TODO list)
 - Make chats full screen
 - Take away chat window border
 - Get "OK" input from user for cert problems
- - look at ncurses.h also has a "pad" full window type.
+- look at ncurses.h also has a "pad" full window type.
 - Configuration type system
 
 
