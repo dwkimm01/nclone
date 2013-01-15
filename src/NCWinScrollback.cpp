@@ -14,6 +14,9 @@
 namespace ncpp
 {
 
+typedef NCTextWinFormatter<LengthFinder> Splitter;
+
+
 NCWinScrollback::NCWinScrollback
 	( NCObject* parent
 	, NCWinCfg cfg
@@ -41,7 +44,7 @@ void NCWinScrollback::refresh()
 	// Would be nice to have a more generic way of keeping track of where we are in the
 	// buffer but for now it's nice enough to be able to track the bottom (latest) if
 	// that's where we are
-	const bool following = getBottom(p_buff.rbegin(), p_buff.rend(), widthOld, heightOld) == p_offs;
+	const bool following = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), widthOld, heightOld) == p_offs;
 
 	// TODO, need to call the base class refresh first since it will do the window resizing
 	// so that we will know what the new cfg.p_h/w/x/y are going to be
@@ -66,11 +69,11 @@ void NCWinScrollback::refresh()
 	// Recalculate offset
 	if(following)
 	{
-		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
+		p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 
 	// Print the buffer to the window
-	printWindow
+	Splitter::printWindow
 	   ( p_buff.begin()
 	   , p_buff.end()
 	   , width
@@ -101,13 +104,13 @@ void NCWinScrollback::append(const ncpp::NCString &line)
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
 	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
-	const bool following = getBottom(p_buff.rbegin(), p_buff.rend(), width, height) == p_offs;
+	const bool following = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height) == p_offs;
 
 	p_buff.addRow(line);
 
 	if(following)
 	{
-		p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
+		p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 }
 
@@ -118,7 +121,7 @@ void NCWinScrollback::scrollDown(const int n)
 	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
-	p_offs = getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
+	p_offs = Splitter::getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
 //	p_buff.addRow("<DW> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
@@ -129,7 +132,7 @@ void NCWinScrollback::scrollUp(const int n)
 	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
-	p_offs = getScrollUp(p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
+	p_offs = Splitter::getScrollUp(p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
 //	p_buff.addRow("<UP> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
@@ -149,12 +152,12 @@ void NCWinScrollback::pageUp()
 
 void NCWinScrollback::home()
 {
-	p_offs = ::ncpp::getTop(p_buff.begin(), p_buff.end());
+	p_offs = Splitter::getTop(p_buff.begin(), p_buff.end());
 }
 
 void NCWinScrollback::end()
 {
-	p_offs = getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
+	p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
 }
 
 void NCWinScrollback::clear()

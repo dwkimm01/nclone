@@ -61,6 +61,10 @@ private:
 };
 
 
+template <typename Splitter = LengthFinder>
+class NCTextWinFormatter
+{
+public:
 
 
 // ---------------------------------------------------------------------------
@@ -68,7 +72,7 @@ private:
 // maxHeight, and an initial offsMajor, offsMinor
 typedef std::function<void(const NCString&)> PrinterType;
 template <typename ForwardIterator>
-void printWindow
+static void printWindow
    ( ForwardIterator begin
    , ForwardIterator end
    , const unsigned int maxWidth
@@ -84,7 +88,7 @@ void printWindow
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
 	for(ForwardIterator lineItr = begin + std::min((unsigned int)(end - begin), offsMajor); lineItr != end && accum < maxHeight; ++lineItr)
 	{
-		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), LengthFinder(maxWidth)), offsMinorInit); subItr != Itr() && accum < maxHeight; ++subItr)
+		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), Splitter(maxWidth)), offsMinorInit); subItr != Itr() && accum < maxHeight; ++subItr)
 		{
 			offsMinorInit = 0;
 //			print(boost::copy_range<std::string>(*subItr));
@@ -110,7 +114,7 @@ void printWindow
 // ---------------------------------------------------------------------------
 // Bottom offset given given vector, maxHeight, maxWidth, etc
 template<typename ReverseItr>
-std::pair<unsigned int, unsigned int> getBottom
+static std::pair<unsigned int, unsigned int> getBottom
 	( ReverseItr begin
 	, ReverseItr end
 	, const unsigned int maxWidth
@@ -142,7 +146,7 @@ std::pair<unsigned int, unsigned int> getBottom
 // ---------------------------------------------------------------------------
 // Top offset given vector
 template <typename ForwardIterator>
-std::pair<unsigned int, unsigned int> getTop(ForwardIterator begin, ForwardIterator end)
+static std::pair<unsigned int, unsigned int> getTop(ForwardIterator begin, ForwardIterator end)
 {
 	return std::pair<unsigned int, unsigned int>(0, 0);
 }
@@ -150,11 +154,11 @@ std::pair<unsigned int, unsigned int> getTop(ForwardIterator begin, ForwardItera
 
 // ---------------------------------------------------------------------------
 // Calculate number of minor lines in string
-unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth, const unsigned int initialOffset = 0)
+static unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth, const unsigned int initialOffset = 0)
 {
 	unsigned int minorLines = 0;
 	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	for(Itr subItr = ADDSPL(boost::make_split_iterator(s, LengthFinder(maxWidth)), initialOffset); subItr != Itr(); ++subItr)
+	for(Itr subItr = ADDSPL(boost::make_split_iterator(s, Splitter(maxWidth)), initialOffset); subItr != Itr(); ++subItr)
 	{
 		++minorLines;
 	}
@@ -166,7 +170,7 @@ unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth, const 
 // Scroll Up offset calculation based on vector, maxWidth, maxHeight, lines to
 // scroll up, and initial offset
 template <typename ReverseIterator>
-std::pair<unsigned int, unsigned int> getScrollUp
+static std::pair<unsigned int, unsigned int> getScrollUp
 	( ReverseIterator begin
 	, ReverseIterator end
 	, const unsigned int maxWidth
@@ -232,7 +236,7 @@ std::pair<unsigned int, unsigned int> getScrollUp
 // Scroll Down offset calculation based on vector, maxWidth, maxHeight, lines
 // to scroll up, and initial offset
 template <typename Iterator, typename ReverseIterator>
-std::pair<unsigned int, unsigned int> getScrollDown
+static std::pair<unsigned int, unsigned int> getScrollDown
 	( Iterator begin
 	, Iterator end
 	, ReverseIterator rbegin
@@ -293,7 +297,7 @@ std::pair<unsigned int, unsigned int> getScrollDown
 }
 
 
-
+}; // class NCTextWinFormatter
 
 } // namespace ncpp
 
