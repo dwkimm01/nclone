@@ -1,5 +1,8 @@
 TODO list
 
+- Remove TODO items from README.md
+ . Add build instructions to README.md
+
 - Window background color
 - Text attributes
  . A_BOLD, A_STANDOUT, A_BLINKING, etc
