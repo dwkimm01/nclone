@@ -22,7 +22,7 @@
 // This isn't in there already?  using namespace boost::algorithm did not help
 template<typename T>
 // boost::split_iterator<T> operator+=(boost::split_iterator<T> & lhs, const int addr)
-boost::split_iterator<T> ADDSPL(boost::split_iterator<T> lhs, const int addr)
+boost::find_iterator<T> ADDSPL(boost::find_iterator<T> lhs, const int addr)
 {
 	for(int i = 0; i < addr; ++i)
 	{
@@ -49,11 +49,12 @@ struct LengthFinder
 	{
 		const ForwardItr n = Begin + p_length;
 
+		// Reached the end, return (final) entire range
 		if(n >= End)
 		{
-			return boost::iterator_range<ForwardItr>(End, End);
+			return boost::iterator_range<ForwardItr>(Begin, End);
 		}
-		return boost::iterator_range<ForwardItr>(n, n);
+		return boost::iterator_range<ForwardItr>(Begin, n);
 	}
 
 private:
@@ -70,6 +71,40 @@ struct LengthSpaceFinder
 	template <typename ForwardItr>
 	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
 	{
+
+		const ForwardItr n = Begin + p_length;
+
+		// Reached the end, return (final) entire range
+		if(n > End)
+		{
+			return boost::iterator_range<ForwardItr>(Begin, End);
+		}
+
+		// Check to see if we have ended on a space
+		const char spaceChar = ' ';
+		if(spaceChar == *n)
+		{
+			return boost::iterator_range<ForwardItr>(Begin, n);
+		}
+
+		// Find last available space
+		ForwardItr lastSpace = Begin;
+		for(ForwardItr itr = Begin; itr != n; ++itr)
+		{
+			if(spaceChar == *itr)
+			{
+				lastSpace = itr;
+			}
+		}
+
+		if(lastSpace > Begin)
+		{
+			return boost::iterator_range<ForwardItr>(Begin, lastSpace);
+		}
+
+		return boost::iterator_range<ForwardItr>(Begin, n);
+
+#if 0
 		const ForwardItr n = Begin + p_length;
 
 		// At the end, return entire range
@@ -94,6 +129,7 @@ struct LengthSpaceFinder
 		}
 
 		return boost::iterator_range<ForwardItr>(n, n);
+#endif
 	}
 
 private:
@@ -111,6 +147,23 @@ struct LengthMaxFinder
 	template <typename ForwardItr>
 	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
 	{
+		const ForwardItr n = Begin + p_length;
+
+		// Reached the end, return (final) entire range
+		if(n > End)
+		{
+			return boost::iterator_range<ForwardItr>(Begin, End);
+		}
+
+		if(p_once)
+		{
+			return boost::iterator_range<ForwardItr>(End, End);
+		}
+
+		p_once = true;
+		return boost::iterator_range<ForwardItr>(Begin, n);
+
+#if 0
 		if(p_once)
 		{
 			return boost::iterator_range<ForwardItr>(Begin, End);
@@ -126,6 +179,7 @@ struct LengthMaxFinder
 //		Begin = End;
 		*n = '+';
 		return boost::iterator_range<ForwardItr>(n, n);
+#endif
 	}
 
 private:
@@ -158,12 +212,12 @@ static void printWindow
 {
 	unsigned int offsMinorInit = offsMinor;
 
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 	unsigned int accum = 0;
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
 	for(ForwardIterator lineItr = begin + std::min((unsigned int)(end - begin), offsMajor); lineItr != end && accum < maxHeight; ++lineItr)
 	{
-		for(Itr subItr = ADDSPL(boost::make_split_iterator((*lineItr)(), Splitter(maxWidth)), offsMinorInit); subItr != Itr() && accum < maxHeight; ++subItr)
+		for(Itr subItr = ADDSPL(boost::make_find_iterator((*lineItr)(), Splitter(maxWidth)), offsMinorInit); subItr != Itr() && accum < maxHeight; ++subItr)
 		{
 			offsMinorInit = 0;
 //			print(boost::copy_range<std::string>(*subItr));
@@ -188,7 +242,7 @@ static std::pair<unsigned int, unsigned int> getBottom
 	, const unsigned int maxWidth
 	, const unsigned int maxHeight )
 {
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 
 	unsigned int accum = 0;
 	unsigned int offsMajor = end - begin;
@@ -225,8 +279,8 @@ static std::pair<unsigned int, unsigned int> getTop(ForwardIterator begin, Forwa
 static unsigned int getWrappedLines(std::string &s, const unsigned int maxWidth, const unsigned int initialOffset = 0)
 {
 	unsigned int minorLines = 0;
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
-	for(Itr subItr = ADDSPL(boost::make_split_iterator(s, Splitter(maxWidth)), initialOffset); subItr != Itr(); ++subItr)
+	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
+	for(Itr subItr = ADDSPL(boost::make_find_iterator(s, Splitter(maxWidth)), initialOffset); subItr != Itr(); ++subItr)
 	{
 		++minorLines;
 	}
@@ -326,7 +380,7 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 // oFile << "   lines = " << lines << std::endl;
 	int initialOffset = offs.second;
 
-	typedef boost::algorithm::split_iterator<std::string::iterator> Itr;
+	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 	// Start at offsMajor + offsMinor, counting at most MAXHEIGHT lines
 	for(auto lineItr = begin + offs.first; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
 	{
