@@ -47,18 +47,59 @@ struct LengthFinder
 	template <typename ForwardItr>
 	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
 	{
-		ForwardItr n = Begin + p_length;
+		const ForwardItr n = Begin + p_length;
 
 		if(n >= End)
 		{
 			return boost::iterator_range<ForwardItr>(End, End);
 		}
-		return boost::iterator_range<ForwardItr>(n , n);
+		return boost::iterator_range<ForwardItr>(n, n);
 	}
 
 private:
 	int p_length;
 };
+
+// ---------------------------------------------------------------------------
+// Functor used to split a string based on length but try to split based on
+// last found space character
+struct LengthSpaceFinder
+{
+	LengthSpaceFinder(const int length) : p_length(length) {}
+
+	template <typename ForwardItr>
+	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
+	{
+		const ForwardItr n = Begin + p_length;
+
+		// At the end, return entire range
+		if(n >= End)
+		{
+			return boost::iterator_range<ForwardItr>(End, End);
+		}
+
+		// Find last space within range n (p_length)
+		ForwardItr lastSpace = Begin;
+		for(ForwardItr itr = Begin; itr != n; ++itr)
+		{
+			if(' ' == *itr)
+			{
+				lastSpace = itr;
+			}
+		}
+
+		if(' ' != *n && lastSpace != Begin && lastSpace < n)
+		{
+			return boost::iterator_range<ForwardItr>(lastSpace, lastSpace);
+		}
+
+		return boost::iterator_range<ForwardItr>(n, n);
+	}
+
+private:
+	int p_length;
+};
+
 
 
 template <typename Splitter = LengthFinder>
@@ -92,18 +133,11 @@ static void printWindow
 		{
 			offsMinorInit = 0;
 //			print(boost::copy_range<std::string>(*subItr));
-			const std::string val = boost::copy_range<std::string>(*subItr);
 
-            // TODO, fix color here - or actually in NCString.cpp now
-			// if it's even possible to fix it there.
-//			boost::iterator_range<std::string::iterator> xyz = *subItr;
-//			std::string::iterator beg = xyz.begin();
-//			beg - (*lineItr).begin();
-//			boost::iterator_range<std::string::iterator> beg((*lineItr)());
-//			xyz - xyz.begin();
-//			lineItr->sub(boost::begin(subItr), boost::end(subItr));
+//			const std::string val = boost::copy_range<std::string>(*subItr);
+//			const NCString ncstr(val, 0);
+//			print(ncstr);
 
-//			print(lineItr->extract(val));
 			print(lineItr->substr( (*subItr).begin(), (*subItr).end() ));
 			++accum;
 		}

@@ -14,7 +14,8 @@
 namespace ncpp
 {
 
-typedef NCTextWinFormatter<LengthFinder> Splitter;
+//typedef NCTextWinFormatter<LengthFinder> Splitter;
+typedef NCTextWinFormatter<LengthSpaceFinder> Splitter;
 
 
 NCWinScrollback::NCWinScrollback

@@ -426,6 +426,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  /jump win(s)   jump to window (reorder)");
 							ncs->append("  /d1       print debug output to test text wrapping");
 							ncs->append("  /d2       print debug shorter string output to test page up/down");
+							ncs->append("  /lorem    print debug lorem text to test space wrapping");
 							ncs->append("");
 							ncs->append(" Shortcuts");
 							ncs->append("  CTRL-c     quit");
@@ -610,6 +611,14 @@ int doit(int argc, char* argv[])
 							{
 								ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
 							}
+							ncs->refresh();
+						}
+					}
+					else if(cmd == "/lorem")
+					{
+						if(ncs)
+						{
+							ncs->append(testexampletext::TestExampleText::get());
 							ncs->refresh();
 						}
 					}

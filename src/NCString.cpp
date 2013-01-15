@@ -4,10 +4,12 @@
  * Created on: December 11, 2012
  * Author:  Jeremy Myslinski, David Kimmel
  */
+
+#include <iostream>
+#include <boost/lexical_cast.hpp>
 #include "NCString.h"
 #include "NCWin.h"
 #include "NCExceptionOutOfRange.h"
-#include <iostream>
 
 namespace ncpp
 {
@@ -63,7 +65,8 @@ NCString NCString::substr(std::string::iterator begin, std::string::iterator end
 	const int count = end - begin;
 	if(offs > colorString.size())
 	{
-		throw NCExceptionOutOfRange("Offset greater than color string size", FLINFO);
+		throw NCExceptionOutOfRange("Offset (" + boost::lexical_cast<std::string>(offs) + ") greater than color string size ("
+				+ boost::lexical_cast<std::string>(colorString.size()) + ")", FLINFO);
 	}
 
 	const std::string s(begin, end);
