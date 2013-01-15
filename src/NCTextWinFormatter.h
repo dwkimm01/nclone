@@ -97,39 +97,15 @@ struct LengthSpaceFinder
 			}
 		}
 
+		// Use last space as long as it's more than the starting point
 		if(lastSpace > Begin)
 		{
 			return boost::iterator_range<ForwardItr>(Begin, lastSpace);
 		}
 
+		// Otherwise just return the entire string and while this forces the
+		// cutting of a string in half at least we've tried
 		return boost::iterator_range<ForwardItr>(Begin, n);
-
-#if 0
-		const ForwardItr n = Begin + p_length;
-
-		// At the end, return entire range
-		if(n >= End)
-		{
-			return boost::iterator_range<ForwardItr>(End, End);
-		}
-
-		// Find last space within range n (p_length)
-		ForwardItr lastSpace = Begin;
-		for(ForwardItr itr = Begin; itr != n; ++itr)
-		{
-			if(' ' == *itr)
-			{
-				lastSpace = itr;
-			}
-		}
-
-		if(' ' != *n && lastSpace != Begin && lastSpace < n)
-		{
-			return boost::iterator_range<ForwardItr>(lastSpace, lastSpace);
-		}
-
-		return boost::iterator_range<ForwardItr>(n, n);
-#endif
 	}
 
 private:
@@ -162,28 +138,14 @@ struct LengthMaxFinder
 
 		p_once = true;
 		return boost::iterator_range<ForwardItr>(Begin, n);
-
-#if 0
-		if(p_once)
-		{
-			return boost::iterator_range<ForwardItr>(Begin, End);
-		}
-
-		const ForwardItr n = Begin + p_length;
-		if(n >= End)
-		{
-			return boost::iterator_range<ForwardItr>(End, End);
-		}
-
-		p_once = true;
-//		Begin = End;
-		*n = '+';
-		return boost::iterator_range<ForwardItr>(n, n);
-#endif
 	}
 
 private:
 	int p_length;
+	// TODO, would be nice to not have this mutable and then change
+	// it in that const method - but will have to construct it differently
+	// to give it a different means of flagging the first call so to speak
+	// Maybe the string's begin iterator...
 	mutable bool p_once;
 };
 
