@@ -618,7 +618,10 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(testexampletext::TestExampleText::get());
+							const NCString entry
+//								= NCTimeUtils::getPrintableColorTimeStamp()
+								= NCString(" " + testexampletext::TestExampleText::get(), 6);
+							ncs->append(entry);
 							ncs->refresh();
 						}
 					}

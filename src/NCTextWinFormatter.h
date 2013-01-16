@@ -14,7 +14,7 @@
 #include <boost/algorithm/string.hpp>
 #include "NCString.h"
 
-// #include <fstream>
+//#include <fstream>
 #include <boost/lexical_cast.hpp>
 // #include "NCExceptionOutOfRange.h"
 
@@ -66,11 +66,12 @@ private:
 // last found space character
 struct LengthSpaceFinder
 {
-	LengthSpaceFinder(const int length) : p_length(length) {}
+	LengthSpaceFinder(const int length) : p_length(length), p_skipFirstSpace(false) {}
 
 	template <typename ForwardItr>
 	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
 	{
+		if(p_skipFirstSpace && ' ' == *Begin) { ++Begin; p_skipFirstSpace = false; }
 
 		const ForwardItr n = Begin + p_length;
 
@@ -100,6 +101,7 @@ struct LengthSpaceFinder
 		// Use last space as long as it's more than the starting point
 		if(lastSpace > Begin)
 		{
+			p_skipFirstSpace = true;
 			return boost::iterator_range<ForwardItr>(Begin, lastSpace);
 		}
 
@@ -110,6 +112,7 @@ struct LengthSpaceFinder
 
 private:
 	int p_length;
+	mutable bool p_skipFirstSpace;  // TODO, change this like the LengthMaxFinder...?
 };
 
 
@@ -278,9 +281,10 @@ static std::pair<unsigned int, unsigned int> getScrollUp
 	if(accum > lines)
 	{
 		offsMajor = beginOffs;
-		offsMinor = offs.second - (accum - lines);
-		// TODO, this needs testing
-//		throw(1); // TODO, took care of scrolling in a single big ENTRY's minor lines
+		offsMinor = accum - lines;
+//		oFile << "accum = " << accum << ", lines = " << lines << std::endl;
+//		oFile << "  offsMajor = " << offsMajor << ", offsMinor = " << offsMinor << std::endl;
+		return std::pair<unsigned int, unsigned int>(cSize - offsMajor, offsMinor);
 	}
 	offsMinor = 0;
 
@@ -295,7 +299,9 @@ static std::pair<unsigned int, unsigned int> getScrollUp
 		if(accum > lines)
 		{
 //			oFile << "wrapCount = " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
-			offsMinor = wrapCount - (accum-lines);
+//			offsMinor = wrapCount - (wrapCount - (accum-lines));
+			offsMinor = accum - lines;
+
 //			oFile << "     offsMinor = " << offsMinor << std::endl;
 			accum = lines;
 		}
@@ -328,7 +334,7 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-// static std::ofstream oFile("info.txt");
+//static std::ofstream oFile("info.txt");
 	// Return values
 	unsigned int offsMajor = offs.first -1;
 	unsigned int offsMinor = 0; // offs.second;
@@ -336,8 +342,8 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 	// Accumulator to compare against lines
 	unsigned int accum = 0;
 
-// oFile << "DWN, init: " << offs.first << ", " << offs.second << std::endl;
-// oFile << "   lines = " << lines << std::endl;
+//oFile << "DWN, init: " << offs.first << ", " << offs.second << std::endl;
+//oFile << "   lines = " << lines << std::endl;
 	int initialOffset = offs.second;
 
 	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
@@ -356,11 +362,11 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 		{
 			const int diff = accum - lines;
 			offsMinor -= diff;
-// oFile << "   a>l mod " << std::endl; 
+//oFile << "   a>l mod " << std::endl;
 		}
 		else if(accum == lines)
 		{
-// oFile << "   a==l mod " << std::endl; 
+//oFile << "   a==l mod " << std::endl;
                         offsMinor = 0;
                         ++offsMajor;
 		}
