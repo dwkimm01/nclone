@@ -217,9 +217,7 @@ static std::pair<unsigned int, unsigned int> getBottom
 		--offsMajor;
 		// Each new entry restarts the sub line (split) iterator
 		offsMinor = 0;
-		const auto &entry = *lineItr;
-		const auto subLines = (entry.size() > maxWidth) ? (1 + ((entry.size() - 1) / maxWidth)) : (1);
-		accum += subLines;
+		accum += getWrappedLines((*lineItr)(), maxWidth);
 		if(accum > maxHeight) offsMinor += (accum - maxHeight);
 	}
 
