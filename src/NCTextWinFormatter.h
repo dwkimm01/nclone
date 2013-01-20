@@ -127,15 +127,16 @@ struct LengthMaxFinder
 	{
 		const ForwardItr n = Begin + p_length;
 
-		// Reached the end, return (final) entire range
-		if(n > End)
-		{
-			return boost::iterator_range<ForwardItr>(Begin, End);
-		}
-
 		if(p_once)
 		{
 			return boost::iterator_range<ForwardItr>(End, End);
+		}
+
+		// Reached the end, return (final) entire range
+		if(n > End)
+		{
+			p_once = true;
+			return boost::iterator_range<ForwardItr>(Begin, End);
 		}
 
 		p_once = true;
