@@ -62,12 +62,26 @@ public:
 	 */
 	void clear();
 
+	// Set different wrap strategies
+	void setWrapLength();
+	void setWrapWordLength();
+	void setWrapCut();
+
 private:
 	NCWinBuffer p_buff;
 	// Note, the second value will definitely be
 	// dependent on the width and height of the
 	// window
 	std::pair<unsigned int, unsigned int> p_offs;
+
+	// Functions for wrapping
+	typedef std::pair<unsigned int, unsigned int> OffsPair;
+	std::function<void(NCWinBuffer::Iterator, NCWinBuffer::Iterator, const unsigned int, const unsigned int, const unsigned int, const unsigned int, std::function<void(const NCString&)> )> p_printWindow;
+	std::function<OffsPair(NCWinBuffer::ReverseIterator, NCWinBuffer::ReverseIterator, const unsigned int, const unsigned int)> p_getBottom;
+	std::function<OffsPair(NCWinBuffer::Iterator, NCWinBuffer::Iterator)> p_getTop;
+
+	std::function<OffsPair(NCWinBuffer::ReverseIterator, NCWinBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollUp;
+	std::function<OffsPair(NCWinBuffer::Iterator, NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator, NCWinBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollDown;
 };
 
 } // namespace ncpp

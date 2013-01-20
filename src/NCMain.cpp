@@ -132,6 +132,7 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
+		winBl->setWrapCut();
 
 
 		NCString one(" One", 1);

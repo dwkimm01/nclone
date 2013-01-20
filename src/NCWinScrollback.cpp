@@ -15,7 +15,7 @@ namespace ncpp
 {
 
 //typedef NCTextWinFormatter<LengthFinder> Splitter;
-typedef NCTextWinFormatter<LengthSpaceFinder> Splitter;
+//typedef NCTextWinFormatter<LengthSpaceFinder> Splitter;
 //typedef NCTextWinFormatter<LengthMaxFinder> Splitter;
 
 
@@ -31,6 +31,7 @@ NCWinScrollback::NCWinScrollback
 	, p_buff(scrollback)
 	, p_offs(0, 0)
 {
+	setWrapWordLength();
 }
 
 NCWinScrollback::~NCWinScrollback() {}
@@ -46,7 +47,7 @@ void NCWinScrollback::refresh()
 	// Would be nice to have a more generic way of keeping track of where we are in the
 	// buffer but for now it's nice enough to be able to track the bottom (latest) if
 	// that's where we are
-	const bool following = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), widthOld, heightOld) == p_offs;
+	const bool following = p_getBottom(p_buff.rbegin(), p_buff.rend(), widthOld, heightOld) == p_offs;
 
 	// TODO, need to call the base class refresh first since it will do the window resizing
 	// so that we will know what the new cfg.p_h/w/x/y are going to be
@@ -71,11 +72,20 @@ void NCWinScrollback::refresh()
 	// Recalculate offset
 	if(following)
 	{
-		p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
+		p_offs = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 
+
+//	auto xx = &Splitter::printWindow<NCWinBuffer::Iterator>;
+//	xx = &NCTextWinFormatter<LengthMaxFinder>::printWindow<NCWinBuffer::Iterator>;
+//	xx = &NCTextWinFormatter<LengthSpaceFinder>::printWindow<NCWinBuffer::Iterator>;
+//	xx = &NCTextWinFormatter<LengthFinder>::printWindow<NCWinBuffer::Iterator>;
+//	xx(p_buff.begin(), p_buff.end(), width, height, p_offs.first, p_offs.second, [&] (const NCString &s) {} );
+
+
 	// Print the buffer to the window
-	Splitter::printWindow
+//	Splitter::printWindow
+	p_printWindow
 	   ( p_buff.begin()
 	   , p_buff.end()
 	   , width
@@ -106,13 +116,13 @@ void NCWinScrollback::append(const ncpp::NCString &line)
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
 	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
-	const bool following = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height) == p_offs;
+	const bool following = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height) == p_offs;
 
 	p_buff.addRow(line);
 
 	if(following)
 	{
-		p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
+		p_offs = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 }
 
@@ -123,7 +133,7 @@ void NCWinScrollback::scrollDown(const int n)
 	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
-	p_offs = Splitter::getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
+	p_offs = p_getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
 //	p_buff.addRow("<DW> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
@@ -134,7 +144,7 @@ void NCWinScrollback::scrollUp(const int n)
 	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
-	p_offs = Splitter::getScrollUp(p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
+	p_offs = p_getScrollUp(p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
 //	p_buff.addRow("<UP> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
@@ -154,7 +164,7 @@ void NCWinScrollback::pageUp()
 
 void NCWinScrollback::home()
 {
-	p_offs = Splitter::getTop(p_buff.begin(), p_buff.end());
+	p_offs = p_getTop(p_buff.begin(), p_buff.end());
 }
 
 void NCWinScrollback::end()
@@ -164,7 +174,7 @@ void NCWinScrollback::end()
 	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
 
-	p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
+	p_offs = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 }
 
 void NCWinScrollback::clear()
@@ -172,6 +182,34 @@ void NCWinScrollback::clear()
 	p_buff.clear();
 	NCWin::clear();
 }
+
+void NCWinScrollback::setWrapLength()
+{
+	p_printWindow = &NCTextWinFormatter<LengthFinder>::printWindow<NCWinBuffer::Iterator>;
+	p_getBottom = &NCTextWinFormatter<LengthFinder>::getBottom<NCWinBuffer::ReverseIterator>;
+	p_getTop = &NCTextWinFormatter<LengthFinder>::getTop<NCWinBuffer::Iterator>;
+	p_getScrollUp = &NCTextWinFormatter<LengthFinder>::getScrollUp<NCWinBuffer::ReverseIterator>;
+	p_getScrollDown = &NCTextWinFormatter<LengthFinder>::getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+}
+
+void NCWinScrollback::setWrapWordLength()
+{
+	p_printWindow = &NCTextWinFormatter<LengthSpaceFinder>::printWindow<NCWinBuffer::Iterator>;
+	p_getBottom = &NCTextWinFormatter<LengthSpaceFinder>::getBottom<NCWinBuffer::ReverseIterator>;
+	p_getTop = &NCTextWinFormatter<LengthSpaceFinder>::getTop<NCWinBuffer::Iterator>;
+	p_getScrollUp = &NCTextWinFormatter<LengthSpaceFinder>::getScrollUp<NCWinBuffer::ReverseIterator>;
+	p_getScrollDown = &NCTextWinFormatter<LengthSpaceFinder>::getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+}
+
+void NCWinScrollback::setWrapCut()
+{
+	p_printWindow = &NCTextWinFormatter<LengthMaxFinder>::printWindow<NCWinBuffer::Iterator>;
+	p_getBottom = &NCTextWinFormatter<LengthMaxFinder>::getBottom<NCWinBuffer::ReverseIterator>;
+	p_getTop = &NCTextWinFormatter<LengthMaxFinder>::getTop<NCWinBuffer::Iterator>;
+	p_getScrollUp = &NCTextWinFormatter<LengthMaxFinder>::getScrollUp<NCWinBuffer::ReverseIterator>;
+	p_getScrollDown = &NCTextWinFormatter<LengthMaxFinder>::getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+}
+
 
 // Design note:
 //  we want the text to start at the bottom and scroll up
