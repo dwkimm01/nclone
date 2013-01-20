@@ -41,7 +41,10 @@ public:
 //        scrollok(p_win, TRUE);
 
         idlok(p_win, TRUE);
-        scrollok(p_win, TRUE);
+        if(p_cfg.p_scrollOk)
+        {
+        	scrollok(p_win, TRUE);
+        }
         intrflush(p_win, FALSE);
         keypad(p_win, TRUE);
         meta(p_win, TRUE);
@@ -275,7 +278,10 @@ public:
 	    		val |= COLOR_PAIR((unsigned int)*color);
 	    		++color;
 	    	}
-	    	waddch(p_win, val);
+	    	if(*str)
+	    	{
+	    		waddch(p_win, val);
+	    	}
 	    }
 
 //		wrefresh(p_win);

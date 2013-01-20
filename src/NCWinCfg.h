@@ -28,6 +28,7 @@ public:
 		, p_x(10)
 		, p_title("Window")
 		, p_hasBorder(false)
+		, p_scrollOk(true)
 	{
 	}
 
@@ -45,6 +46,9 @@ public:
 
 	// Has border
 	bool p_hasBorder;
+
+	// NCurses Scrolling, don't really use it but it messes up some printing
+	bool p_scrollOk;
 };
 
 } // namespace ncpp

@@ -21,6 +21,7 @@
 #include "NCWin.h"
 #include "NCWinBuffer.h"
 #include "NCWinScrollback.h"
+#include "NCWinTime.h"
 #include "NCTimeUtils.h"
 #include "NCCmdLineOptions.h"
 #include "NCConnectionString.h"
@@ -86,6 +87,7 @@ int doit(int argc, char* argv[])
 		cfg.p_x = 0;
 		cfg.p_y = app.maxHeight() - cfg.p_h;
 		cfg.p_hasBorder = true;
+		cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
 		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 
 		// Set of chat windows
@@ -134,7 +136,21 @@ int doit(int argc, char* argv[])
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		winBl->setWrapCut();
 
+		// Time stamp window
+		auto timeCfg = cfg;
+		timeCfg.p_title = "Time";
+		timeCfg.p_h = 1;
+		timeCfg.p_w = 10;
+		timeCfg.p_x = app.maxWidth() - timeCfg.p_w - 1;
+		timeCfg.p_y = app.maxHeight() - 4;
+		timeCfg.p_hasBorder = false;
+		timeCfg.p_scrollOk = false;
+		ncwin::NCWin::ResizeFuncs timeResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w -1; });
+		ncwin::NCWin::ResizeFuncs timeResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 4; });
 
+		ncwintime::NCWinTime winTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
+
+		// Color printing
 		NCString one(" One", 1);
 		NCString two(" Two", 2);
 		NCString oneTwo = one + two;
@@ -301,6 +317,9 @@ int doit(int argc, char* argv[])
 			switch(c)
 			{
 			case KEY_TIMEOUT:
+				// Update timestamp
+				winTime.refresh();
+
 				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
 				if(statusIndex >= status.size())
 				{

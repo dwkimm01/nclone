@@ -17,7 +17,8 @@ CPP_SRCS += \
 ../src/NCTimeUtils.cpp \
 ../src/NCWin.cpp \
 ../src/NCWinBuffer.cpp \
-../src/NCWinScrollback.cpp 
+../src/NCWinScrollback.cpp \
+../src/NCWinTime.cpp 
 
 OBJS += \
 ./src/NCApp.o \
@@ -33,7 +34,8 @@ OBJS += \
 ./src/NCTimeUtils.o \
 ./src/NCWin.o \
 ./src/NCWinBuffer.o \
-./src/NCWinScrollback.o 
+./src/NCWinScrollback.o \
+./src/NCWinTime.o 
 
 CPP_DEPS += \
 ./src/NCApp.d \
@@ -49,7 +51,8 @@ CPP_DEPS += \
 ./src/NCTimeUtils.d \
 ./src/NCWin.d \
 ./src/NCWinBuffer.d \
-./src/NCWinScrollback.d 
+./src/NCWinScrollback.d \
+./src/NCWinTime.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
