@@ -1,5 +1,10 @@
 TODO list
 
+- Show scrollback indicator
+ . parhaps a n/max number on the "status bar"
+ . in lieu of an actual status bar maybe throw it on top of the command window's upper right
+ . or maybe an asterisk on the far right hand side of the window - top being 0% bottom being 100%
+
 - Remove TODO items from README.md
  . Add build instructions to README.md
 
