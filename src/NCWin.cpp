@@ -61,7 +61,13 @@ public:
 
 	void print(const char* str, const int x, const int y)
 	{
+		int xOld = 0;
+		int yOld = 0;
+		getyx(p_win, yOld, xOld);
+
 		mvwprintw(p_win, y, x, str);
+
+		wmove(p_win, yOld, xOld);
 	}
 
 	void refresh()

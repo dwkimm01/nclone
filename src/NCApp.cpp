@@ -61,6 +61,8 @@ NCApp::NCApp()
 	keypad(stdscr, TRUE);
 	// Don't echo characters
 	noecho();
+
+	timeout(800);
 }
 
 NCApp::~NCApp()

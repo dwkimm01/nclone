@@ -243,9 +243,13 @@ int doit(int argc, char* argv[])
 			ncs->refresh();
 		}
 
+		// Simple non-blocking getch sample usage
+		unsigned int statusIndex = 0;
+		const std::vector<std::string> status = {"|", "/", "-", "\\"};
+
 		// Input collector
 		std::string cmd;
-                bool stillRunning = true;
+		bool stillRunning = true;
 
 		// Loop forever until input tells us to return
 		while(stillRunning)
@@ -289,10 +293,25 @@ int doit(int argc, char* argv[])
 //			app << "char(" << boost::lexical_cast<std::string>((int)c).c_str() << ") ";
 
 
+
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
 			if(ncs)
+			{
+
 			switch(c)
 			{
+			case KEY_TIMEOUT:
+				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
+				if(statusIndex >= status.size())
+				{
+					statusIndex = 0;
+				}
+//				winCmd.refresh();
+//				ncs->append("KEY " + boost::lexical_cast<std::string>(c) + " " + boost::lexical_cast<std::string>(statusIndex));
+//				ncs->refresh();
+
+
+				break;
 			case KEY_PPAGE:
 				ncs->pageUp();
 				ncs->refresh();
@@ -771,6 +790,7 @@ int doit(int argc, char* argv[])
 				break;
 				// nothing
 			}
+		} // if ncs
 
 		}
 	} // end NCApp scope

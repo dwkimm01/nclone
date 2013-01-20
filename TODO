@@ -1,5 +1,7 @@
 TODO list
 
+- Highlight current chat window in different color in buddy list
+
 - Show scrollback indicator
  . parhaps a n/max number on the "status bar"
  . in lieu of an actual status bar maybe throw it on top of the command window's upper right
