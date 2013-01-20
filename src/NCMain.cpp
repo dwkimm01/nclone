@@ -418,6 +418,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  /history  print command history");
 							ncs->append("  /list     print windows open");
 							ncs->append("  /refresh  refresh all windows");
+							ncs->append("  /set scroll (length|word|cut)");
 							ncs->append("  /newconn  create a new connection");
 							ncs->append("      protocol		username");
 							ncs->append("      prpl-sipe	user@domain.com,domain\\user");
@@ -497,6 +498,39 @@ int doit(int argc, char* argv[])
 							ncs->append("");
 						}
 						app.refresh();
+					}
+					else if (cmd.find("/set") == 0)
+					{
+//						ncs->append("  /set scroll (length|word|cut)")
+						std::vector<std::string> cmdParam;
+						boost::split(cmdParam, cmd, boost::is_space()); // boost::is_any_of("\t"));
+						if(cmdParam.size() == 3 && "/set" == cmdParam[0])
+						{
+							// TODO, do we want to do set on all of the (chat) windows
+							if("scroll" == cmdParam[1])
+							{
+								ncs->append("setting scroll type \"" + cmdParam[2] + "\"");
+								if("length" == cmdParam[2])
+								{
+									ncs->setWrapLength();
+								}
+								else if("word" == cmdParam[2])
+								{
+									ncs->setWrapWordLength();
+								}
+								else if("cut" == cmdParam[2])
+								{
+									ncs->setWrapCut();
+								}
+								else
+								{
+									ncs->append(" Unknown wrap type.  Should be: length, word, cut");
+								}
+								ncs->refresh();
+							}
+
+						}
+
 					}
 					else if(cmd == "/clear")
 					{
