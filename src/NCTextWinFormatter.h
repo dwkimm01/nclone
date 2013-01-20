@@ -14,7 +14,6 @@
 #include <boost/algorithm/string.hpp>
 #include "NCString.h"
 
-#include <fstream>
 #include <boost/lexical_cast.hpp>
 // #include "NCExceptionOutOfRange.h"
 
@@ -263,8 +262,6 @@ static std::pair<unsigned int, unsigned int> getScrollUp
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-
-//	static std::ofstream oFile("info.txt");
 	// Convert offset to reverse offset
 	const unsigned int cSize = end - begin;
 	const unsigned int beginOffs = (offs.first < cSize)?(cSize - offs.first):(0);
@@ -282,8 +279,6 @@ static std::pair<unsigned int, unsigned int> getScrollUp
 	{
 		offsMajor = beginOffs;
 		offsMinor = accum - lines;
-//		oFile << "accum = " << accum << ", lines = " << lines << std::endl;
-//		oFile << "  offsMajor = " << offsMajor << ", offsMinor = " << offsMinor << std::endl;
 		return std::pair<unsigned int, unsigned int>(cSize - offsMajor, offsMinor);
 	}
 	offsMinor = 0;
@@ -298,17 +293,12 @@ static std::pair<unsigned int, unsigned int> getScrollUp
 		offsMinor = 0;
 		if(accum > lines)
 		{
-//			oFile << "wrapCount = " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
-//			offsMinor = wrapCount - (wrapCount - (accum-lines));
 			offsMinor = accum - lines;
-
-//			oFile << "     offsMinor = " << offsMinor << std::endl;
 			accum = lines;
 		}
-		else if(lines == accum)
-		{
-//			oFile << "wrapCount == " << wrapCount << ", accum = " << accum << ", lines = " << lines << std::endl;
-		}
+//		else if(lines == accum)
+//		{
+//		}
 	}
 
 	// Check to see if out of bounds has been reached
@@ -334,23 +324,18 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-static std::ofstream oFile("info.txt");
 	// Return values
 	unsigned int offsMajor = offs.first - 1;
-	unsigned int offsMinor = 0; // offs.second;
+	unsigned int offsMinor = 0;
 
 	// Accumulator to compare against lines
 	unsigned int accum = 0;
-
-oFile << "DWN, init: " << offs.first << ", " << offs.second << std::endl;
-oFile << "   lines = " << lines << std::endl;
 	int initialOffset = offs.second;
 
 	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 	// Start at offsMajor + offsMinor, counting at most MAXHEIGHT lines
 	for(auto lineItr = begin + offs.first; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
 	{
-oFile << "LOOP" << std::endl;
 		// Calculate number of wrapped lines in this entry
 		const unsigned int wrapCount = getWrappedLines((*lineItr)(), maxWidth, initialOffset);
 		initialOffset = 0;
@@ -361,26 +346,17 @@ oFile << "LOOP" << std::endl;
 
 		if(accum > lines)
 		{
-oFile << "   1: accum = " << accum << ", lines = " << lines << ", wrapCount = " << wrapCount << std::endl;
-//			const int diff = accum - lines;
-//			offsMinor -= diff;
 			const int diff = accum - lines;
 			offsMinor = getWrappedLines((*lineItr)(), maxWidth) - diff;
-
-oFile << "   2:   a>l mod, diff = " << diff << std::endl;
-oFile << "   3:   offsMajor = " << offsMajor << ", offsMinor = " << offsMinor << std::endl;
+// TODO get rid of extra getWrappedLines call
 		}
 		else if(accum == lines)
 		{
-oFile << "   a==l mod " << std::endl;
-                        offsMinor = 0;
-                        ++offsMajor;
-oFile << "    offsMajor = " << offsMajor << ", offsMinor = " << offsMinor << std::endl;
+			offsMinor = 0;
+			++offsMajor;
 		}
 	}
-oFile << " ((" << offsMajor << ", " << offsMinor << "))" << std::endl;
 
-// oFile << "   final:: " << offsMajor << ", " << offsMinor << std::endl;
 	// Check if we have gone past the bottom
 	// TODO, would be nice to rewrite and take this out as well as the addition reverse iterators...
 	const auto bottom = getBottom(rbegin, rend, maxWidth, maxHeight);
@@ -388,9 +364,7 @@ oFile << " ((" << offsMajor << ", " << offsMinor << "))" << std::endl;
 	{
 		return bottom;
 	}
-oFile << "   returning " << offsMajor << ", " << offsMinor << std::endl;
 	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
-
 }
 
 
