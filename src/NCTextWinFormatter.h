@@ -14,7 +14,7 @@
 #include <boost/algorithm/string.hpp>
 #include "NCString.h"
 
-//#include <fstream>
+#include <fstream>
 #include <boost/lexical_cast.hpp>
 // #include "NCExceptionOutOfRange.h"
 
@@ -334,22 +334,23 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 	, const unsigned int lines
 	, const std::pair<unsigned int, unsigned int> offs )
 {
-//static std::ofstream oFile("info.txt");
+static std::ofstream oFile("info.txt");
 	// Return values
-	unsigned int offsMajor = offs.first -1;
+	unsigned int offsMajor = offs.first - 1;
 	unsigned int offsMinor = 0; // offs.second;
 
 	// Accumulator to compare against lines
 	unsigned int accum = 0;
 
-//oFile << "DWN, init: " << offs.first << ", " << offs.second << std::endl;
-//oFile << "   lines = " << lines << std::endl;
+oFile << "DWN, init: " << offs.first << ", " << offs.second << std::endl;
+oFile << "   lines = " << lines << std::endl;
 	int initialOffset = offs.second;
 
 	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 	// Start at offsMajor + offsMinor, counting at most MAXHEIGHT lines
 	for(auto lineItr = begin + offs.first; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
 	{
+oFile << "LOOP" << std::endl;
 		// Calculate number of wrapped lines in this entry
 		const unsigned int wrapCount = getWrappedLines((*lineItr)(), maxWidth, initialOffset);
 		initialOffset = 0;
@@ -360,17 +361,24 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 
 		if(accum > lines)
 		{
+oFile << "   1: accum = " << accum << ", lines = " << lines << ", wrapCount = " << wrapCount << std::endl;
+//			const int diff = accum - lines;
+//			offsMinor -= diff;
 			const int diff = accum - lines;
-			offsMinor -= diff;
-//oFile << "   a>l mod " << std::endl;
+			offsMinor = getWrappedLines((*lineItr)(), maxWidth) - diff;
+
+oFile << "   2:   a>l mod, diff = " << diff << std::endl;
+oFile << "   3:   offsMajor = " << offsMajor << ", offsMinor = " << offsMinor << std::endl;
 		}
 		else if(accum == lines)
 		{
-//oFile << "   a==l mod " << std::endl;
+oFile << "   a==l mod " << std::endl;
                         offsMinor = 0;
                         ++offsMajor;
+oFile << "    offsMajor = " << offsMajor << ", offsMinor = " << offsMinor << std::endl;
 		}
 	}
+oFile << " ((" << offsMajor << ", " << offsMinor << "))" << std::endl;
 
 // oFile << "   final:: " << offsMajor << ", " << offsMinor << std::endl;
 	// Check if we have gone past the bottom
@@ -380,6 +388,7 @@ static std::pair<unsigned int, unsigned int> getScrollDown
 	{
 		return bottom;
 	}
+oFile << "   returning " << offsMajor << ", " << offsMinor << std::endl;
 	return std::pair<unsigned int, unsigned int>(offsMajor, offsMinor);
 
 }
