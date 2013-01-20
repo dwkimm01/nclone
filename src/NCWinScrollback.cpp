@@ -159,7 +159,12 @@ void NCWinScrollback::home()
 
 void NCWinScrollback::end()
 {
-	p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), getConfig().p_w-2, getConfig().p_h);
+	// Calculate text area width and height
+	const NCWinCfg& cfg = getConfig();
+	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
+	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+
+	p_offs = Splitter::getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 }
 
 void NCWinScrollback::clear()
