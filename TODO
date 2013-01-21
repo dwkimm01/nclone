@@ -1,5 +1,12 @@
 TODO list
 
+- Container plus Current Index abstraction
+ . Could be helpful for Cmd History
+ . Might be useful for NCWinScrollBack 
+
+- Break Container out of NCWinscrollBack for a more MVC like arch
+ . Might be a good time to start on this item which is listed out fuller below
+
 - Highlight current chat window in different color in buddy list
 
 - Show scrollback indicator
