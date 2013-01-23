@@ -1,5 +1,7 @@
 TODO list
 
+- SHIFT-UP/DOWN does not work in full screen terminal mode on laptop
+
 - Container plus Current Index abstraction
  . Could be helpful for Cmd History
  . Might be useful for NCWinScrollBack 
