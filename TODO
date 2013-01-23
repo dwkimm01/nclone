@@ -1,6 +1,8 @@
 TODO list
 
-- SHIFT-UP/DOWN does not work in full screen terminal mode on laptop
+- Text video mode (non graphics vga)
+ . SHIFT-UP/DOWN does not work in full screen terminal mode on laptop
+ . every keypress refreshes everything (prob. a problem all the time)
 
 - Container plus Current Index abstraction
  . Could be helpful for Cmd History
