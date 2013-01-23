@@ -5,7 +5,6 @@
  *      Author: dwkimm01
  */
 
-//#include <boost/lexical_cast.hpp>
 #include "NCWinScrollback.h"
 #include "NCStringUtils.h"
 #include "NCTextWinFormatter.h"
@@ -13,11 +12,6 @@
 
 namespace ncpp
 {
-
-//typedef NCTextWinFormatter<LengthFinder> Splitter;
-//typedef NCTextWinFormatter<LengthSpaceFinder> Splitter;
-//typedef NCTextWinFormatter<LengthMaxFinder> Splitter;
-
 
 NCWinScrollback::NCWinScrollback
 	( NCObject* parent
@@ -31,6 +25,7 @@ NCWinScrollback::NCWinScrollback
 	, p_buff(scrollback)
 	, p_offs(0, 0)
 {
+	// Start off defaulting to word wrapping (length and spaces)
 	setWrapWordLength();
 }
 
@@ -39,10 +34,8 @@ NCWinScrollback::~NCWinScrollback() {}
 void NCWinScrollback::refresh()
 {
 	// Calculate old text area width and height
-	const NCWinCfg cfgOld = getConfig();
-	const int widthOld =  (cfgOld.p_hasBorder)?(cfgOld.p_w - 2):(cfgOld.p_w) - 1;
-	const int heightOld = (cfgOld.p_hasBorder)?(cfgOld.p_h - 2):(cfgOld.p_h);
-// TODO, replace all these conditional calls with getters:  getTextWidth, getTextHeight
+	const int widthOld =  getTextWidth();
+	const int heightOld = getTextHeight();
 
 	// Would be nice to have a more generic way of keeping track of where we are in the
 	// buffer but for now it's nice enough to be able to track the bottom (latest) if
@@ -56,9 +49,8 @@ void NCWinScrollback::refresh()
 	// TODO, add back in pushing down lines for buffers that don't fill the height
 	// If there aren't enough lines, push down to start at bottom
 	// Calculate text area width and height
-	const NCWinCfg& cfg = getConfig();
-	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
-	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+	const int width = getTextWidth();
+	const int height = getTextHeight();
 
 	// Clear
 	NCWin::clear();
@@ -75,16 +67,7 @@ void NCWinScrollback::refresh()
 		p_offs = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 
-
-//	auto xx = &Splitter::printWindow<NCWinBuffer::Iterator>;
-//	xx = &NCTextWinFormatter<LengthMaxFinder>::printWindow<NCWinBuffer::Iterator>;
-//	xx = &NCTextWinFormatter<LengthSpaceFinder>::printWindow<NCWinBuffer::Iterator>;
-//	xx = &NCTextWinFormatter<LengthFinder>::printWindow<NCWinBuffer::Iterator>;
-//	xx(p_buff.begin(), p_buff.end(), width, height, p_offs.first, p_offs.second, [&] (const NCString &s) {} );
-
-
 	// Print the buffer to the window
-//	Splitter::printWindow
 	p_printWindow
 	   ( p_buff.begin()
 	   , p_buff.end()
@@ -111,9 +94,8 @@ void NCWinScrollback::append(const std::string &line)
 void NCWinScrollback::append(const ncpp::NCString &line)
 {
 	// Calculate text area width and height
-	const NCWinCfg& cfg = getConfig();
-	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
-	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+	const int width = getTextWidth();
+	const int height = getTextHeight();
 
 	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
 	const bool following = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height) == p_offs;
@@ -129,23 +111,19 @@ void NCWinScrollback::append(const ncpp::NCString &line)
 void NCWinScrollback::scrollDown(const int n)
 {
 	// Calculate text area width and height
-	const NCWinCfg& cfg = getConfig();
-	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
-	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+	const int width = getTextWidth();
+	const int height = getTextHeight();
 
 	p_offs = p_getScrollDown(p_buff.begin(), p_buff.end(), p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
-//	p_buff.addRow("<DW> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
 void NCWinScrollback::scrollUp(const int n)
 {
 	// Calculate text area width and height
-	const NCWinCfg& cfg = getConfig();
-	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
-	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+	const int width = getTextWidth();
+	const int height = getTextHeight();
 
 	p_offs = p_getScrollUp(p_buff.rbegin(), p_buff.rend(), width, height, n, p_offs);
-//	p_buff.addRow("<UP> " + boost::lexical_cast<std::string>(p_offs.first) + ", " + boost::lexical_cast<std::string>(p_offs.second));
 }
 
 void NCWinScrollback::pageDown()
@@ -170,9 +148,8 @@ void NCWinScrollback::home()
 void NCWinScrollback::end()
 {
 	// Calculate text area width and height
-	const NCWinCfg& cfg = getConfig();
-	const int width =  (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
-	const int height = (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+	const int width = getTextWidth();
+	const int height = getTextHeight();
 
 	p_offs = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 }
@@ -183,31 +160,57 @@ void NCWinScrollback::clear()
 	NCWin::clear();
 }
 
+// Helper to set all of the necessary text formatting functions
+template <typename FindType, typename Print, typename Bottom, typename Top, typename ScrollUp, typename ScrollDown>
+void setFinder(Print &p, Bottom &b, Top &t, ScrollUp &su, ScrollDown &sd)
+{
+	p = &NCTextWinFormatter<FindType>::template printWindow<ncpp::NCWinBuffer::Iterator>;
+	b = &NCTextWinFormatter<FindType>::template getBottom<NCWinBuffer::ReverseIterator>;
+	t = &NCTextWinFormatter<FindType>::template getTop<NCWinBuffer::Iterator>;
+	su = &NCTextWinFormatter<FindType>::template getScrollUp<NCWinBuffer::ReverseIterator>;
+	sd = &NCTextWinFormatter<FindType>::template getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+}
+
 void NCWinScrollback::setWrapLength()
 {
-	p_printWindow = &NCTextWinFormatter<LengthFinder>::printWindow<NCWinBuffer::Iterator>;
-	p_getBottom = &NCTextWinFormatter<LengthFinder>::getBottom<NCWinBuffer::ReverseIterator>;
-	p_getTop = &NCTextWinFormatter<LengthFinder>::getTop<NCWinBuffer::Iterator>;
-	p_getScrollUp = &NCTextWinFormatter<LengthFinder>::getScrollUp<NCWinBuffer::ReverseIterator>;
-	p_getScrollDown = &NCTextWinFormatter<LengthFinder>::getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+	setFinder<LengthFinder>
+		( p_printWindow
+		, p_getBottom
+		, p_getTop
+		, p_getScrollUp
+		, p_getScrollDown );
 }
 
 void NCWinScrollback::setWrapWordLength()
 {
-	p_printWindow = &NCTextWinFormatter<LengthSpaceFinder>::printWindow<NCWinBuffer::Iterator>;
-	p_getBottom = &NCTextWinFormatter<LengthSpaceFinder>::getBottom<NCWinBuffer::ReverseIterator>;
-	p_getTop = &NCTextWinFormatter<LengthSpaceFinder>::getTop<NCWinBuffer::Iterator>;
-	p_getScrollUp = &NCTextWinFormatter<LengthSpaceFinder>::getScrollUp<NCWinBuffer::ReverseIterator>;
-	p_getScrollDown = &NCTextWinFormatter<LengthSpaceFinder>::getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+	setFinder<LengthSpaceFinder>
+		( p_printWindow
+		, p_getBottom
+		, p_getTop
+		, p_getScrollUp
+		, p_getScrollDown );
 }
 
 void NCWinScrollback::setWrapCut()
 {
-	p_printWindow = &NCTextWinFormatter<LengthMaxFinder>::printWindow<NCWinBuffer::Iterator>;
-	p_getBottom = &NCTextWinFormatter<LengthMaxFinder>::getBottom<NCWinBuffer::ReverseIterator>;
-	p_getTop = &NCTextWinFormatter<LengthMaxFinder>::getTop<NCWinBuffer::Iterator>;
-	p_getScrollUp = &NCTextWinFormatter<LengthMaxFinder>::getScrollUp<NCWinBuffer::ReverseIterator>;
-	p_getScrollDown = &NCTextWinFormatter<LengthMaxFinder>::getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+	setFinder<LengthMaxFinder>
+		( p_printWindow
+		, p_getBottom
+		, p_getTop
+		, p_getScrollUp
+		, p_getScrollDown );
+}
+
+int NCWinScrollback::getTextHeight() const
+{
+	const NCWinCfg& cfg = getConfig();
+	return (cfg.p_hasBorder)?(cfg.p_h - 2):(cfg.p_h);
+}
+
+int NCWinScrollback::getTextWidth() const
+{
+	const NCWinCfg& cfg = getConfig();
+	return (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 }
 
 

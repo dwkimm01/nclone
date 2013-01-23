@@ -67,6 +67,11 @@ public:
 	void setWrapWordLength();
 	void setWrapCut();
 
+	// Get the text area height and width
+	int getTextHeight() const;
+	int getTextWidth() const;
+
+
 private:
 	NCWinBuffer p_buff;
 	// Note, the second value will definitely be
