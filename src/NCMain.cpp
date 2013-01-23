@@ -122,6 +122,9 @@ int doit(int argc, char* argv[])
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
+#define BUDDYLIST 1
+
+#if BUDDYLIST
 		// Buddy list window
 		auto blCfg = cfg;
 		blCfg.p_title = "Contacts";
@@ -135,6 +138,7 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs emptyResize;
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		winBl->setWrapCut();
+#endif
 
 		// Time stamp window
 		auto timeCfg = cfg;
@@ -274,6 +278,7 @@ int doit(int argc, char* argv[])
 		while(stillRunning)
 		{
 
+#if BUDDYLIST
 			// Update Buddly List
 			if(winBl)
 			{
@@ -294,6 +299,7 @@ int doit(int argc, char* argv[])
 				winBl->end();
 				winBl->refresh();
 			}
+#endif
 
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
@@ -593,6 +599,11 @@ int doit(int argc, char* argv[])
 								{
 									ncs->append(" Unknown wrap type.  Should be: length, word, cut");
 								}
+								ncs->refresh();
+							}
+							else
+							{
+								ncs->append("Unknown set option \"" + cmdParam[1] + "\"");
 								ncs->refresh();
 							}
 

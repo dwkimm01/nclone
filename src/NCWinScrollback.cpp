@@ -67,6 +67,32 @@ void NCWinScrollback::refresh()
 		p_offs = p_getBottom(p_buff.rbegin(), p_buff.rend(), width, height);
 	}
 
+	// Check to see if we should draw from the bottom up so that when we start off text appears near the bottom (eg cmd window)
+	// aka Determine if we need to push first printed lines further down so that text appears near bottom
+	if(p_buff.size() > 0 && p_buff.size() < height)
+	{
+		// calculate how many lines we do have to print
+		int linesAvailable = 0;
+		p_printWindow
+		   ( p_buff.begin()
+		   , p_buff.end()
+		   , width
+		   , height
+		   , p_offs.first
+		   , p_offs.second
+		   , [&](const NCString &line)
+		   {
+			 ++linesAvailable;
+		   });
+		const int hmax = height - linesAvailable;
+		for(int i = 0; i < hmax; ++i)
+		{
+			NCWin::print("");
+			NCWin::clearTillEnd();
+			NCWin::cursorNextLine();
+		}
+	}
+
 	// Print the buffer to the window
 	p_printWindow
 	   ( p_buff.begin()
@@ -158,6 +184,7 @@ void NCWinScrollback::clear()
 {
 	p_buff.clear();
 	NCWin::clear();
+	p_offs = p_getTop(p_buff.begin(), p_buff.end());
 }
 
 // Helper to set all of the necessary text formatting functions

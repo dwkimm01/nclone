@@ -58,7 +58,7 @@ public:
 	/**
 	 * <b>Purpose:</b> Scroll window up one level
 	 */
-	void scrollup1(const int n);
+//	void scrollUp(const int n);
 //	void scrolldown(const int n);
 
 	void print(const char* str);
@@ -69,6 +69,7 @@ public:
 	void cursorReset();
 	void cursorNextLine();
 	void clearTillEnd();
+//	void cursorSet(const int x, const int y);
 
 	void putChar(const char c, const int x, const int y);
 

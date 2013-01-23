@@ -37,10 +37,7 @@ public:
 		, p_resizeY(resizeY)
 
 	{
-//        idlok(p_win, TRUE);
-//        scrollok(p_win, TRUE);
-
-        idlok(p_win, TRUE);
+        idlok(p_win, TRUE);  // Turn on using hardware insert/delete line
         if(p_cfg.p_scrollOk)
         {
         	scrollok(p_win, TRUE);
@@ -198,7 +195,7 @@ public:
 	}
 
 // TODO, decide if we want to use this
-//	void scrollup(const int n)
+//	void scrollUp(const int n)
 //	{
 //		wscrl(p_win, n);
 //	}
@@ -249,6 +246,11 @@ public:
 			}
 		}
 	}
+
+//	void cursorSet(const int x, const int y)
+//	{
+//		wmove(p_win, y, x);
+//	}
 
 	void putChar(const char c, const int x, const int y)
 	{
@@ -364,6 +366,10 @@ const NCWinCfg& NCWin::getConfig() const
 	return p_data->getConfig();
 }
 
+//void NCWin::scrollUp(const int n)
+//{
+//	p_data->scrollUp(n);
+//}
 
 void NCWin::print(const char* str)
 {
@@ -401,6 +407,10 @@ void NCWin::clearTillEnd()
 	p_data->clearTillEnd();
 }
 
+//void NCWin::cursorSet(const int x, const int y)
+//{
+//	p_data->cursorSet(x, y);
+//}
 
 void NCWin::putChar(const char c, const int x, const int y)
 {

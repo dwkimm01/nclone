@@ -122,3 +122,17 @@ TODO list
  . Still want to be able to use Eclipse, XCode, Linux, OSX, etc
  . Build in deps statically
 
+
+
+----------------------------------------------------
+-- Fixed
+
+
+ error:
+  /lorem
+  type single line
+  /d1
+  /clear
+  type single line enter ... nothing, page up crashes
+ fix: didn't have p_offs reset in the NCWinScrollBack::clear method 
+
