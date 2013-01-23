@@ -1,5 +1,13 @@
 TODO list
 
+- MS Communicator
+ . crashes, might be a library issue
+ . incoming msgs are in HTML, need to parse it
+
+- Google chat
+ . HTML chars like ' and ... don't come through properly
+ . <BR> show up and should be translated
+
 - Text video mode (non graphics vga)
  . SHIFT-UP/DOWN does not work in full screen terminal mode on laptop
  . every keypress refreshes everything (prob. a problem all the time)
