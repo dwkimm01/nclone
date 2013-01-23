@@ -62,6 +62,7 @@ NCApp::NCApp()
 	// Don't echo characters
 	noecho();
 
+	// Set getch timeout
 	timeout(800);
 }
 
