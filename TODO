@@ -35,6 +35,15 @@ TODO list
  . Create an enum in NCWin.h maybe to use as an additional CTOR param?
 - Cleanup NCWin::NCWinData::printColor to use std::string::iterator
 
+- Debug Window
+ . for getting keystrokes initially
+ . F6 or CTRL-F5 or something to toggle visibility (order in refresh list)
+
+- Debug prpl-sipe bug
+ . Build debug version of libpurple etc
+ . Make sure it's not just a newer version of libpurple that's needed
+ . Run gdb ./hw with that g_debug set to whatever (see README.md)
+
 - Need a more MVC type architecture
  . Separate Window from data
  . Create data store to group Text Buffer, Connection, Buddy Name
@@ -72,6 +81,11 @@ TODO list
 - Status line
  . One line window with updating and useful information
  .  TIME   INFO_COMMENT   CONNECTION STATUS
+
+- House Keeping
+ . Redraw (to softcopy) of architecture/code overview
+ . Can use umbrello probally - put into notes section
+ . Put screenshot link from README.md
 
 - Command parsing improvements
  . Up/Down command line history
@@ -118,6 +132,16 @@ TODO list
  . buddy names should use a shorter version
  . accept new buddy or chat request
  . be able to log onto multiple services simultaneously
+ . be able to see offline buddies
+ . queue up messages to send to buddies when they are online
+ . group chat
+ . away message
+ . auto away message (after timeout)
+ . personalized away message (with buddy's name, etc)
+
+- System/OS notification integration
+ . be able to notify the system when events happen (messages come in)
+ . would be annoying if it happens even when window is in focus
 
 - Load chat clients through plugin libraries
 
