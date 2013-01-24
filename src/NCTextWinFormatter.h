@@ -65,12 +65,12 @@ private:
 // last found space character
 struct LengthSpaceFinder
 {
-	LengthSpaceFinder(const int length) : p_length(length), p_skipFirstSpace(false) {}
-
+	LengthSpaceFinder(const int length) : p_length(length) {}
+// TODO, on scope exit set p_skipFirstSpace to true
 	template <typename ForwardItr>
 	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
 	{
-		if(p_skipFirstSpace && ' ' == *Begin) { ++Begin; p_skipFirstSpace = false; }
+		if(p_skipFirstSpace && ' ' == *Begin) { ++Begin; p_skipFirstSpace = true; }
 
 		const ForwardItr n = Begin + p_length;
 
@@ -83,7 +83,8 @@ struct LengthSpaceFinder
 		// Check to see if we have ended on a space
 		const char spaceChar = ' ';
 		if(spaceChar == *n)
-		{
+		{ 
+                        p_skipFirstSpace = true;
 			return boost::iterator_range<ForwardItr>(Begin, n);
 		}
 
