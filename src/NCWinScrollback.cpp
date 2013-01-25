@@ -106,10 +106,11 @@ void NCWinScrollback::refresh()
 	   {
 			line.draw(this);
 			++lineCount;
+
 			if(lineCount < height)
 			{
-			NCWin::clearTillEnd();
-			NCWin::cursorNextLine();
+				NCWin::clearTillEnd();
+				NCWin::cursorNextLine();
 			}
 	   });
 
@@ -188,7 +189,7 @@ void NCWinScrollback::end()
 void NCWinScrollback::clear()
 {
 	p_buff.clear();
-	NCWin::clear();
+//	NCWin::clear();
 	p_offs = p_getTop(p_buff.begin(), p_buff.end());
 }
 

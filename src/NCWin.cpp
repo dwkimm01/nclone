@@ -6,7 +6,6 @@
  */
 #include <ncurses.h>
 #include <string>
-
 #include <iostream>
 #include <stdlib.h>
 #include "NCWin.h"
@@ -37,7 +36,7 @@ public:
 		, p_resizeY(resizeY)
 
 	{
-        idlok(p_win, TRUE);  // Turn on using hardware insert/delete line
+//        idlok(p_win, TRUE);  // Turn on using hardware insert/delete line
         if(p_cfg.p_scrollOk)
         {
         	scrollok(p_win, TRUE);
@@ -47,6 +46,8 @@ public:
         meta(p_win, TRUE);
 //        wbkgd(p_win, COLOR_PAIR(nw_COLORS*faimconf.b[bg]));
         werase(p_win);
+
+    	wtimeout(p_win, 800);
 
         // Update cursor position
         cursorReset();
@@ -139,7 +140,10 @@ public:
 
 	void clear()
 	{
-		wclear(p_win);
+		// TODO, used to be wclear(p_win);  but that seemed to refresh the entire screen!
+		// why can't we get by with just using the cleartillend in places?
+		// why is there a character left at the very end sometimes?
+		werase(p_win);
 		cursorReset();
 	}
 
@@ -300,6 +304,10 @@ public:
 	//    waddch(win, '/');
 	}
 
+	int getChar()
+	{
+		return wgetch(p_win);
+	}
 
 private:
 	NCWin* p_ncWin;
@@ -433,6 +441,14 @@ void NCWin::printColor(const char* str, const char* color)
 {
 	p_data->printColor(str, color);
 }
+
+
+NCWin& NCWin::operator>>(int &c)
+{
+	c = p_data->getChar();
+	return *this;
+}
+
 
 } // namespace ncwin
 } // namespace ncpp

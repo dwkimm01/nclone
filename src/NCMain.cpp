@@ -88,7 +88,8 @@ int doit(int argc, char* argv[])
 		cfg.p_y = app.maxHeight() - cfg.p_h;
 		cfg.p_hasBorder = true;
 		cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
-		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
+//		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
+		NCWinScrollback winCmd(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 
 		// Set of chat windows
 		cfg.p_title = "Chats";
@@ -122,6 +123,7 @@ int doit(int argc, char* argv[])
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
+// TODO, take this out when we can hide the window/autohide
 #define BUDDYLIST 1
 
 #if BUDDYLIST
@@ -266,9 +268,11 @@ int doit(int argc, char* argv[])
 			ncs->refresh();
 		}
 
+#if STATUSTWIRL
 		// Simple non-blocking getch sample usage
 		unsigned int statusIndex = 0;
 		const std::vector<std::string> status = {"|", "/", "-", "\\"};
+#endif
 
 		// Input collector
 		std::string cmd;
@@ -279,7 +283,7 @@ int doit(int argc, char* argv[])
 		{
 
 #if BUDDYLIST
-			// Update Buddly List
+			// Update Buddy List
 			if(winBl)
 			{
 				winBl->clear();
@@ -310,7 +314,8 @@ int doit(int argc, char* argv[])
 			// TODO, would be nice to periodically break out of this and be able to get control
 			// of this thread back to do some housekeeping type chores (idle timestamp printing etc)
 			int c = 0;
-			app >> c;
+//			app >> c;
+			winCmd >> c;
 			// Uncomment this to show what the numeric values of each keystroke are
 //			std::string tmp;
 //			tmp.push_back(c);
@@ -328,11 +333,13 @@ int doit(int argc, char* argv[])
 				// Update timestamp
 				winTime.refresh();
 
+#if STATUSTWIRL
 				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
 				if(statusIndex >= status.size())
 				{
 					statusIndex = 0;
 				}
+#endif
 
 //				winCmd.refresh();
 //				ncs->append("KEY " + boost::lexical_cast<std::string>(c) + " " + boost::lexical_cast<std::string>(statusIndex));
@@ -373,7 +380,8 @@ int doit(int argc, char* argv[])
 					{
 						cmd = cmdHistory[cmdHistoryIndex--];
 						winCmd.clear();
-						winCmd.print(cmd.c_str());
+//						winCmd.print(cmd.c_str());
+						winCmd.append(cmd);
 						winCmd.refresh();
 					}
 				}
@@ -386,7 +394,8 @@ int doit(int argc, char* argv[])
 						cmdHistoryIndex += 2;
 						cmd = cmdHistory[cmdHistoryIndex];
 						winCmd.clear();
-						winCmd.print(cmd.c_str());
+//						winCmd.print(cmd.c_str());
+						winCmd.append(cmd);
 						winCmd.refresh();
 					}
 				}
@@ -457,7 +466,8 @@ int doit(int argc, char* argv[])
 					}
 					else
 					{
-						winCmd.print(cmd.c_str());
+//						winCmd.print(cmd.c_str());
+						winCmd.append(cmd);
 					}
 					winCmd.refresh();
 				}
@@ -852,14 +862,17 @@ int doit(int argc, char* argv[])
 					cmd += c;
 					if(PASSWORD == inputState)
 					{
-						winCmd.print("x");
+//						winCmd.print("x");
+						const std::string xxx('x', cmd.size());
+						winCmd.append(xxx);
 					}
 					else
 					{
 						const char ca[] = {(char)c, 0};
-						winCmd.print(ca);
+//						winCmd.print(ca);
+						winCmd.append(cmd);
 					}
-					winCmd.refresh();
+//					winCmd.refresh();
 				}
 				break;
 				// nothing

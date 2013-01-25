@@ -85,6 +85,12 @@ public:
 	 */
 	void printColor(const char* str, const char* color);
 
+	/**
+	 * <b>Purpose:</b> Get a single char as input
+	 */
+	NCWin& operator>>(int &c);
+
+
 private:
 	class NCWinData;
 	std::auto_ptr<NCWinData> p_data;

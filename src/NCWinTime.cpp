@@ -29,8 +29,8 @@ NCWinTime::~NCWinTime() {}
 
 void NCWinTime::refresh()
 {
-	ncwin::NCWin::clear();
 	ncwin::NCWin::refresh();
+	ncwin::NCWin::cursorReset();
 
 	const auto currTime = NCTimeUtils::getPrintableColorTimeStamp();
 	ncwin::NCWin::print(currTime);

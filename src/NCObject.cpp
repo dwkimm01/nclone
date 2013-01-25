@@ -54,7 +54,8 @@ void NCObject::refresh()
 void NCObject::add(NCObject* ncobject)
 {
 	// Add, if it is not already added
-	if(std::find(p_objVec.begin(), p_objVec.end(), ncobject) == p_objVec.end())
+	if( (std::find(p_objVec.begin(), p_objVec.end(), ncobject) == p_objVec.end()) 
+	&& (p_parent != ncobject) )
 	{
 		p_objVec.push_back(ncobject);
 	}
