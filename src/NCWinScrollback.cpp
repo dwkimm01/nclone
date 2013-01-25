@@ -93,6 +93,7 @@ void NCWinScrollback::refresh()
 		}
 	}
 
+	int lineCount = 0;
 	// Print the buffer to the window
 	p_printWindow
 	   ( p_buff.begin()
@@ -104,8 +105,12 @@ void NCWinScrollback::refresh()
 	   , [&](const NCString &line)
 	   {
 			line.draw(this);
+			++lineCount;
+			if(lineCount < height)
+			{
 			NCWin::clearTillEnd();
 			NCWin::cursorNextLine();
+			}
 	   });
 
 	NCWin::rRefresh();
