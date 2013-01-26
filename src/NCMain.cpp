@@ -13,6 +13,7 @@
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/date_time.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
 #include <ctype.h>
@@ -234,7 +235,10 @@ int doit(int argc, char* argv[])
 		typedef boost::circular_buffer<std::string> CmdHistory;
 		CmdHistory cmdHistory(CmdHistoryMax);
 		int cmdHistoryIndex = 0;
-
+		// Timeout/idle count
+		using namespace boost::gregorian;
+		using namespace boost::posix_time;
+		ptime now = second_clock::local_time();
 
 		// Draw/show entire app by refreshing
 		app.refresh();
@@ -327,11 +331,41 @@ int doit(int argc, char* argv[])
 			if(ncs)
 			{
 
+				// Update last time a key was pressed for idle timeout
+				if(KEY_TIMEOUT != c)
+				{
+					now = second_clock::local_time();
+				}
+
+				// Get time current time and calculate timeout for idle timeout check
+				const ptime nowp = second_clock::local_time();
+				const ptime nowNext = now + seconds(25);
+
+
 			switch(c)
 			{
+
 			case KEY_TIMEOUT:
 				// Update timestamp
 				winTime.refresh();
+
+
+				// Checkout idle status
+				// Check to see if there was an idle timeout
+				if(nowp > nowNext)
+				{
+					if(ncs)
+					{
+						const NCString TimeoutStr("  -- Timeout -- ", 2);
+						ncs->append(NCTimeUtils::getPrintableColorTimeStamp() + TimeoutStr);
+						ncs->refresh();
+						// Finally, update timeout so we don't do this again right away
+						now = second_clock::local_time();
+					}
+				}
+
+
+
 
 #if STATUSTWIRL
 				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
@@ -632,11 +666,19 @@ int doit(int argc, char* argv[])
 					}
 					else if(cmd.find("/info") == 0)
 					{
-						ncs->append(cmd);
-						typedef boost::split_iterator<std::string::iterator> ItrType;
-				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
-				             i != ItrType();
-				             ++i)
+						if(ncs)
+						{
+							// Create the window list, if there is no window listed add current/top window to list
+							std::string winList = cmd;
+							boost::replace_all(winList, "/info", "");
+							if(winList.size() == 0)
+							{
+								winList = ncs->getConfig().p_title;
+							}
+
+							typedef boost::split_iterator<std::string::iterator> ItrType;
+							for (ItrType i = boost::make_split_iterator(winList, boost::first_finder(" ", boost::is_iequal()));
+									i != ItrType(); ++i)
 				        {
 				        	const std::string winName = boost::copy_range<std::string>(*i);
 				        	if(winName != "/info")
@@ -646,7 +688,7 @@ int doit(int argc, char* argv[])
 				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
 				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
 				        			{
-				        				ncs->append("  found " + winName);
+				        				ncs->append("  Window " + winName);
 				        				ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
 				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
 				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
@@ -659,6 +701,7 @@ int doit(int argc, char* argv[])
 				        	}
 				        }
 				        ncs->refresh();
+						}
 					}
 					else if(cmd.find("/jump") == 0)
 					{
@@ -868,7 +911,7 @@ int doit(int argc, char* argv[])
 					}
 					else
 					{
-						const char ca[] = {(char)c, 0};
+//						const char ca[] = {(char)c, 0};
 //						winCmd.print(ca);
 						winCmd.append(cmd);
 					}
