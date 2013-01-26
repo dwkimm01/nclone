@@ -156,6 +156,13 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
 
 
 
+
+----------------------------------------------------
+-- Done
+
+ - Add a timeout to the window when user doesn't press anything for awhile 
+
+
 ----------------------------------------------------
 -- Fixed
 
