@@ -135,7 +135,7 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . be able to see offline buddies
  . queue up messages to send to buddies when they are online
  . group chat
- . away message
+ . away message (auto sets after timeout)
  . auto away message (after timeout)
  . personalized away message (with buddy's name, etc)
 
