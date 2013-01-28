@@ -31,6 +31,7 @@
 #include "NCInput.h"
 #include "NCString.h"
 #include "NCException.h"
+#include "NCCmdHistory.h"
 using namespace std;
 using namespace ncpp;
 
@@ -231,10 +232,8 @@ int doit(int argc, char* argv[])
 		// new connection here?
 
 		// Command history
-		const int CmdHistoryMax = 100;  // TODO, make configurable
-		typedef boost::circular_buffer<std::string> CmdHistory;
-		CmdHistory cmdHistory(CmdHistoryMax);
-		int cmdHistoryIndex = 0;
+		nccmdhistory::NCCmdHistory cmdHist;
+
 		// Timeout/idle count
 		using namespace boost::gregorian;
 		using namespace boost::posix_time;
@@ -405,34 +404,17 @@ int doit(int argc, char* argv[])
 				ncs->scrollDown(1);
 				ncs->refresh();
 				break;
-			case KEY_UP:  // TODO
-				if(cmdHistory.size())
-				{
-					// TODO, Add current command to the history so you can go back easily?
-					// will open up all sorts of issues
-					if(cmdHistoryIndex > 0)
-					{
-						cmd = cmdHistory[cmdHistoryIndex--];
-						winCmd.clear();
-//						winCmd.print(cmd.c_str());
-						winCmd.append(cmd);
-						winCmd.refresh();
-					}
-				}
+			case KEY_UP: // Command history Up
+				cmd = (--cmdHist).getCommand();
+				winCmd.clear();
+				winCmd.append(cmd);
+				winCmd.refresh();
 				break;
-			case KEY_DOWN:
-				if(cmdHistory.size())
-				{
-					if(cmdHistoryIndex < (cmdHistory.size()-1))
-					{
-						cmdHistoryIndex += 2;
-						cmd = cmdHistory[cmdHistoryIndex];
-						winCmd.clear();
-//						winCmd.print(cmd.c_str());
-						winCmd.append(cmd);
-						winCmd.refresh();
-					}
-				}
+			case KEY_DOWN: // Command history down
+				cmd = (++cmdHist).getCommand();
+				winCmd.clear();
+				winCmd.append(cmd);
+				winCmd.refresh();
 				break;
 			case KEY_LEFT:
 				if(ncs)
@@ -567,7 +549,7 @@ int doit(int argc, char* argv[])
 						if(ncs)
 						{
 							ncs->append(cmd + ", command history:");
-							for(auto x : cmdHistory)
+							for(auto x : cmdHist)
 							{
 								ncs->append(" " + x);
 							}
@@ -865,8 +847,7 @@ int doit(int argc, char* argv[])
 					}
 
 					// Reset command window and assume it needs updating
-					cmdHistory.push_back(cmd);  // First, update Command history
-					cmdHistoryIndex = cmdHistory.size()-1;
+					cmdHist.add(cmd);
 					// TODO, probably don't want/need to add standard cmds w/o params like help
 					cmd.clear();
 					winCmd.clear();
