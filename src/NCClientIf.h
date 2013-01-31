@@ -32,6 +32,13 @@ public:
 
    virtual ~NCClientIf();
 
+   // TODO, need a way to get configuration or user enterable information
+   // dynamically into subclasses.  Meaning a virtual method that maybe
+   // you call to get a list of strings/keys that need to be filled out
+   // then maybe another virtual method that takes those values for setting
+   // it up.
+   // Unfortunately, that won't work with a CTOR
+
    // --------------------------------------------------------------
    // Human readable
    virtual String getName() = 0;
