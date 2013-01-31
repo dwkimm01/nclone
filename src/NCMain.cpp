@@ -142,6 +142,7 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs emptyResize;
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		winBl->setWrapCut();
+		bool winBlVisible = true;
 #endif
 
 		// Time stamp window
@@ -287,7 +288,7 @@ int doit(int argc, char* argv[])
 
 #if BUDDYLIST
 			// Update Buddy List
-			if(winBl)
+			if(winBl && winBlVisible)
 			{
 				winBl->clear();
 				win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
@@ -494,6 +495,25 @@ int doit(int argc, char* argv[])
 					// TODO, toggle visible dropdown (from top) console window
 					ncs->append("<Console window toggle>");
 					ncs->refresh();
+				}
+				break;
+			case KEY_F(3):
+				if(ncs)
+				{
+					winBlVisible = !winBlVisible;
+					// ncs->append("<Toggle Contacts Window visibility " + boost::lexical_cast<std::string>(winBlVisible) + ">");
+					// ncs->refresh();
+
+					if(!winBlVisible)
+					{
+						app.bringToBack(winBl);
+						win3.refresh();
+					}
+					else
+					{
+						app.bringToFront(winBl);
+						winBl->refresh();
+					}
 				}
 				break;
 			case KEY_F(5):
