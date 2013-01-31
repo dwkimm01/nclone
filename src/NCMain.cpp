@@ -551,6 +551,8 @@ int doit(int argc, char* argv[])
 							ncs->append("  /lorem    print debug lorem text to test space wrapping");
 							ncs->append("");
 							ncs->append(" Shortcuts");
+							// TODO, would be cool if dynamically mapping keystrokes would show up here in the
+							// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
 							ncs->append("  CTRL-c     quit");
 							ncs->append("  TAB        go to next window");
 							ncs->append("  SHIFT-TAB  go to previous window");
