@@ -560,6 +560,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  Home       Scroll to top of scrollback");
 							ncs->append("  End        Scroll to bottom of scrollback");
 							ncs->append("  Enter      Send Message or process command");
+							ncs->append("  F3         Toggle Contact list window visibility");
 							ncs->append("");
 							ncs->refresh();
 						}
