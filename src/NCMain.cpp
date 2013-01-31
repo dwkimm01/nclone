@@ -700,6 +700,9 @@ int doit(int argc, char* argv[])
 				        				ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
 				        				const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
 				        				ncs->append(std::string("     border: ") + borderVal);
+				        			        NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
+                                                                        if(nwstmp)	
+                                                                           ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) ); 
 				        			}
 				        			return true;
 				        		});

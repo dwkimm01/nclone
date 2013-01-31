@@ -246,6 +246,10 @@ int NCWinScrollback::getTextWidth() const
 	return (cfg.p_hasBorder)?(cfg.p_w - 2):(cfg.p_w) - 1;
 }
 
+int NCWinScrollback::entryCount() const
+{
+   return p_buff.size();
+}
 
 // Design note:
 //  we want the text to start at the bottom and scroll up
