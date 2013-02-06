@@ -13,6 +13,7 @@
 #include <functional>
 #include <boost/range.hpp>
 #include <boost/algorithm/string.hpp>
+#include <ctype.h>  // just for isprint right now
 
 #include "NCString.h"
 
@@ -35,6 +36,11 @@ public:
 		std::string r(text);
 		boost::replace_all(r, find, replacement);
 		return r;
+	}
+
+	inline static int isPrint(const int i)
+	{
+		return isprint(i);
 	}
 
 };

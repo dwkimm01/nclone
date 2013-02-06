@@ -16,7 +16,6 @@
 #include <boost/date_time.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
-#include <ctype.h>
 
 #include "NCApp.h"
 #include "NCWin.h"
@@ -30,6 +29,7 @@
 #include "TestExampleText.h"
 #include "NCInput.h"
 #include "NCString.h"
+#include "NCStringUtils.h"
 #include "NCException.h"
 #include "NCCmdHistory.h"
 using namespace std;
@@ -144,6 +144,14 @@ int doit(int argc, char* argv[])
 		winBl->setWrapCut();
 		bool winBlVisible = true;
 #endif
+
+		// Debug keystroke window
+		auto keysCfg = blCfg;
+		keysCfg.p_title = "Keys";
+		keysCfg.p_y = 10;
+		NCWinScrollback* winKeys = new NCWinScrollback(&app, keysCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
+
+
 
 		// Time stamp window
 		auto timeCfg = cfg;
@@ -320,12 +328,16 @@ int doit(int argc, char* argv[])
 			int c = 0;
 //			app >> c;
 			winCmd >> c;
-			// Uncomment this to show what the numeric values of each keystroke are
-//			std::string tmp;
-//			tmp.push_back(c);
-//			app << "char(" << tmp.c_str() << ")";
-//			app << "char(" << boost::lexical_cast<std::string>((int)c).c_str() << ") ";
 
+			// Show keystroke in keystroke debug window
+			if(KEY_TIMEOUT != c)
+			{
+			const char ks[] = {(char)c, 0};
+			const std::string keyStroke = (ncstringutils::NCStringUtils::isPrint(c))
+					? (std::string("Key ") + std::string(ks))
+					: (std::string("Key ") + boost::lexical_cast<std::string>(c));
+			winKeys->append(keyStroke);
+			}
 
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
 			if(ncs)
@@ -517,7 +529,7 @@ int doit(int argc, char* argv[])
 				}
 				break;
 			case KEY_F(5):
-				winCmd.refresh();
+				app.refresh();
 				break;
 			case 10:
 			case KEY_ENTER:
@@ -792,9 +804,18 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							const NCString entry
-//								= NCTimeUtils::getPrintableColorTimeStamp()
-								= NCString(" " + testexampletext::TestExampleText::get(), 6);
+							NCString entry
+								= NCTimeUtils::getPrintableColorTimeStamp()
+								+ NCString(" " + testexampletext::TestExampleText::get(), 6);
+							// Change color of e's for fun
+							entry.forEach([](char &c, char &color)
+							{
+								if('e' == c)
+								{
+									color = 1;
+								}
+							});
+
 							ncs->append(entry);
 							ncs->refresh();
 						}
@@ -906,7 +927,7 @@ int doit(int argc, char* argv[])
 //					(c >= 'A' && c <= 'Z') ||
 //					(c >= '0' && c <= '9'))
 				//TODO, implement as boost ns::print
-				if (isprint(c))
+				if (ncstringutils::NCStringUtils::isPrint(c))
 				{
 					// Add characters to cmd string, refresh
 					cmd += c;

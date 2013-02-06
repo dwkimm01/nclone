@@ -56,6 +56,9 @@ public:
 	// Create an NCString based on a substring
 	NCString substr(std::string::iterator begin, std::string::iterator end);
 
+	// Iterate over character and color simultaneously
+	void forEach(std::function<void(char &c, char& color)> func);
+
 private:
 	std::string theString;
 	std::string colorString;

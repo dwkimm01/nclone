@@ -80,6 +80,16 @@ NCString NCString::substr(std::string::iterator begin, std::string::iterator end
 	return NCString(s, c);
 }
 
+void NCString::forEach(std::function<void(char &c, char& color)> func)
+{
+	char emptyColor = 0;
+	for(unsigned int i = 0; i < theString.size(); ++i)
+	{
+		func(theString[i], (colorString.size() > i)?(colorString[i]):(emptyColor));
+	}
+}
+
+
 std::string::size_type NCString::size() const
 {
 	return theString.size();
