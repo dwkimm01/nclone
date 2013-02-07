@@ -137,6 +137,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
+        blCfg.p_backgroundColor = 5;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
