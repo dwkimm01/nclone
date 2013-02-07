@@ -114,7 +114,7 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . Then maybe write a LengthSpaceFinder (LengthFinder brother) class
  . Make NCTextWinFormatter a templated class on FINDER (maybe?)
 
-- NCWin refeshes too much
+- NCWin refreshes too much
  . add lots of new windows: blinks too often
  . logon to chat service with buddies onlien: doesn't always redraw fully
 
