@@ -10,7 +10,7 @@ TODO list
 
 - Text video mode (non graphics vga)
  . SHIFT-UP/DOWN does not work in full screen terminal mode on laptop
- . every keypress refreshes everything (prob. a problem all the time)
+DONE i think, buddy list needs attention though . every keypress refreshes everything (prob. a problem all the time)
 
 - Container plus Current Index abstraction
  . Could be helpful for Cmd History
@@ -135,7 +135,7 @@ TODO list
  . be able to see offline buddies
  . queue up messages to send to buddies when they are online
  . group chat
- . away message
+ . away message (auto sets after timeout)
  . auto away message (after timeout)
  . personalized away message (with buddy's name, etc)
 
@@ -154,6 +154,13 @@ TODO list
  . Still want to be able to use Eclipse, XCode, Linux, OSX, etc
  . Build in deps statically
 
+
+
+
+----------------------------------------------------
+-- Done
+
+ - Add a timeout to the window when user doesn't press anything for awhile 
 
 
 ----------------------------------------------------

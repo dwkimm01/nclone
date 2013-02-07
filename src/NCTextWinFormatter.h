@@ -65,7 +65,7 @@ private:
 // last found space character
 struct LengthSpaceFinder
 {
-	LengthSpaceFinder(const int length) : p_length(length) {}
+	LengthSpaceFinder(const int length) : p_length(length), p_skipFirstSpace(false) {}
 // TODO, on scope exit set p_skipFirstSpace to true
 	template <typename ForwardItr>
 	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const

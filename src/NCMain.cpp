@@ -13,6 +13,7 @@
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/date_time.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
 #include <ctype.h>
@@ -30,6 +31,7 @@
 #include "NCInput.h"
 #include "NCString.h"
 #include "NCException.h"
+#include "NCCmdHistory.h"
 using namespace std;
 using namespace ncpp;
 
@@ -140,6 +142,7 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs emptyResize;
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		winBl->setWrapCut();
+		bool winBlVisible = true;
 #endif
 
 		// Time stamp window
@@ -230,11 +233,12 @@ int doit(int argc, char* argv[])
 		// new connection here?
 
 		// Command history
-		const int CmdHistoryMax = 100;  // TODO, make configurable
-		typedef boost::circular_buffer<std::string> CmdHistory;
-		CmdHistory cmdHistory(CmdHistoryMax);
-		int cmdHistoryIndex = 0;
+		nccmdhistory::NCCmdHistory cmdHist;
 
+		// Timeout/idle count
+		using namespace boost::gregorian;
+		using namespace boost::posix_time;
+		ptime now = second_clock::local_time();
 
 		// Draw/show entire app by refreshing
 		app.refresh();
@@ -284,7 +288,7 @@ int doit(int argc, char* argv[])
 
 #if BUDDYLIST
 			// Update Buddy List
-			if(winBl)
+			if(winBl && winBlVisible)
 			{
 				winBl->clear();
 				win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
@@ -327,11 +331,41 @@ int doit(int argc, char* argv[])
 			if(ncs)
 			{
 
+				// Update last time a key was pressed for idle timeout
+				if(KEY_TIMEOUT != c)
+				{
+					now = second_clock::local_time();
+				}
+
+				// Get time current time and calculate timeout for idle timeout check
+				const ptime nowp = second_clock::local_time();
+				const ptime nowNext = now + seconds(25);
+
+
 			switch(c)
 			{
+
 			case KEY_TIMEOUT:
 				// Update timestamp
 				winTime.refresh();
+
+
+				// Checkout idle status
+				// Check to see if there was an idle timeout
+				if(nowp > nowNext)
+				{
+					if(ncs)
+					{
+						const NCString TimeoutStr("  -- Timeout -- ", 2);
+						ncs->append(NCTimeUtils::getPrintableColorTimeStamp() + TimeoutStr);
+						ncs->refresh();
+						// Finally, update timeout so we don't do this again right away
+						now = second_clock::local_time();
+					}
+				}
+
+
+
 
 #if STATUSTWIRL
 				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
@@ -371,34 +405,17 @@ int doit(int argc, char* argv[])
 				ncs->scrollDown(1);
 				ncs->refresh();
 				break;
-			case KEY_UP:  // TODO
-				if(cmdHistory.size())
-				{
-					// TODO, Add current command to the history so you can go back easily?
-					// will open up all sorts of issues
-					if(cmdHistoryIndex > 0)
-					{
-						cmd = cmdHistory[cmdHistoryIndex--];
-						winCmd.clear();
-//						winCmd.print(cmd.c_str());
-						winCmd.append(cmd);
-						winCmd.refresh();
-					}
-				}
+			case KEY_UP: // Command history Up
+				cmd = (--cmdHist).getCommand();
+				winCmd.clear();
+				winCmd.append(cmd);
+				winCmd.refresh();
 				break;
-			case KEY_DOWN:
-				if(cmdHistory.size())
-				{
-					if(cmdHistoryIndex < (cmdHistory.size()-1))
-					{
-						cmdHistoryIndex += 2;
-						cmd = cmdHistory[cmdHistoryIndex];
-						winCmd.clear();
-//						winCmd.print(cmd.c_str());
-						winCmd.append(cmd);
-						winCmd.refresh();
-					}
-				}
+			case KEY_DOWN: // Command history down
+				cmd = (++cmdHist).getCommand();
+				winCmd.clear();
+				winCmd.append(cmd);
+				winCmd.refresh();
 				break;
 			case KEY_LEFT:
 				if(ncs)
@@ -480,6 +497,25 @@ int doit(int argc, char* argv[])
 					ncs->refresh();
 				}
 				break;
+			case KEY_F(3):
+				if(ncs)
+				{
+					winBlVisible = !winBlVisible;
+					// ncs->append("<Toggle Contacts Window visibility " + boost::lexical_cast<std::string>(winBlVisible) + ">");
+					// ncs->refresh();
+
+					if(!winBlVisible)
+					{
+						app.bringToBack(winBl);
+						win3.refresh();
+					}
+					else
+					{
+						app.bringToFront(winBl);
+						winBl->refresh();
+					}
+				}
+				break;
 			case KEY_F(5):
 				winCmd.refresh();
 				break;
@@ -515,6 +551,8 @@ int doit(int argc, char* argv[])
 							ncs->append("  /lorem    print debug lorem text to test space wrapping");
 							ncs->append("");
 							ncs->append(" Shortcuts");
+							// TODO, would be cool if dynamically mapping keystrokes would show up here in the
+							// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
 							ncs->append("  CTRL-c     quit");
 							ncs->append("  TAB        go to next window");
 							ncs->append("  SHIFT-TAB  go to previous window");
@@ -524,6 +562,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  Home       Scroll to top of scrollback");
 							ncs->append("  End        Scroll to bottom of scrollback");
 							ncs->append("  Enter      Send Message or process command");
+							ncs->append("  F3         Toggle Contact list window visibility");
 							ncs->append("");
 							ncs->refresh();
 						}
@@ -533,7 +572,7 @@ int doit(int argc, char* argv[])
 						if(ncs)
 						{
 							ncs->append(cmd + ", command history:");
-							for(auto x : cmdHistory)
+							for(auto x : cmdHist)
 							{
 								ncs->append(" " + x);
 							}
@@ -632,11 +671,19 @@ int doit(int argc, char* argv[])
 					}
 					else if(cmd.find("/info") == 0)
 					{
-						ncs->append(cmd);
-						typedef boost::split_iterator<std::string::iterator> ItrType;
-				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
-				             i != ItrType();
-				             ++i)
+						if(ncs)
+						{
+							// Create the window list, if there is no window listed add current/top window to list
+							std::string winList = cmd;
+							boost::replace_all(winList, "/info", "");
+							if(winList.size() == 0)
+							{
+								winList = ncs->getConfig().p_title;
+							}
+
+							typedef boost::split_iterator<std::string::iterator> ItrType;
+							for (ItrType i = boost::make_split_iterator(winList, boost::first_finder(" ", boost::is_iequal()));
+									i != ItrType(); ++i)
 				        {
 				        	const std::string winName = boost::copy_range<std::string>(*i);
 				        	if(winName != "/info")
@@ -646,7 +693,7 @@ int doit(int argc, char* argv[])
 				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
 				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
 				        			{
-				        				ncs->append("  found " + winName);
+				        				ncs->append("  Window " + winName);
 				        				ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
 				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
 				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
@@ -659,6 +706,7 @@ int doit(int argc, char* argv[])
 				        	}
 				        }
 				        ncs->refresh();
+						}
 					}
 					else if(cmd.find("/jump") == 0)
 					{
@@ -822,8 +870,7 @@ int doit(int argc, char* argv[])
 					}
 
 					// Reset command window and assume it needs updating
-					cmdHistory.push_back(cmd);  // First, update Command history
-					cmdHistoryIndex = cmdHistory.size()-1;
+					cmdHist.add(cmd);
 					// TODO, probably don't want/need to add standard cmds w/o params like help
 					cmd.clear();
 					winCmd.clear();
@@ -868,7 +915,7 @@ int doit(int argc, char* argv[])
 					}
 					else
 					{
-						const char ca[] = {(char)c, 0};
+//						const char ca[] = {(char)c, 0};
 //						winCmd.print(ca);
 						winCmd.append(cmd);
 					}

@@ -289,3 +289,8 @@ Random Code Sample that needs cleanup?
         , _1
 
 </pre>
+
+
+Git, useful commands
+--------------
+git config --global color.ui auto

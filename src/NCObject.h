@@ -37,11 +37,15 @@ public:
 
 	/**
 	 * <b>Purpose:</b> Bring child object to front
+	 * So it will be draw last, meaning it will be visible over
+	 * all other windows
 	 */
 	void bringToFront(NCObject* ncobject);
 
 	/**
 	 * <b>Purpose:</b> Bring child object to back
+	 * So it will be drawn first, meaning it may be written over by
+	 * subsequent windows
 	 */
 	void bringToBack(NCObject* ncobject);
 
