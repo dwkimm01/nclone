@@ -20,3 +20,6 @@ Debug/*
 *.swp
 *~
 
+# Scons
+.sconsign.dblite
+Scons/build
