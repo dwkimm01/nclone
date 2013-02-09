@@ -426,15 +426,45 @@ int doit(int argc, char* argv[])
 				winCmd.refresh();
 				break;
 			case KEY_LEFT:
-				if(ncs)
-				{
-					if(0 < cmdIdx) --cmdIdx;
-				}
+				if(0 < cmdIdx) --cmdIdx;
 				break;
 			case KEY_RIGHT:
-				if(ncs)
+				if(cmd.size() > cmdIdx) ++cmdIdx;
+				break;
+			case 539: // CTRL-LEFT
+				// Move cursor to previous word start
+				// find first nonwhite character
+				for(int nsp = cmdIdx-1; nsp > 0; --nsp)
 				{
-					if(cmd.size() > cmdIdx) ++cmdIdx;
+					if(' ' != cmd[nsp])
+					{
+						// Find last non-white character
+						for(int wd = nsp-1; wd > 0; --wd)
+						{
+							if(' ' == cmd[wd])
+							{
+								cmdIdx = wd+1;
+								nsp = 0;
+								break;
+							}
+						}
+						// Didn't set cmdIdx yet so we're at the beginning
+						if(0 != nsp)
+						{
+							cmdIdx = 0;
+						}
+					}
+				}
+				break;
+			case 554: // CTRL-RIGHT
+				// Move cursor to next word end (space)
+				for(int sp = cmdIdx+1; sp <= cmd.size(); ++sp)
+				{
+					if(' ' == cmd[sp] || cmd.size() == sp)
+					{
+						cmdIdx = sp;
+						break;
+					}
 				}
 				break;
 			case '\t':
@@ -922,6 +952,17 @@ int doit(int argc, char* argv[])
 						winCmd.append(cmd);
 					}
 //					winCmd.refresh();
+				}
+				else
+				{
+					if(ncs)
+					{
+						// Not printable - but didn't get accepted by any other rules
+						// TODO, print octal (and hexidecimal version) as well
+						const std::string unmapped = "Unmapped keystroke " + boost::lexical_cast<std::string>((int)c);
+						ncs->append(unmapped);
+						ncs->refresh();
+					}
 				}
 				break;
 				// nothing
