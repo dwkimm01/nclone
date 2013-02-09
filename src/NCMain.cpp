@@ -322,16 +322,9 @@ int doit(int argc, char* argv[])
 			winCmd.refresh();
 			winCmd.cursorSet(1+(/*cmdIdxLine*/ cmdIdx % cmdWidth), 1);
 
-
 			// Get user input
 			int c = 0;
 			winCmd >> c;
-			// Uncomment this to show what the numeric values of each keystroke are
-//			std::string tmp;
-//			tmp.push_back(c);
-//			app << "char(" << tmp.c_str() << ")";
-//			app << "char(" << boost::lexical_cast<std::string>((int)c).c_str() << ") ";
-
 
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
 			if(ncs)
@@ -412,6 +405,7 @@ int doit(int argc, char* argv[])
 				ncs->refresh();
 				break;
 			case KEY_UP: // Command history Up
+// TODO, going up when the history is blank erases everything...
 				cmd = (--cmdHist).getCommand();
 				cmdIdx = cmd.size();
 				winCmd.clear();
@@ -929,29 +923,20 @@ int doit(int argc, char* argv[])
 				break;
 			default:
 				//Filter out non-printable characters
-//				if ((c >= 'a' && c <= 'z') ||
-//					(c >= 'A' && c <= 'Z') ||
-//					(c >= '0' && c <= '9'))
 				//TODO, implement as boost ns::print
 				if (isprint(c))
 				{
 					// Add characters to cmd string, refresh
-//					cmd += c;
 					cmd.insert(cmd.begin() + cmdIdx, c);
 					++cmdIdx;
 					if(PASSWORD == inputState)
 					{
-//						winCmd.print("x");
-						const std::string xxx('x', cmd.size());
-						winCmd.append(xxx);
+						winCmd.append(std::string('x', cmd.size()));
 					}
 					else
 					{
-//						const char ca[] = {(char)c, 0};
-//						winCmd.print(ca);
 						winCmd.append(cmd);
 					}
-//					winCmd.refresh();
 				}
 				else
 				{
@@ -959,8 +944,7 @@ int doit(int argc, char* argv[])
 					{
 						// Not printable - but didn't get accepted by any other rules
 						// TODO, print octal (and hexidecimal version) as well
-						const std::string unmapped = "Unmapped keystroke " + boost::lexical_cast<std::string>((int)c);
-						ncs->append(unmapped);
+						ncs->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)c)));
 						ncs->refresh();
 					}
 				}
