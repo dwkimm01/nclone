@@ -157,6 +157,17 @@ DONE  . Text wrapping for commands/text that is too long for one window width
  . Build in deps statically
 
 
+- Plugin Overridable
+ . config
+  . colors
+  . win placement
+  . login, saved
+ . signals
+  . msgs: in, out
+  . resize
+ . Client library
+ . CMD Map
+- Version through makefile and git?
 
 
 ----------------------------------------------------
