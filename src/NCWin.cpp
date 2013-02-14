@@ -50,7 +50,7 @@ public:
     	wtimeout(p_win, 800);
         
         if (p_cfg.p_backgroundColor != -1) {
-            wbkgd(p_win, p_cfg.p_backgroundColor);
+            wbkgd(p_win, COLOR_PAIR(8));
         }
 
         // Update cursor position

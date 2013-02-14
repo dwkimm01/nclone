@@ -54,6 +54,7 @@ NCApp::NCApp()
     init_pair(5, COLOR_MAGENTA, -1);
     init_pair(6, COLOR_CYAN, -1);
     init_pair(7, COLOR_WHITE, -1);
+    init_pair(8, -1, COLOR_BLUE);
 
 	// Disable line buffering
 	raw();
