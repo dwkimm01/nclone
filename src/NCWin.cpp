@@ -46,7 +46,6 @@ public:
         meta(p_win, TRUE);
 //        wbkgd(p_win, COLOR_PAIR(nw_COLORS*faimconf.b[bg]));
         werase(p_win);
-        p_cfg.p_backgroundColor = -1;
     	wtimeout(p_win, 800);
         
         if (p_cfg.p_backgroundColor != -1) {
