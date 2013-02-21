@@ -69,7 +69,7 @@ public:
 	void cursorReset();
 	void cursorNextLine();
 	void clearTillEnd();
-//	void cursorSet(const int x, const int y);
+	void cursorSet(const int x, const int y);
 
 	void putChar(const char c, const int x, const int y);
 

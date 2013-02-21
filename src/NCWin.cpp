@@ -46,8 +46,11 @@ public:
         meta(p_win, TRUE);
 //        wbkgd(p_win, COLOR_PAIR(nw_COLORS*faimconf.b[bg]));
         werase(p_win);
-
     	wtimeout(p_win, 800);
+        
+        if (p_cfg.p_backgroundColor != -1) {
+            wbkgd(p_win, COLOR_PAIR(8));
+        }
 
         // Update cursor position
         cursorReset();
@@ -251,10 +254,10 @@ public:
 		}
 	}
 
-//	void cursorSet(const int x, const int y)
-//	{
-//		wmove(p_win, y, x);
-//	}
+	void cursorSet(const int x, const int y)
+	{
+		wmove(p_win, y, x);
+	}
 
 	void putChar(const char c, const int x, const int y)
 	{
@@ -415,10 +418,10 @@ void NCWin::clearTillEnd()
 	p_data->clearTillEnd();
 }
 
-//void NCWin::cursorSet(const int x, const int y)
-//{
-//	p_data->cursorSet(x, y);
-//}
+void NCWin::cursorSet(const int x, const int y)
+{
+	p_data->cursorSet(x, y);
+}
 
 void NCWin::putChar(const char c, const int x, const int y)
 {

@@ -20,3 +20,11 @@ Debug/*
 *.swp
 *~
 
+# Scons
+.sconsign.dblite
+Scons/build
+
+# XCode
+nclone/nclone.xcodeproj/project.pbxproj
+nclone/nclone/main.cpp
+nclone/nclone/nclone.1

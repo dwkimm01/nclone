@@ -92,6 +92,7 @@ int doit(int argc, char* argv[])
 		cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
 //		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 		NCWinScrollback winCmd(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
+		winCmd.setWrapLength();
 
 		// Set of chat windows
 		cfg.p_title = "Chats";
@@ -111,7 +112,6 @@ int doit(int argc, char* argv[])
 //			xxxWin->append("Howdy");
 //			xxxWin->append("Howdy 2");
 //			xxxWin->append(NCString("Howdy 3", 2));
-//
 //		}
 
 
@@ -137,6 +137,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
+        blCfg.p_backgroundColor = 8;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
@@ -288,6 +289,7 @@ int doit(int argc, char* argv[])
 
 		// Input collector
 		std::string cmd;
+		int cmdIdx = 0;
 		bool stillRunning = true;
 
 		// Loop forever until input tells us to return
@@ -326,11 +328,16 @@ int doit(int argc, char* argv[])
 
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
+			// All of this is to put the cursor in the correct place for editing a line
+			const int cmdWidth = winCmd.getConfig().p_w - ((winCmd.getConfig().p_hasBorder)?(2):(0));
+			const int cmdTotal = cmd.size() / cmdWidth;
+			const int cmdIdxLine = cmdIdx / cmdWidth;
+			winCmd.end();
+			winCmd.scrollUp(cmdTotal - cmdIdxLine);
 			winCmd.refresh();
+			winCmd.cursorSet(1+(/*cmdIdxLine*/ cmdIdx % cmdWidth), 1);
 
 			// Get user input
-			// TODO, would be nice to periodically break out of this and be able to get control
-			// of this thread back to do some housekeeping type chores (idle timestamp printing etc)
 			int c = 0;
 			winCmd >> c;  // app >> c;
 
@@ -356,7 +363,7 @@ int doit(int argc, char* argv[])
 
 				// Get time current time and calculate timeout for idle timeout check
 				const ptime nowp = second_clock::local_time();
-				const ptime nowNext = now + seconds(25);
+				const ptime nowNext = now + minutes(15); // seconds(900); // 15 mins
 
 
 			switch(c)
@@ -422,37 +429,60 @@ int doit(int argc, char* argv[])
 				ncs->refresh();
 				break;
 			case KEY_UP: // Command history Up
+// TODO, going up when the history is blank erases everything...
 				cmd = (--cmdHist).getCommand();
+				cmdIdx = cmd.size();
 				winCmd.clear();
 				winCmd.append(cmd);
 				winCmd.refresh();
 				break;
 			case KEY_DOWN: // Command history down
 				cmd = (++cmdHist).getCommand();
+				cmdIdx = cmd.size();
 				winCmd.clear();
 				winCmd.append(cmd);
 				winCmd.refresh();
 				break;
 			case KEY_LEFT:
-				if(ncs)
-				{
-					// TODO, winCmd editing
-					ncs->append("<LEFT>");
-					ncs->refresh();
-					cmd.clear();
-					winCmd.clear();
-					winCmd.refresh();
-				}
+				if(0 < cmdIdx) --cmdIdx;
 				break;
 			case KEY_RIGHT:
-				if(ncs)
+				if(cmd.size() > cmdIdx) ++cmdIdx;
+				break;
+			case 539: // CTRL-LEFT
+				// Move cursor to previous word start
+				// find first nonwhite character
+				for(int nsp = cmdIdx-1; nsp > 0; --nsp)
 				{
-					// TODO, winCmd editing
-					ncs->append("<RIGHT>");
-					ncs->refresh();
-					cmd.clear();
-					winCmd.clear();
-					winCmd.refresh();
+					if(' ' != cmd[nsp])
+					{
+						// Find last non-white character
+						for(int wd = nsp-1; wd > 0; --wd)
+						{
+							if(' ' == cmd[wd])
+							{
+								cmdIdx = wd+1;
+								nsp = 0;
+								break;
+							}
+						}
+						// Didn't set cmdIdx yet so we're at the beginning
+						if(0 != nsp)
+						{
+							cmdIdx = 0;
+						}
+					}
+				}
+				break;
+			case 554: // CTRL-RIGHT
+				// Move cursor to next word end (space)
+				for(int sp = cmdIdx+1; sp <= cmd.size(); ++sp)
+				{
+					if(' ' == cmd[sp] || cmd.size() == sp)
+					{
+						cmdIdx = sp;
+						break;
+					}
 				}
 				break;
 			case '\t':
@@ -471,8 +501,9 @@ int doit(int argc, char* argv[])
 				stillRunning = false; // return 0;
 				break;
 			case 21: // CTRL-u
-				// TODO
+				// TODO, change to only delete what is in front of the cursor
 				cmd.clear();
+				cmdIdx = 0;
 				winCmd.clear();
 				winCmd.refresh();
 				break;
@@ -490,7 +521,7 @@ int doit(int argc, char* argv[])
 			case KEY_BACKSPACE:
 				if(!cmd.empty())
 				{
-					cmd.erase(cmd.end() - 1);
+					cmd.erase( cmd.begin() + (--cmdIdx));
 					winCmd.clear();
 					if(PASSWORD == inputState)
 					{
@@ -917,6 +948,7 @@ int doit(int argc, char* argv[])
 					cmdHist.add(cmd);
 					// TODO, probably don't want/need to add standard cmds w/o params like help
 					cmd.clear();
+					cmdIdx = 0;
 					winCmd.clear();
 					winCmd.refresh();
 
@@ -943,27 +975,30 @@ int doit(int argc, char* argv[])
 				break;
 			default:
 				//Filter out non-printable characters
-//				if ((c >= 'a' && c <= 'z') ||
-//					(c >= 'A' && c <= 'Z') ||
-//					(c >= '0' && c <= '9'))
 				//TODO, implement as boost ns::print
 				if (ncstringutils::NCStringUtils::isPrint(c))
 				{
 					// Add characters to cmd string, refresh
-					cmd += c;
+					cmd.insert(cmd.begin() + cmdIdx, c);
+					++cmdIdx;
 					if(PASSWORD == inputState)
 					{
-//						winCmd.print("x");
-						const std::string xxx('x', cmd.size());
-						winCmd.append(xxx);
+						winCmd.append(std::string('x', cmd.size()));
 					}
 					else
 					{
-//						const char ca[] = {(char)c, 0};
-//						winCmd.print(ca);
 						winCmd.append(cmd);
 					}
-//					winCmd.refresh();
+				}
+				else
+				{
+					if(ncs)
+					{
+						// Not printable - but didn't get accepted by any other rules
+						// TODO, print octal (and hexidecimal version) as well
+						ncs->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)c)));
+						ncs->refresh();
+					}
 				}
 				break;
 				// nothing

@@ -13,7 +13,7 @@ TODO list
 DONE i think, buddy list needs attention though . every keypress refreshes everything (prob. a problem all the time)
 
 - Container plus Current Index abstraction
- . Could be helpful for Cmd History
+DONE . Could be helpful for Cmd History
  . Might be useful for NCWinScrollBack 
 
 - Break Container out of NCWinscrollBack for a more MVC like arch
@@ -35,7 +35,7 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . Create an enum in NCWin.h maybe to use as an additional CTOR param?
 - Cleanup NCWin::NCWinData::printColor to use std::string::iterator
 
-- Debug Window
+- Debug Window (started in CN10?)
  . for getting keystrokes initially
  . F6 or CTRL-F5 or something to toggle visibility (order in refresh list)
 
@@ -54,8 +54,8 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . Improve functions in NCTextWinFormatter so they calculate line counts better
  . Page up goes up too far when there are wrapping lines
 
-- Fix initial text windows when there isn't enough text to fill window
- . Right now we start from top but I want the text entered down near the cmd window
+DONE - Fix initial text windows when there isn't enough text to fill window
+DONE  . Right now we start from top but I want the text entered down near the cmd window
  . Might want to be able to make this configurable
 
 - Buddy List
@@ -66,6 +66,8 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . Animate hiding and showing of the window if config says to
 
 - Console window
+ . One console per connection?
+ . Drops down at start when there aren't any chat windows?
  . F1 type drop down kind of like quake had
  . Should show first "chat1" contents right now
  . Make sure general debug statements go to console
@@ -82,15 +84,15 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . One line window with updating and useful information
  .  TIME   INFO_COMMENT   CONNECTION STATUS
 
-- House Keeping
- . Redraw (to softcopy) of architecture/code overview
- . Can use umbrello probally - put into notes section
- . Put screenshot link from README.md
+DONE - House Keeping
+DONE  . Redraw (to softcopy) of architecture/code overview
+DONE  . Can use umbrello probally - put into notes section
+DONE  . Put screenshot link from README.md
 
 - Command parsing improvements
- . Up/Down command line history
+DONE  . Up/Down command line history
  . Left/Right move cursor
- . Text wrapping for commands/text that is too long for one window width
+DONE  . Text wrapping for commands/text that is too long for one window width
  . CTRL-r reverse search through command line history
  . Don't wait forever for a key to be entered (thread reuse)
  . Auto complete (suggestions) with dimmed text - and info/help about command
@@ -155,6 +157,17 @@ DONE i think, buddy list needs attention though . every keypress refreshes every
  . Build in deps statically
 
 
+- Plugin Overridable
+ . config
+  . colors
+  . win placement
+  . login, saved
+ . signals
+  . msgs: in, out
+  . resize
+ . Client library
+ . CMD Map
+- Version through makefile and git?
 
 
 ----------------------------------------------------

@@ -29,6 +29,7 @@ public:
 		, p_title("Window")
 		, p_hasBorder(false)
 		, p_scrollOk(true)
+        , p_backgroundColor(-1)
 	{
 	}
 
@@ -49,6 +50,9 @@ public:
 
 	// NCurses Scrolling, don't really use it but it messes up some printing
 	bool p_scrollOk;
+    
+    // Background color
+    int p_backgroundColor;
 };
 
 } // namespace ncpp
