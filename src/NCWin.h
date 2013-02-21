@@ -55,6 +55,8 @@ public:
 	 */
 	const NCWinCfg& getConfig() const;
 
+	void setBackground(const short color);
+
 	/**
 	 * <b>Purpose:</b> Scroll window up one level
 	 */

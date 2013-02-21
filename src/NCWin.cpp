@@ -48,9 +48,6 @@ public:
         werase(p_win);
     	wtimeout(p_win, 800);
         
-        if (p_cfg.p_backgroundColor != -1) {
-            wbkgd(p_win, COLOR_PAIR(8));
-        }
 
         // Update cursor position
         cursorReset();
@@ -85,6 +82,12 @@ public:
 
 		x = std::min(x, p_cfg.p_w-2);
 //		if(x > p_cfg.p_w) { x = p_cfg.p_w; ++y; }
+
+        if (p_cfg.p_backgroundColor != -1)
+        {
+            wbkgd(p_win, COLOR_PAIR(p_cfg.p_backgroundColor));
+        }
+
 
 #if 0
 // ---------------------------------------------------------------------------
@@ -212,6 +215,11 @@ public:
 		return p_cfg;
 	}
 
+	void setBackground(const short color)
+	{
+		p_cfg.p_backgroundColor = color;
+	}
+
 	void cursorReset()
 	{
 		// Calculate x, y position
@@ -281,10 +289,16 @@ public:
 	//    }
 
 		// TODO, implement with iterators as an exercise
-	    for (; *str != 0; ++str){
+	    for (; *str != 0; ++str)
+	    {
 	    	int val = *str;
-	    	if (color && *color != 0){
-	    		val |= COLOR_PAIR((unsigned int)*color);
+	    	if (color && *color != 0)
+	    	{
+	    		const short foreground = (short)*color;
+	    		const short background = p_cfg.p_backgroundColor;
+	    		const short colorCombined = foreground + ((background+1) * (COLOR_WHITE+1) );
+	    		val |= COLOR_PAIR(colorCombined);
+//	    		val |= COLOR_PAIR((unsigned int)*color);
 	    		++color;
 	    	}
 	    	if(*str)
@@ -376,6 +390,12 @@ const NCWinCfg& NCWin::getConfig() const
 {
 	return p_data->getConfig();
 }
+
+void NCWin::setBackground(const short color)
+{
+	p_data->setBackground(color);
+}
+
 
 //void NCWin::scrollUp(const int n)
 //{

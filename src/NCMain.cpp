@@ -137,7 +137,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
-        blCfg.p_backgroundColor = 8;
+        blCfg.p_backgroundColor = 27; // 4+ (8*2); // 4; // (4+1)*8;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
@@ -174,6 +174,8 @@ int doit(int argc, char* argv[])
 		NCString oneTwo = one + two;
 
 		winLog->append("Colors:");
+		winLog->append(NCString(" Zero", 0));
+
 		winLog->append(one);//NCString(" One",1));
 		winLog->append(two);//NCString(" Two",2));
 		winLog->append(NCString(" Three",3));
@@ -181,6 +183,8 @@ int doit(int argc, char* argv[])
 		winLog->append(NCString(" Five", 5));
 		winLog->append(NCString(" Six", 6));
 		winLog->append(NCString(" Seven", 7));
+		winLog->append(NCString(" Eight", 8));
+
 		winLog->append(oneTwo);
 		winLog->append("");
 
@@ -581,6 +585,17 @@ int doit(int argc, char* argv[])
 				break;
 			case KEY_F(5):
 				app.refresh();
+				break;
+			case KEY_F(7):
+				if(winBl)
+				{
+					const int oldColor = winBl->getConfig().p_backgroundColor;
+					winBl->setBackground(oldColor+1);
+					if(ncs)
+					{
+						ncs->append(std::string("Next color ") + boost::lexical_cast<std::string>(oldColor+1));
+					}
+				}
 				break;
 			case 10:
 			case KEY_ENTER:
