@@ -112,7 +112,6 @@ int doit(int argc, char* argv[])
 //			xxxWin->append("Howdy");
 //			xxxWin->append("Howdy 2");
 //			xxxWin->append(NCString("Howdy 3", 2));
-//
 //		}
 
 
