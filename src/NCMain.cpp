@@ -539,6 +539,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  /history  print command history");
 							ncs->append("  /list     print windows open");
 							ncs->append("  /refresh  refresh all windows");
+                            ncs->append("  /time     print system time");
 							ncs->append("  /set wrap (length|word|cut)");
 							ncs->append("  /newconn  create a new connection");
 							ncs->append("      protocol		username");
@@ -623,6 +624,15 @@ int doit(int argc, char* argv[])
 						}
 						app.refresh();
 					}
+                    else if (cmd == "/time")
+                    {
+                        if (ncs)
+                        {
+                            ncs->append(cmd);
+                            ncs->append(NCTimeUtils::getPrintableColorTimeStamp());
+                            ncs->refresh();
+                        }
+                    }
 					else if (cmd.find("/set") == 0)
 					{
 						std::vector<std::string> cmdParam;
