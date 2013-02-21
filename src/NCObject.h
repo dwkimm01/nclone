@@ -50,6 +50,11 @@ public:
 	void bringToBack(NCObject* ncobject);
 
 	/**
+	 * <b>Purpose:</b> Determine if a window is on top of another window
+	 */
+	bool isOnTopOf(NCObject* a, NCObject* b);
+
+	/**
 	 * <b>Purpose:</b> Rotate window list
 	 */
 	void rotate();

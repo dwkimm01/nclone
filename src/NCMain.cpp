@@ -150,7 +150,7 @@ int doit(int argc, char* argv[])
 		keysCfg.p_title = "Keys";
 		keysCfg.p_y = 10;
 		NCWinScrollback* winKeys = new NCWinScrollback(&app, keysCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
-
+		app.bringToBack(winKeys);
 
 
 		// Time stamp window
@@ -317,26 +317,31 @@ int doit(int argc, char* argv[])
 			}
 #endif
 
+
+			// Refresh winKeys if it is on top
+			if(winKeys && app.isOnTopOf(winKeys, winLog))
+			{
+				winKeys->refresh();
+			}
+
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
 			winCmd.refresh();
-
 
 			// Get user input
 			// TODO, would be nice to periodically break out of this and be able to get control
 			// of this thread back to do some housekeeping type chores (idle timestamp printing etc)
 			int c = 0;
-//			app >> c;
-			winCmd >> c;
+			winCmd >> c;  // app >> c;
 
 			// Show keystroke in keystroke debug window
 			if(KEY_TIMEOUT != c)
 			{
-			const char ks[] = {(char)c, 0};
-			const std::string keyStroke = (ncstringutils::NCStringUtils::isPrint(c))
+				const char ks[] = {(char)c, 0};
+				const std::string keyStroke = (ncstringutils::NCStringUtils::isPrint(c))
 					? (std::string("Key ") + std::string(ks))
 					: (std::string("Key ") + boost::lexical_cast<std::string>(c));
-			winKeys->append(keyStroke);
+				winKeys->append(keyStroke);
 			}
 
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
@@ -375,7 +380,6 @@ int doit(int argc, char* argv[])
 						now = second_clock::local_time();
 					}
 				}
-
 
 
 
@@ -525,6 +529,22 @@ int doit(int argc, char* argv[])
 					{
 						app.bringToFront(winBl);
 						winBl->refresh();
+					}
+				}
+				break;
+			case KEY_F(4):
+				if(winKeys)
+				{
+					// Bring winKeys to top if it's not on top, if it is push it to back
+					if(app.isOnTopOf(winKeys, winLog))
+					{
+						app.bringToBack(winKeys);
+						app.refresh();
+					}
+					else
+					{
+						app.bringToFront(winKeys);
+						app.refresh();
 					}
 				}
 				break;

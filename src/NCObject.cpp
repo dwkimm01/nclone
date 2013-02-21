@@ -98,6 +98,32 @@ void NCObject::bringToBack(NCObject* ncobject)
 		);
 }
 
+bool NCObject::isOnTopOf(NCObject* a, NCObject* b)
+{
+	// Determine which is on top, winKeys or the chat windows
+	int aPos = 0;
+	int bPos = 0;
+	int counter = 0;
+	forEachChild([&](ncpp::ncobject::NCObject* obj)
+	{
+		++counter;
+		if(obj == a)
+		{
+			aPos = counter;
+		}
+		else if(obj == b)
+		{
+			bPos = counter;
+		}
+		if(0 != aPos && 0 != bPos)
+			return false;
+		return true;
+	});
+
+	return aPos > bPos;
+}
+
+
 
 void NCObject::rotate()
 {
