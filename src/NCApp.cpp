@@ -50,8 +50,9 @@ NCApp::NCApp()
     // -1 specifies "default" color, so this will put black over transparent background
 
 
-//    init_pair(1, COLOR_RED, -1); // COLOR_BLACK); // COLOR_BLACK);
-/*    init_pair(2, COLOR_GREEN, -1);
+    /*
+    init_pair(1, COLOR_RED, -1); // COLOR_BLACK); // COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, -1);
     init_pair(3, COLOR_YELLOW, -1);
     init_pair(4, COLOR_BLUE, -1);
     init_pair(5, COLOR_MAGENTA, -1);
@@ -74,38 +75,6 @@ NCApp::NCApp()
     	}
     }
 
-
-
-//    short yyy = 80; // (((int)nccolor::NCColor::CYAN) << 4) | nccolor::NCColor::BLUE;
-
-//    init_pair( yyy, COLOR_CYAN, COLOR_BLUE);
-
-    /*
-    typedef short ColorType;
-    const std::vector<ColorType> colors =
-    	{-1, COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE,
-    		 COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
-
-    int colorNum = 0;
-    for(auto background : colors)
-    {
-    	for(auto foreground : colors)
-    	{
-    		init_pair(colorNum++, foreground, background);
-    	}
-    }
-    */
-
- /*
-#define COLOR_BLACK	0
-#define COLOR_RED	1
-#define COLOR_GREEN	2
-#define COLOR_YELLOW	3
-#define COLOR_BLUE	4
-#define COLOR_MAGENTA	5
-#define COLOR_CYAN	6
-#define COLOR_WHITE	7
-*/
 
 	// Disable line buffering
 	raw();
