@@ -32,6 +32,7 @@
 #include "NCStringUtils.h"
 #include "NCException.h"
 #include "NCCmdHistory.h"
+#include "NCColor.h"
 using namespace std;
 using namespace ncpp;
 
@@ -52,6 +53,14 @@ using namespace ncpp;
 // Main method
 int doit(int argc, char* argv[])
 {
+
+	using namespace ncpp::nccolor;
+
+//	NCColor color(2,1);
+//	std::cout << "1,1 => " << color.foreground() << ", " << color.background() << std::endl;
+//	std::cout << "    => " << (int)color.toUnsignedChar() << std::endl;
+//	return 0;
+
 	// Scope for NCApp
 	{
 		// Parse command line options
@@ -137,7 +146,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
-        blCfg.p_backgroundColor = 27; // 4+ (8*2); // 4; // (4+1)*8;
+        blCfg.p_backgroundColor = nccolor::NCColor::GREEN; // 27; // 4+ (8*2); // 4; // (4+1)*8;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
@@ -169,21 +178,20 @@ int doit(int argc, char* argv[])
 		ncwintime::NCWinTime winTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
 
 		// Color printing
-		NCString one(" One", 1);
-		NCString two(" Two", 2);
+		NCString one(" BLACK", nccolor::NCColor::BLACK);
+		NCString two(" RED", nccolor::NCColor::RED);
 		NCString oneTwo = one + two;
 
 		winLog->append("Colors:");
-		winLog->append(NCString(" Zero", 0));
-
-		winLog->append(one);//NCString(" One",1));
-		winLog->append(two);//NCString(" Two",2));
-		winLog->append(NCString(" Three",3));
-		winLog->append(NCString(" Four", 4));
-		winLog->append(NCString(" Five", 5));
-		winLog->append(NCString(" Six", 6));
-		winLog->append(NCString(" Seven", 7));
-		winLog->append(NCString(" Eight", 8));
+		winLog->append(NCString(" Default", nccolor::NCColor::DEFAULT));
+		winLog->append(one);
+		winLog->append(two);
+		winLog->append(NCString(" Green", nccolor::NCColor::GREEN));
+		winLog->append(NCString(" Yellow", nccolor::NCColor::YELLOW));
+		winLog->append(NCString(" BLUE", nccolor::NCColor::BLUE));
+		winLog->append(NCString(" MAGENTA", nccolor::NCColor::MAGENTA));
+		winLog->append(NCString(" CYAN", nccolor::NCColor::CYAN));
+		winLog->append(NCString(" WHITE", nccolor::NCColor::WHITE));
 
 		winLog->append(oneTwo);
 		winLog->append("");
@@ -310,7 +318,7 @@ int doit(int argc, char* argv[])
 					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(ncw)
 					{
-						winBl->append(NCString(ncw->getConfig().p_title, 2));
+						winBl->append(NCString(ncw->getConfig().p_title, nccolor::NCColor::BLUE));
 					}
 					else
 					{

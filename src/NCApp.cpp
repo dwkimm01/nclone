@@ -8,6 +8,7 @@
 #include "NCApp.h"
 #include "NCUtils.h"
 #include "NCExceptionCurses.h"
+#include "NCColor.h"
 
 /**
  * *Notes:
@@ -60,6 +61,26 @@ NCApp::NCApp()
     init_pair(9, COLOR_BLACK, -1);
     */
 
+    // Initialize colors
+    using namespace ncpp::nccolor;
+
+    for(auto background : NCColor::getColors())
+    {
+    	for(auto foreground : NCColor::getColors())
+    	{
+    		const NCColor color(foreground, background);
+
+    		init_pair(color.toUnsignedChar(), foreground - 1, background - 1);
+    	}
+    }
+
+
+
+//    short yyy = 80; // (((int)nccolor::NCColor::CYAN) << 4) | nccolor::NCColor::BLUE;
+
+//    init_pair( yyy, COLOR_CYAN, COLOR_BLUE);
+
+    /*
     typedef short ColorType;
     const std::vector<ColorType> colors =
     	{-1, COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE,
@@ -73,6 +94,7 @@ NCApp::NCApp()
     		init_pair(colorNum++, foreground, background);
     	}
     }
+    */
 
  /*
 #define COLOR_BLACK	0

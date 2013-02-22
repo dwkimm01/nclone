@@ -10,6 +10,7 @@
 #include "NCString.h"
 #include "NCWin.h"
 #include "NCExceptionOutOfRange.h"
+#include "NCColor.h"
 
 namespace ncpp
 {
@@ -17,10 +18,11 @@ namespace ncpp
 NCString::NCString(const std::string& pString, const int pColor)
    : theString(pString)
 {
+	const nccolor::NCColor color(pColor, nccolor::NCColor::DEFAULT);
+	const char c = static_cast<char>(color.toUnsignedChar());
 	for(unsigned int i = 0; i < theString.size(); ++i)
 	{
-		char c = ((unsigned char)pColor);
-		colorString.push_back( c );
+		colorString.push_back(c);
 	}
 }
 

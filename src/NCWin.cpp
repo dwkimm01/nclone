@@ -8,9 +8,12 @@
 #include <string>
 #include <iostream>
 #include <stdlib.h>
+
 #include "NCWin.h"
 #include "NCUtils.h"
 #include "NCString.h"
+#include "NCColor.h"
+
 
 namespace ncpp
 {
@@ -83,10 +86,16 @@ public:
 		x = std::min(x, p_cfg.p_w-2);
 //		if(x > p_cfg.p_w) { x = p_cfg.p_w; ++y; }
 
-        if (p_cfg.p_backgroundColor != -1)
-        {
-            wbkgd(p_win, COLOR_PAIR(p_cfg.p_backgroundColor));
-        }
+//        if (p_cfg.p_backgroundColor != -1)
+//        {
+//            wbkgd(p_win, COLOR_PAIR(p_cfg.p_backgroundColor));
+//        }
+
+		const nccolor::NCColor ncColor(0, p_cfg.p_backgroundColor);
+		if(ncColor.background())
+		{
+			wbkgd(p_win, COLOR_PAIR(ncColor.toUnsignedChar()));
+		}
 
 
 #if 0
@@ -294,11 +303,12 @@ public:
 	    	int val = *str;
 	    	if (color && *color != 0)
 	    	{
-	    		const short foreground = (short)*color;
-	    		const short background = p_cfg.p_backgroundColor;
-	    		const short colorCombined = foreground + ((background+1) * (COLOR_WHITE+1) );
-	    		val |= COLOR_PAIR(colorCombined);
-//	    		val |= COLOR_PAIR((unsigned int)*color);
+
+	    		nccolor::NCColor ncColor; // (nccolor::NCColor::BLUE, nccolor::NCColor::GREEN); // p_cfg.p_backgroundColor);
+	    		ncColor.fromUnsignedChar(*color);
+	    		val |= COLOR_PAIR(ncColor.toUnsignedChar());
+// TODO, need to combine background color
+// TODO, max color still not sorted out
 	    		++color;
 	    	}
 	    	if(*str)

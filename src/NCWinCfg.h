@@ -29,7 +29,7 @@ public:
 		, p_title("Window")
 		, p_hasBorder(false)
 		, p_scrollOk(true)
-        , p_backgroundColor(-1)
+        , p_backgroundColor(0)
 	{
 	}
 
