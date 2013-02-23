@@ -20,6 +20,7 @@ NCString::NCString(const std::string& pString, const int pColor)
 {
 	const nccolor::NCColor color(pColor, nccolor::NCColor::DEFAULT);
 	const char c = static_cast<char>(color.toUnsignedChar());
+
 	for(unsigned int i = 0; i < theString.size(); ++i)
 	{
 		colorString.push_back(c);

@@ -5,6 +5,8 @@
  *      Author: dkimmel
  */
 #include <ncurses.h>
+#include <iostream>
+
 #include "NCApp.h"
 #include "NCUtils.h"
 #include "NCExceptionCurses.h"
@@ -32,6 +34,14 @@ namespace ncpp
 NCApp::NCApp()
 	: ncobject::NCObject(0)
 {
+//    using namespace ncpp::nccolor;
+//    nccolor::NCColor::forEachColor([](const short offs, const short f, const short b)
+//    {
+//    	std::cout << " " << offs << " (" << f << ", " << b << ")" << std::endl;
+//    });
+//    exit(1);
+
+
 	// Start up ncurses
 	initscr();
 
@@ -63,17 +73,11 @@ NCApp::NCApp()
     */
 
     // Initialize colors
-    using namespace ncpp::nccolor;
-
-    for(auto background : NCColor::getColors())
+    nccolor::NCColor::forEachColor([](const short offs, const short foreground, const short background)
     {
-    	for(auto foreground : NCColor::getColors())
-    	{
-    		const NCColor color(foreground, background);
+    	init_pair(offs, foreground-1, background-1);
+    });
 
-    		init_pair(color.toUnsignedChar(), foreground - 1, background - 1);
-    	}
-    }
 
 
 	// Disable line buffering

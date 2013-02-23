@@ -47,10 +47,8 @@ public:
         intrflush(p_win, FALSE);
         keypad(p_win, TRUE);
         meta(p_win, TRUE);
-//        wbkgd(p_win, COLOR_PAIR(nw_COLORS*faimconf.b[bg]));
         werase(p_win);
     	wtimeout(p_win, 800);
-        
 
         // Update cursor position
         cursorReset();
@@ -306,6 +304,13 @@ public:
 
 	    		nccolor::NCColor ncColor; // (nccolor::NCColor::BLUE, nccolor::NCColor::GREEN); // p_cfg.p_backgroundColor);
 	    		ncColor.fromUnsignedChar(*color);
+
+	    		if(-1 != p_cfg.p_backgroundColor)
+	    		{
+	    			ncColor.background(p_cfg.p_backgroundColor);
+	    		}
+
+
 	    		val |= COLOR_PAIR(ncColor.toUnsignedChar());
 // TODO, need to combine background color
 // TODO, max color still not sorted out

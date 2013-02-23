@@ -146,7 +146,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
-        blCfg.p_backgroundColor = nccolor::NCColor::GREEN; // 27; // 4+ (8*2); // 4; // (4+1)*8;
+        blCfg.p_backgroundColor = nccolor::NCColor::BLUE; // 27; // 4+ (8*2); // 4; // (4+1)*8;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
@@ -312,12 +312,20 @@ int doit(int argc, char* argv[])
 			// Update Buddy List
 			if(winBl && winBlVisible)
 			{
+				auto topChatWin = dynamic_cast<ncwin::NCWin*>(win3.getTop());
+				const std::string topChatName = (topChatWin)
+						? (topChatWin->getConfig().p_title)
+						: ("");
+
 				winBl->clear();
 				win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
 				{
 					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(ncw)
 					{
+//						auto currentColor = (topChatName == ncw->getConfig().p_title) ? (nccolor::)
+						// TODO set the current window's name's background to something different (YELLOW)?
+
 						winBl->append(NCString(ncw->getConfig().p_title, nccolor::NCColor::BLUE));
 					}
 					else
@@ -497,7 +505,7 @@ int doit(int argc, char* argv[])
 					}
 				}
 				break;
-			case '\t':
+			case '\t': // 9
 				win3.rotate();
 				win3.refresh();
 				break;
