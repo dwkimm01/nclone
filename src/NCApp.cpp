@@ -5,20 +5,15 @@
  *      Author: dkimmel
  */
 #include <ncurses.h>
-#include <iostream>
-
 #include "NCApp.h"
 #include "NCUtils.h"
 #include "NCExceptionCurses.h"
 #include "NCColor.h"
 
 /**
- * *Notes:
+ * Notes:
  * http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/init.html
- */
-
-/**
- *  TODO
+ * TODO
  * http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/init.html
  *  use: raw(); after initscr, to get line buffering disabled
  *  use keypad(stdscr, TRUE); after raw to get F1, F2, etc
@@ -31,54 +26,35 @@
 namespace ncpp
 {
 
+namespace ncapp
+{
+
 NCApp::NCApp()
 	: ncobject::NCObject(0)
 {
-//    using namespace ncpp::nccolor;
-//    nccolor::NCColor::forEachColor([](const short offs, const short f, const short b)
-//    {
-//    	std::cout << " " << offs << " (" << f << ", " << b << ")" << std::endl;
-//    });
-//    exit(1);
-
-
 	// Start up ncurses
 	initscr();
 
 	// -------------------------------------------------------------
     // Turn color on
-    if(has_colors() == FALSE)
+
+	// Check to make sure color is supported
+    if(FALSE == has_colors())
     {
     	endwin();
-    	printf("Your terminal does not support color\n");
-    	throw ncexceptioncurses::NCExceptionCurses("Your terminal does not support color", FLINFO);
+    	throw ncexceptioncurses::NCExceptionCurses("Terminal does not support color", FLINFO);
     }
     // Color startup
     start_color();
     // Keep transparent terminal background
     use_default_colors();
-    // -1 specifies "default" color, so this will put black over transparent background
-
-
-    /*
-    init_pair(1, COLOR_RED, -1); // COLOR_BLACK); // COLOR_BLACK);
-    init_pair(2, COLOR_GREEN, -1);
-    init_pair(3, COLOR_YELLOW, -1);
-    init_pair(4, COLOR_BLUE, -1);
-    init_pair(5, COLOR_MAGENTA, -1);
-    init_pair(6, COLOR_CYAN, -1);
-    init_pair(7, COLOR_WHITE, -1);
-    init_pair(8, -1, COLOR_BLUE);
-    init_pair(9, COLOR_BLACK, -1);
-    */
-
     // Initialize colors
     nccolor::NCColor::forEachColor([](const short offs, const short foreground, const short background)
     {
     	init_pair(offs, foreground-1, background-1);
     });
 
-
+    // -1 specifies "default" color, so 0, -1, this will put black over transparent background
 
 	// Disable line buffering
 	raw();
@@ -86,7 +62,6 @@ NCApp::NCApp()
 	keypad(stdscr, TRUE);
 	// Don't echo characters
 	noecho();
-
 	// Set getch timeout
 	timeout(800);
 }
@@ -132,5 +107,7 @@ int NCApp::maxWidth() const
 	getmaxyx(stdscr, h, w);
 	return w;
 }
+
+} // namespace ncapp
 
 } // namespace ncpp

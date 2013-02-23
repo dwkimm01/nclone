@@ -13,6 +13,9 @@
 namespace ncpp
 {
 
+namespace ncapp
+{
+
 class NCApp : public ncobject::NCObject
 {
 public:
@@ -57,6 +60,8 @@ public:
 	int maxWidth() const;
 
 };
+
+} // namespace ncapp
 
 } // namespace ncpp
 

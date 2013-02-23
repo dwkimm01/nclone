@@ -72,7 +72,7 @@ int doit(int argc, char* argv[])
 		boost::signal<void(const std::string&, const std::string&)> msgSignal;
 
 		// Start up application
-		NCApp app;
+		ncapp::NCApp app;
 
 		// Resize functions
 		ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );
@@ -178,22 +178,17 @@ int doit(int argc, char* argv[])
 		ncwintime::NCWinTime winTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
 
 		// Color printing
-		NCString one(" BLACK", nccolor::NCColor::BLACK);
-		NCString two(" RED", nccolor::NCColor::RED);
-		NCString oneTwo = one + two;
-
 		winLog->append("Colors:");
 		winLog->append(NCString(" Default", nccolor::NCColor::DEFAULT));
-		winLog->append(one);
-		winLog->append(two);
+		winLog->append(NCString(" Black", nccolor::NCColor::BLACK));
+		winLog->append(NCString(" Red", nccolor::NCColor::RED));
 		winLog->append(NCString(" Green", nccolor::NCColor::GREEN));
 		winLog->append(NCString(" Yellow", nccolor::NCColor::YELLOW));
 		winLog->append(NCString(" BLUE", nccolor::NCColor::BLUE));
 		winLog->append(NCString(" MAGENTA", nccolor::NCColor::MAGENTA));
 		winLog->append(NCString(" CYAN", nccolor::NCColor::CYAN));
 		winLog->append(NCString(" WHITE", nccolor::NCColor::WHITE));
-
-		winLog->append(oneTwo);
+		winLog->append(NCString(" Red", nccolor::NCColor::RED) + NCString(" Blue", nccolor::NCColor::BLUE));
 		winLog->append("");
 
 		// Message received signal connect
