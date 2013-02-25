@@ -13,6 +13,120 @@ namespace ncpp
 namespace nccolor
 {
 
+
+NCColor::NCColor()
+	: p_foreground(-1)
+	, p_background(getBackGroundOffset(-1))
+{
+}
+
+NCColor::NCColor(int foreground)
+	: p_foreground(foreground)
+	, p_background(getBackGroundOffset(-1))
+{
+}
+
+NCColor::NCColor(int foreground, int background)
+	: p_foreground(foreground)
+	, p_background(getBackGroundOffset(background))
+{
+}
+
+int NCColor::foreground() const { return p_foreground; }
+int NCColor::foreground() { return p_foreground; }
+int NCColor::background() const { return p_background; }
+int NCColor::background() { return p_background; }
+
+void NCColor::foreground(const int foreground) { p_foreground = foreground; }
+void NCColor::background(const int background) { p_background = getBackGroundOffset(background); }
+
+unsigned char NCColor::toUnsignedChar() const
+{
+//		return colorOffs[p_foreground][p_background];
+	return (p_foreground) | (p_background << 4);
+}
+
+void NCColor::fromUnsignedChar(const unsigned char color)
+{
+	p_foreground = color & 7;
+	p_background = color >> 4;
+/*		for(unsigned int background = 0; background < 7; ++background)
+	{
+		for(unsigned int foreground = 0; foreground < 7; ++foreground)
+		{
+			if(colorOffs[foreground][background] == color)
+			{
+				p_foreground = foreground;
+				p_background = background;
+				return;
+			}
+		}
+	}
+	*/
+}
+
+std::vector<NCColor::Colors> NCColor::getColors()
+{
+	const std::vector<Colors> vec = { DEFAULT, BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE };
+	return vec;
+}
+
+std::vector<NCColor::ColorsBack> NCColor::getColorsBackground()
+{
+	const std::vector<ColorsBack> vec = { DEFAULT_BACK, BLACK_BACK, GREEN_BACK, BLUE_BACK };
+	return vec;
+}
+
+const int NCColor::getBackGroundOffset(const int x)
+{
+	return x;
+}
+
+
+void NCColor::forEachColor(std::function<void(const short, const short, const short)> func)
+{
+	for(auto background : getColorsBackground())
+	{
+		for(auto foreground : getColors())
+		{
+			func(foreground | (background << 4), foreground, background);
+		}
+	}
+//	    for(auto background : getColorsBackground())
+//	    {
+//	    	for(auto foreground : getColors())
+//	    	{
+//	    		const NCColor color(foreground, background);
+//
+//	    		func(color.toUnsignedChar(), foreground, background);
+//	    	}
+//	    	std::cout << std::endl;
+//	    }
+
+//		for(unsigned int background = 0; background < 7; ++background)
+//		{
+//			for(unsigned int foreground = 0; foreground < 7; ++foreground)
+//			{
+//				func(colorOffs[foreground][background], foreground, background);
+//			}
+//		}
+/*		for(unsigned int offs = 0; offs < offsColor.size(); ++offs)
+	{
+		std::tuple<int, int> t = offsColor[offs];
+		std::get<1>(t);
+		func(
+				colorOffs[std::get<0>(t)][std::get<1>(t)],
+				std::get<0>(t),
+				std::get<1>(t)
+				);
+
+	}
+*/
+}
+
+
+
+
 //static const std::vector<std::vector<short> > colorOffs;
 //static const std::vector<std::tuple<int, int> > offsColor;
 
@@ -124,109 +238,6 @@ const std::vector<std::tuple<int, int> > NCColor::offsColor = {
 
 };
 
-
-
-#if 0
-class NCColor
-{
-public:
-	enum Colors
-	{
-		DEFAULT = 0,
-		BLACK = 1,
-		RED = 2,
-		GREEN = 3,
-		YELLOW = 4,
-		BLUE = 5,
-		MAGENTA = 6,
-		CYAN = 7,
-		WHITE = 8
-	};
-
-
-	NCColor()
-		: p_foreground(-1)
-		, p_background(getBackGroundOffset(-1))
-	{
-	}
-
-	NCColor(int foreground)
-		: p_foreground(foreground)
-		, p_background(getBackGroundOffset(-1))
-	{
-	}
-
-	NCColor(int foreground, int background)
-		: p_foreground(foreground)
-		, p_background(getBackGroundOffset(background))
-	{
-	}
-
-	int foreground() const { return p_foreground; }
-	int foreground() { return p_foreground; }
-	int background() const { return p_background; }
-	int background() { return p_background; }
-
-	void foreground(const int foreground) { p_foreground = foreground; }
-	void background(const int background) { p_background = getBackGroundOffset(background); }
-
-	unsigned char toUnsignedChar() const
-	{
-		const unsigned char r = static_cast<unsigned int>
-				(p_background << 3) |
-				(p_foreground << 0)
-				;
-
-		return r;
-	}
-
-	void fromUnsignedChar(const unsigned char color)
-	{
-		p_background = ((int)color) >> 3;
-		p_foreground = ((int)color) & 7;
-	}
-
-	static std::vector<Colors> getColors()
-	{
-		const std::vector<Colors> vec = { DEFAULT, BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA}; // , CYAN, WHITE };
-		return vec;
-	}
-
-	static std::vector<Colors> getColorsBackground()
-	{
-		const std::vector<Colors> vec = { DEFAULT, BLACK, RED, GREEN, BLUE, WHITE };
-		return vec;
-	}
-
-	static int getBackGroundOffset(const int c)
-	{
-		const std::vector<Colors> vec = { DEFAULT, BLACK, RED, GREEN, BLACK, BLUE, BLACK, BLACK, WHITE };
-		return vec[c];
-	}
-
-
-	static void forEachColor(std::function<void(const short, const short, const short)> func)
-	{
-	    for(auto background : getColorsBackground())
-	    {
-	    	for(auto foreground : getColors())
-	    	{
-	    		const NCColor color(foreground, background);
-
-	    		func(color.toUnsignedChar(), foreground, background);
-	    	}
-	    	std::cout << std::endl;
-	    }
-	}
-
-	static const Colors colors[][2];
-
-private:
-	int p_foreground;
-	int p_background;
-
-};
-#endif
 
 
 } // namespace nccolor

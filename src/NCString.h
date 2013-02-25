@@ -28,7 +28,7 @@ public:
 	NCString(const std::string& pString, const int pColor);
 
 	/**
-	 * <b>Purpose:</b> CTOR takes a prepopulated color string
+	 * <b>Purpose:</b> CTOR takes a pre-populated color string
 	 */
 	NCString(const std::string& pString, const std::string& pColor);
 

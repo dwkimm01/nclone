@@ -146,7 +146,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
-        blCfg.p_backgroundColor = nccolor::NCColor::BLUE; // 27; // 4+ (8*2); // 4; // (4+1)*8;
+        blCfg.p_backgroundColor = nccolor::NCColor::GREEN; // 27; // 4+ (8*2); // 4; // (4+1)*8;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
@@ -199,7 +199,7 @@ int doit(int argc, char* argv[])
 						[&](const std::string &s, const std::string &t)
 						{
 							// Prefix message with timestamp
-							const int incomingMsgColor = 1;
+							const int incomingMsgColor = 2;
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
 							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", incomingMsgColor);
 							// Determine which window message will go to
@@ -318,10 +318,11 @@ int doit(int argc, char* argv[])
 					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(ncw)
 					{
-//						auto currentColor = (topChatName == ncw->getConfig().p_title) ? (nccolor::)
+						auto currentColor = (topChatName == ncw->getConfig().p_title) ? (nccolor::NCColor::RED)
+								: (nccolor::NCColor::BLUE);
 						// TODO set the current window's name's background to something different (YELLOW)?
 
-						winBl->append(NCString(ncw->getConfig().p_title, nccolor::NCColor::BLUE));
+						winBl->append(NCString(ncw->getConfig().p_title, currentColor));
 					}
 					else
 					{
@@ -491,7 +492,7 @@ int doit(int argc, char* argv[])
 				break;
 			case 554: // CTRL-RIGHT
 				// Move cursor to next word end (space)
-				for(int sp = cmdIdx+1; sp <= cmd.size(); ++sp)
+				for(unsigned int sp = cmdIdx+1; sp <= cmd.size(); ++sp)
 				{
 					if(' ' == cmd[sp] || cmd.size() == sp)
 					{
@@ -537,15 +538,17 @@ int doit(int argc, char* argv[])
 				if(!cmd.empty())
 				{
 					cmd.erase( cmd.begin() + (--cmdIdx));
-					winCmd.clear();
 					if(PASSWORD == inputState)
 					{
 						// If this is a password print x's instead
-						std::for_each(cmd.begin(), cmd.end(), [&](const char ) { winCmd.print("x"); } );
+						std::string xInput;
+						xInput.reserve(cmd.size());
+						for(unsigned int i = 0; cmd.size() > i; ++i)
+							xInput.push_back('x');
+						winCmd.append(xInput);
 					}
 					else
 					{
-//						winCmd.print(cmd.c_str());
 						winCmd.append(cmd);
 					}
 					winCmd.refresh();
@@ -1009,7 +1012,11 @@ int doit(int argc, char* argv[])
 					++cmdIdx;
 					if(PASSWORD == inputState)
 					{
-						winCmd.append(std::string('x', cmd.size()));
+						std::string xInput;
+						xInput.reserve(cmd.size());
+						for(unsigned int i = 0; cmd.size() > i; ++i)
+							xInput.push_back('x');
+						winCmd.append(xInput);
 					}
 					else
 					{
