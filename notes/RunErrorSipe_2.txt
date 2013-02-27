@@ -1,0 +1,34 @@
+Program received signal SIGTRAP, Trace/breakpoint trap.
+g_logv (log_domain=0xb79a510e "GLib", log_level=<optimized out>, format=0xb79ad57e "%s: assertion `%s' failed", 
+    args1=0xb46e1d8c "\031\222\232\267 \220\232\267\366|\226\267\364/\241\267\364/\241\267\350,\023\b8-\023\b\364/\241\267\267\024\225\267\016Q\232\267\031\222\232\267 \220\232\267\332=\345\265 /\262\263\067\266\346\265\330\035n\264\bt\273\263\025\017\211", <incomplete sequence \370>) at /build/buildd/glib2.0-2.32.3/./glib/gmessages.c:765
+765     in /build/buildd/glib2.0-2.32.3/./glib/gmessages.c
+(gdb) bt
+#0  g_logv (log_domain=0xb79a510e "GLib", log_level=<optimized out>, format=0xb79ad57e "%s: assertion `%s' failed", 
+    args1=0xb46e1d8c "\031\222\232\267 \220\232\267\366|\226\267\364/\241\267\364/\241\267\350,\023\b8-\023\b\364/\241\267\267\024\225\267\016Q\232\267\031\222\232\267 \220\232\267\332=\345\265 /\262\263\067\266\346\265\330\035n\264\bt\273\263\025\017\211", <incomplete sequence \370>) at /build/buildd/glib2.0-2.32.3/./glib/gmessages.c:765
+#1  0xb7969823 in g_log (log_domain=0xb79a510e "GLib", log_level=G_LOG_LEVEL_CRITICAL, format=0xb79ad57e "%s: assertion `%s' failed") at /build/buildd/glib2.0-2.32.3/./glib/gmessages.c:792
+#2  0xb796986d in g_return_if_fail_warning (log_domain=0xb79a510e "GLib", pretty_function=0xb79a9219 "g_hash_table_lookup", expression=0xb79a9020 "hash_table != NULL")
+    at /build/buildd/glib2.0-2.32.3/./glib/gmessages.c:801
+#3  0xb79514b7 in g_hash_table_lookup (hash_table=0x0, key=0xb3bb7408) at /build/buildd/glib2.0-2.32.3/./glib/ghash.c:1072
+#4  0xb5e57cbc in ?? () from /usr/lib/purple-2/libsipe.so
+#5  0xb5e6418e in process_incoming_notify () from /usr/lib/purple-2/libsipe.so
+#6  0xb5e52690 in ?? () from /usr/lib/purple-2/libsipe.so
+#7  0xb5e44fff in ?? () from /usr/lib/purple-2/libsipe.so
+#8  0xb5e455d1 in ?? () from /usr/lib/purple-2/libsipe.so
+#9  0xb5e68735 in ?? () from /usr/lib/purple-2/libsipe.so
+#10 0xb7f2543c in recv_cb (data=0xb3d01c78, source=12, cond=PURPLE_INPUT_READ) at /build/buildd/pidgin-2.10.3/./libpurple/sslconn.c:155
+#11 0x08054aca in ncpp::ncclientpurple::NCClientPurple::Data::purple_glib_io_invoke (source=0xb3baafb8, condition=G_IO_IN, data=0xb3d1a3f0) at ../src/NCClientPurple.cpp:274
+#12 0xb79a217e in g_io_unix_dispatch (source=0xb3bb2698, callback=0x8054a68 <ncpp::ncclientpurple::NCClientPurple::Data::purple_glib_io_invoke(_GIOChannel*, GIOCondition, void*)>, user_data=0xb3d1a3f0)
+    at /build/buildd/glib2.0-2.32.3/./glib/giounix.c:166
+#13 0xb7961d86 in g_main_dispatch (context=0x80fa020) at /build/buildd/glib2.0-2.32.3/./glib/gmain.c:2539
+#14 g_main_context_dispatch (context=0x80fa020) at /build/buildd/glib2.0-2.32.3/./glib/gmain.c:3075
+#15 0xb7962125 in g_main_context_iterate (dispatch=1, block=-1214842288, context=0x80fa020, self=<optimized out>) at /build/buildd/glib2.0-2.32.3/./glib/gmain.c:3146
+#16 g_main_context_iterate (context=0x80fa020, block=-1214842288, dispatch=1, self=<optimized out>) at /build/buildd/glib2.0-2.32.3/./glib/gmain.c:3083
+#17 0xb796256b in g_main_loop_run (loop=0x8132cc8) at /build/buildd/glib2.0-2.32.3/./glib/gmain.c:3340
+#18 0x08054892 in ncpp::ncclientpurple::NCClientPurple::Data::runThread (l=0x8132cc8) at ../src/NCClientPurple.cpp:136
+#19 0x08056954 in std::_Bind_simple<void (*(_GMainLoop*))(_GMainLoop*)>::_M_invoke<0u>(std::_Index_tuple<0u>) (this=0x814f09c) at /usr/include/c++/4.7/functional:1598
+#20 0x08056891 in std::_Bind_simple<void (*(_GMainLoop*))(_GMainLoop*)>::operator()() (this=0x814f09c) at /usr/include/c++/4.7/functional:1586
+#21 0x08056846 in std::thread::_Impl<std::_Bind_simple<void (*(_GMainLoop*))(_GMainLoop*)> >::_M_run() (this=0x814f090) at /usr/include/c++/4.7/thread:115
+#22 0xb7c822e7 in ?? () from /usr/lib/i386-linux-gnu/libstdc++.so.6
+#23 0xb7ce2d4c in start_thread (arg=0xb46e2b40) at pthread_create.c:308
+#24 0xb7b02d3e in clone () at ../sysdeps/unix/sysv/linux/i386/clone.S:130
+

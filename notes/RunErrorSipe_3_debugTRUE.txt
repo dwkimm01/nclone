@@ -1,0 +1,46 @@
+ (linux-i386; )
+               Call-ID: C76EgC93Da4A48i0920m55A6t2C76bE4F8x65B7x
+                                                                Contact: <sip:10.12.116.213:59309;transport=tls;ms-opaque=d3470f2e1d>;methods="INVITE, MESSAGE, INFO, SUBSCRIBE, OPTIONS, BYE, CANCEL, NOTIFY, ACK, REFER, BENOTIFY";proxy=replace;+sip.instance="<urn:uuid:52b0448b-8d3d-5ac0-b359-a4669b732b9c>"
+                                                                                                         Supported: gruu-10, adhoclist, msrtc-event-categories, com.microsoft.msrtc.presence
+                                                                                                                                                                                            Event: registration
+      Allow-Events: presence
+                            ms-keep-alive: UAC;hop-hop=yes
+                                                          Content-Length: 0
+
+
+                                                                           MESSAGE END >>>>>>>>>> SIP - 2013-01-03T22:31:09.466372Z
+                                                                                                                                   (14:31:09) sipe: process_input_message: removing CSeq 2
+                                                                                                                                                                                          (14:31:09) sipe: SIP transactions count:1 after removal
+                                        (14:31:09) sipe: 
+                                                         MESSAGE START <<<<<<<<<< SIP - 2013-01-03T22:31:09.680145Z
+                                                                                                                   SIP/2.0 401 Unauthorized
+                                                                                                                                           Date: Thu, 03 Jan 2013 22:31:10 GMT
+                                                                                                                                                                              WWW-Authenticate: NTLM opaque="D38B8804", gssapi-data="TlRMTVNTUAACAAAAAAAAADgAAADzgpjiQEMntjMG2IYAAAAAAAAAAKYApgA4AAAABgBxFwAAAA8CABAASQBMAEwAVQBNAEkATgBBAAEAFABJAEwATQBOAC0ATwBDAFMAMAAxAAQAGABpAGwAbAB1AG0AaQBuAGEALgBjAG8AbQADAC4AaQBsAG0AbgAtAG8AYwBzADAAMQAuAGkAbABsAHUAbQBpAG4AYQAuAGMAbwBtAAUAGABpAGwAbAB1AG0AaQBuAGEALgBjAG8AbQAHAAgALpe4BwLqzQEAAAAA", targetname="ilmn-ocs01.illumina.com", realm="SIP Communications Service", version=4
+        From: <sip:dkimmel@illumina.com>;tag=548614869;epid=b1925b31913d
+                                                                        To: <sip:dkimmel@illumina.com>;tag=77915DF781750557AB6F1C7457E51EC3
+                                                                                                                                           Call-ID: C76EgC93Da4A48i0920m55A6t2C76bE4F8x65B7x
+                                                                                                                                                                                            CSeq: 2 REGISTER
+   Via: SIP/2.0/tls 10.12.116.213:59309;branch=z9hG4bKAECDD9ED22FCC479E62A;ms-received-port=59309;ms-received-cid=21FD200
+                                                                                                                         Content-Length: 0
+
+
+                                                                                                                                          MESSAGE END <<<<<<<<<< SIP - 2013-01-03T22:31:09.680145Z
+                                                                                                                                                                                                  (14:31:09) sipe: process_input_message: msg->response(401),msg->method(REGISTER)
+                                                                         (14:31:09) sipe: process_input_message: RE-REGISTER CSeq: 2
+                                                                                                                                    (14:31:09) sipe: process_input_message: we have a transaction callback
+ (14:31:09) sipe: process_register_response: got response to REGISTER; expires = 0
+                                                                                  (14:31:09) sipe: process_register_response: REGISTER retries 2
+                                                                                                                                                (14:31:09) sipe: process_register_response: Auth header: NTLM opaque="D38B8804", gssapi-data="TlRMTVNTUAACAAAAAAAAADgAAADzgpjiQEMntjMG2IYAAAAAAAAAAKYApgA4AAAABgBxFwAAAA8CABAASQBMAEwAVQBNAEkATgBBAAEAFABJAEwATQBOAC0ATwBDAFMAMAAxAAQAGABpAGwAbAB1AG0AaQBuAGEALgBjAG8AbQADAC4AaQBsAG0AbgAtAG8AYwBzADAAMQAuAGkAbABsAHUAbQBpAG4AYQAuAGMAbwBtAAUAGABpAGwAbAB1AG0AaQBuAGEALgBjAG8AbQAHAAgALpe4BwLqzQEAAAAA", targetname="ilmn-ocs01.illumina.com", realm="SIP Communications Service", version=4
+                 (14:31:09) sipe: fill_auth: type NTLM
+                                                      (14:31:09) stun: using server 
+                                                                                    (14:31:09) stun: using server 
+                                                                                                                  (14:31:09) sipe: sip_sec_init_sec_context__ntlm: in use
+
+                                                                                                                                                                         (process:8994): GLib-CRITICAL **: g_base64_encode_step: assertion `in != NULL' failed
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+[Switching to Thread 0xb46e2b40 (LWP 8999)]
+g_logv (log_domain=0xb79a510e "GLib", log_level=<optimized out>, format=0xb79ad57e "%s: assertion `%s' failed", args1=0xb46e1bac "`^\232\267U\202\232\267\022\003\t")
+    at /build/buildd/glib2.0-2.32.3/./glib/gmessages.c:765
+765     /build/buildd/glib2.0-2.32.3/./glib/gmessages.c: No such file or directory.
+
