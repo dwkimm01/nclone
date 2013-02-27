@@ -12,6 +12,8 @@ LIBPATHS = ['/home/dwkimm01/apps/pidgin-2.10.6/lib', '/home/dwkimm01/apps/lib']
 LIBS = ['boost_regex', 'boost_program_options', 'boost_signals', 'boost_system', 'ncurses', 'purple', 'dbus-glib-1', 'edbus', 'glib-2.0', 'pthread']
 SRCS = Glob('build/*.cpp')
 
+# TODO, try out ncursesw at some point
+
 # Build executable
 env.Program(SRCS, CPPPATH=INCS, LIBS=LIBS, LIBPATH=LIBPATHS)
 #env.Program(SRCS, CPPPATH=INCS, LIBS=LIBS, LIBPATH=LIBPATHS, LINKFLAGS="--static")
