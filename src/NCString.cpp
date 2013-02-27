@@ -18,17 +18,16 @@ namespace ncpp
 NCString::NCString(const std::string& pString, const int pColor)
    : theString(pString)
 {
-	const nccolor::NCColor color(pColor, nccolor::NCColor::DEFAULT);
-	const char c = static_cast<char>(color.toUnsignedChar());
-
-	for(unsigned int i = 0; i < theString.size(); ++i)
+	colorString.reserve(theString.size());
+	for(unsigned int i = 0; theString.size() > i; ++i)
 	{
-		colorString.push_back(c);
+		colorString.push_back(pColor);
 	}
 }
 
 NCString::NCString(const std::string& pString, const std::string& pColor)
-	: theString(pString), colorString(pColor)
+	: theString(pString)
+	, colorString(pColor)
 {
 }
 
@@ -48,11 +47,9 @@ const std::string& NCString::getColor() const
 
 NCString NCString::operator+(const NCString& rhs) const
 {
-	std::string concatString = theString + rhs.getString();
-	std::string concatColorString = colorString + rhs.getColor();
-	NCString value(concatString, concatColorString);
-
-	return value;
+	return NCString(
+			theString + rhs.getString(),
+			colorString + rhs.getColor());
 }
 
 std::string& NCString::operator()()

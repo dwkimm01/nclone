@@ -56,6 +56,31 @@ int doit(int argc, char* argv[])
 
 	using namespace ncpp::nccolor;
 
+#if 0
+	const NCString pre("[", nccolor::NCColor::DEFAULT);
+	const NCString post("]", nccolor::NCColor::DEFAULT);
+	const NCString thing("HOWDY", nccolor::NCColor::BUDDYLIST_NORMAL);
+
+//	auto cat = pre + thing + post;
+	auto cat = NCTimeUtils::getPrintableColorTimeStamp();
+
+	auto s = cat.getString();
+	auto c = cat.getColor();
+
+	for(auto i : s)
+	{
+		std::cout << i;
+	}
+	std::cout << std::endl;
+
+	for(auto i : c)
+	{
+		std::cout << (int)i;
+	}
+	std::cout << std::endl;
+	return -1;
+#endif
+
 //	NCColor color(2,1);
 //	std::cout << "1,1 => " << color.foreground() << ", " << color.background() << std::endl;
 //	std::cout << "    => " << (int)color.toUnsignedChar() << std::endl;
@@ -146,7 +171,7 @@ int doit(int argc, char* argv[])
 		blCfg.p_x = app.maxWidth() - blCfg.p_w;
 		blCfg.p_y = 0;
 		blCfg.p_hasBorder = true;
-        blCfg.p_backgroundColor = nccolor::NCColor::GREEN; // 27; // 4+ (8*2); // 4; // (4+1)*8;
+        blCfg.p_backgroundColor = nccolor::NCColor::BUDDYLIST_NORMAL;
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
@@ -179,16 +204,21 @@ int doit(int argc, char* argv[])
 
 		// Color printing
 		winLog->append("Colors:");
-		winLog->append(NCString(" Default", nccolor::NCColor::DEFAULT));
-		winLog->append(NCString(" Black", nccolor::NCColor::BLACK));
-		winLog->append(NCString(" Red", nccolor::NCColor::RED));
-		winLog->append(NCString(" Green", nccolor::NCColor::GREEN));
-		winLog->append(NCString(" Yellow", nccolor::NCColor::YELLOW));
-		winLog->append(NCString(" BLUE", nccolor::NCColor::BLUE));
-		winLog->append(NCString(" MAGENTA", nccolor::NCColor::MAGENTA));
-		winLog->append(NCString(" CYAN", nccolor::NCColor::CYAN));
-		winLog->append(NCString(" WHITE", nccolor::NCColor::WHITE));
-		winLog->append(NCString(" Red", nccolor::NCColor::RED) + NCString(" Blue", nccolor::NCColor::BLUE));
+		NCColor::forEachColor([&](const short colorNum, const short foreground, const short background)
+		{
+			const NCString spce(" ", nccolor::NCColor::DEFAULT);
+			winLog->append(spce + NCString(boost::lexical_cast<std::string>(colorNum), colorNum));
+		});
+//		winLog->append(NCString(" Default", nccolor::NCColor::DEFAULT));
+//		winLog->append(NCString(" Black", nccolor::NCColor::BLACK));
+//		winLog->append(NCString(" Red", nccolor::NCColor::RED));
+//		winLog->append(NCString(" Green", nccolor::NCColor::GREEN));
+//		winLog->append(NCString(" Yellow", nccolor::NCColor::YELLOW));
+//		winLog->append(NCString(" BLUE", nccolor::NCColor::BLUE));
+//		winLog->append(NCString(" MAGENTA", nccolor::NCColor::MAGENTA));
+//		winLog->append(NCString(" CYAN", nccolor::NCColor::CYAN));
+//		winLog->append(NCString(" WHITE", nccolor::NCColor::WHITE));
+//		winLog->append(NCString(" Red", nccolor::NCColor::RED) + NCString(" Blue", nccolor::NCColor::BLUE));
 		winLog->append("");
 
 		// Message received signal connect
@@ -199,9 +229,8 @@ int doit(int argc, char* argv[])
 						[&](const std::string &s, const std::string &t)
 						{
 							// Prefix message with timestamp
-							const int incomingMsgColor = 2;
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
-							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", incomingMsgColor);
+							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", NCColor::CHATBUDDY_NORMAL);
 							// Determine which window message will go to
 							const std::string titleToFind = (s == "DEBUG" || s == "INFO")?("Console"):(s);
 
@@ -318,8 +347,9 @@ int doit(int argc, char* argv[])
 					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(ncw)
 					{
-						auto currentColor = (topChatName == ncw->getConfig().p_title) ? (nccolor::NCColor::RED)
-								: (nccolor::NCColor::BLUE);
+						auto currentColor = (topChatName == ncw->getConfig().p_title)
+								? (nccolor::NCColor::BUDDYLIST_HIGHLIGHT)
+								: (nccolor::NCColor::BUDDYLIST_NORMAL);
 						// TODO set the current window's name's background to something different (YELLOW)?
 
 						winBl->append(NCString(ncw->getConfig().p_title, currentColor));
@@ -928,7 +958,7 @@ int doit(int argc, char* argv[])
 								client->msgSend(buddyName, cmd);
 							}
 
-							const int outgoingMsgColor = 4;
+							const auto outgoingMsgColor = NCColor::CHAT_NORMAL;
 							// Add msg to top (front) buffer
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + cmd, outgoingMsgColor);
 							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));

@@ -8,7 +8,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "NCTimeUtils.h"
 #include "NCString.h"
-
+#include "NCColor.h"
 
 namespace ncpp
 {
@@ -23,15 +23,17 @@ std::string NCTimeUtils::getTimeStamp()
 	return to_simple_string(second_clock::local_time().time_of_day());
 }
 
-
-NCString NCTimeUtils::getColorTimeStamp(){
-	return NCString(NCTimeUtils::getTimeStamp(), 3);
+NCString NCTimeUtils::getColorTimeStamp()
+{
+	return NCString(NCTimeUtils::getTimeStamp(), nccolor::NCColor::CLOCK_NORMAL);
 
 }
 
-NCString NCTimeUtils::getPrintableColorTimeStamp(){
-	return NCString("[" + NCTimeUtils::getTimeStamp() + "]", 3);
+NCString NCTimeUtils::getPrintableColorTimeStamp()
+{
+	return NCString("[", nccolor::NCColor::DEFAULT) +
+			getColorTimeStamp() +
+			NCString("]", nccolor::NCColor::DEFAULT);
 }
-
 
 } // namespace ncpp

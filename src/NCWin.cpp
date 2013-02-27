@@ -89,9 +89,9 @@ public:
 //            wbkgd(p_win, COLOR_PAIR(p_cfg.p_backgroundColor));
 //        }
 
-		const nccolor::NCColor ncColor(0, p_cfg.p_backgroundColor);
-		if(ncColor.background())
+		if(p_cfg.p_backgroundColor)
 		{
+			const nccolor::NCColor ncColor(static_cast<nccolor::NCColor::Color>(p_cfg.p_backgroundColor));
 			wbkgd(p_win, COLOR_PAIR(ncColor.toUnsignedChar()));
 		}
 
@@ -299,21 +299,9 @@ public:
 	    for (; *str != 0; ++str)
 	    {
 	    	int val = *str;
-	    	if (color && *color != 0)
+	    	if (color)
 	    	{
-
-	    		nccolor::NCColor ncColor; // (nccolor::NCColor::BLUE, nccolor::NCColor::GREEN); // p_cfg.p_backgroundColor);
-	    		ncColor.fromUnsignedChar(*color);
-
-	    		if(-1 != p_cfg.p_backgroundColor)
-	    		{
-	    			ncColor.background(p_cfg.p_backgroundColor);
-	    		}
-
-
-	    		val |= COLOR_PAIR(ncColor.toUnsignedChar());
-// TODO, need to combine background color
-// TODO, max color still not sorted out
+	    		val |= COLOR_PAIR(*color);
 	    		++color;
 	    	}
 	    	if(*str)

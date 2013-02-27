@@ -51,7 +51,7 @@ NCApp::NCApp()
     // Initialize colors
     nccolor::NCColor::forEachColor([](const short offs, const short foreground, const short background)
     {
-    	init_pair(offs, foreground-1, background-1);
+    	init_pair(offs, foreground, background);
     });
 
     // -1 specifies "default" color, so 0, -1, this will put black over transparent background

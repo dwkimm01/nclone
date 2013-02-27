@@ -35,7 +35,6 @@ public:
 	static NCString getPrintableColorTimeStamp();
 };
 
-
 } // namespace ncpp
 
 #endif // NCTIMEUTILS_H_
