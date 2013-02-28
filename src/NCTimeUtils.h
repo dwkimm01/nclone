@@ -33,6 +33,11 @@ public:
 	 * and surrounding '[' and ']'
 	 */
 	static NCString getPrintableColorTimeStamp();
+
+	/**
+	 */
+	static NCString getBlinkingTime(const int blankColonOn);
+
 };
 
 } // namespace ncpp

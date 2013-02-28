@@ -36,4 +36,32 @@ NCString NCTimeUtils::getPrintableColorTimeStamp()
 			NCString("]", nccolor::NCColor::DEFAULT);
 }
 
+
+NCString NCTimeUtils::getBlinkingTime(const int blankColonOn)
+{
+   std::ostringstream os;
+   boost::posix_time::ptime pt(boost::posix_time::second_clock::local_time());
+//   boost::gregorian::date const& d = pt.date();
+   boost::posix_time::time_duration const& t = pt.time_of_day();
+   /*CharT*/ char const orig_fill(os.fill('0'));
+   const int hrs = (t.hours() && t.hours() != 12 ? t.hours() % 12 : 12);
+
+   os << (hrs < 10 ? " " : "")
+      << (hrs && hrs != 12 ? hrs % 12 : 12)
+      << ((0 == (t.seconds()%10)%5)?(" "):(":"))
+      << std::setw(2) << t.minutes()
+      << ' '
+      << (t.hours() / 12 ? 'P' : 'A') << 'M'
+      ;
+   os.fill(orig_fill);
+
+	return NCString("[", nccolor::NCColor::DEFAULT) +
+		   NCString(os.str(), nccolor::NCColor::CLOCK_NORMAL) +
+		   NCString("]", nccolor::NCColor::DEFAULT);
+
+//   return NCString(os.str(), nccolor::NCColor::CLOCK_NORMAL);
+
+}
+
+
 } // namespace ncpp
