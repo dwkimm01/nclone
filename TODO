@@ -1,5 +1,20 @@
 TODO list
 
+- Save command history to a file
+ . save periodically and when app exits
+ . load at startup
+
+- Save and load settings
+ . Need to be able to make things configurable first (eg window wrap setting)
+ . Add a /save command for settings
+ . Load at startup
+
+- Make buddy list automatically hide
+ . animate open/close and just hide mode
+
+- Be able to parse double quotes in commands 
+ . as a single setting
+
 - MS Communicator
  . crashes, might be a library issue
  . incoming msgs are in HTML, need to parse it
@@ -19,7 +34,6 @@ DONE . Could be helpful for Cmd History
 - Break Container out of NCWinscrollBack for a more MVC like arch
  . Might be a good time to start on this item which is listed out fuller below
 
-- Highlight current chat window in different color in buddy list
 
 - Show scrollback indicator
  . parhaps a n/max number on the "status bar"
@@ -49,15 +63,6 @@ DONE . Could be helpful for Cmd History
  . Create data store to group Text Buffer, Connection, Buddy Name
  . Possibly use a BOOST::multi_map
 
-- Fix page up/down scrolling
- . Cleanup NCTextWinFormatter
- . Improve functions in NCTextWinFormatter so they calculate line counts better
- . Page up goes up too far when there are wrapping lines
-
-DONE - Fix initial text windows when there isn't enough text to fill window
-DONE  . Right now we start from top but I want the text entered down near the cmd window
- . Might want to be able to make this configurable
-
 - Buddy List
  . Needs window size (too small) protection
  . text wrapping should just cutoff instead (maybe add ...'s)
@@ -84,17 +89,8 @@ DONE  . Right now we start from top but I want the text entered down near the cm
  . One line window with updating and useful information
  .  TIME   INFO_COMMENT   CONNECTION STATUS
 
-DONE - House Keeping
-DONE  . Redraw (to softcopy) of architecture/code overview
-DONE  . Can use umbrello probally - put into notes section
-DONE  . Put screenshot link from README.md
-
 - Command parsing improvements
-DONE  . Up/Down command line history
- . Left/Right move cursor
-DONE  . Text wrapping for commands/text that is too long for one window width
  . CTRL-r reverse search through command line history
- . Don't wait forever for a key to be entered (thread reuse)
  . Auto complete (suggestions) with dimmed text - and info/help about command
 
 - Log chats
@@ -110,15 +106,9 @@ DONE  . Text wrapping for commands/text that is too long for one window width
  . Command parsing and executing could go somewhere else
  . Window setup could probably happen in an NCApp child
 
-- NCTextWinFormatter spaces aware
- . Want to be able to split the lines on spaces where possible
- . Turn NCTextWinFormatter into a class probably
- . Then maybe write a LengthSpaceFinder (LengthFinder brother) class
- . Make NCTextWinFormatter a templated class on FINDER (maybe?)
-
 - NCWin refreshes too much
  . add lots of new windows: blinks too often
- . logon to chat service with buddies onlien: doesn't always redraw fully
+ . logon to chat service with buddies online: doesn't always redraw fully
 
 - NCWin/NCObject refresh and draw cleanup
  . Currently there is refresh, rRefresh, clear, and updateSize
@@ -174,6 +164,28 @@ DONE  . Text wrapping for commands/text that is too long for one window width
 -- Done
 
  - Add a timeout to the window when user doesn't press anything for awhile 
+ - Highlight current chat window in different color in buddy list
+ - NCTextWinFormatter spaces aware
+  . Want to be able to split the lines on spaces where possible
+  . Turn NCTextWinFormatter into a class probably
+  . Then maybe write a LengthSpaceFinder (LengthFinder brother) class
+  . Make NCTextWinFormatter a templated class on FINDER (maybe?)
+ - House Keeping
+  . Redraw (to softcopy) of architecture/code overview
+  . Can use umbrello probally - put into notes section
+  . Put screenshot link from README.md
+ - Command parsing improvements
+  . Up/Down command line history
+  . Left/Right move cursor
+  . Text wrapping for commands/text that is too long for one window width
+  . Don't wait forever for a key to be entered (thread reuse)
+ - Fix page up/down scrolling
+  . Cleanup NCTextWinFormatter
+  . Improve functions in NCTextWinFormatter so they calculate line counts better
+  . Page up goes up too far when there are wrapping lines
+ - Fix initial text windows when there isn't enough text to fill window
+  . Right now we start from top but I want the text entered down near the cmd window
+
 
 
 ----------------------------------------------------
