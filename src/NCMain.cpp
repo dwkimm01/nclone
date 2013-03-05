@@ -741,7 +741,6 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-//							ncs->append(cmd);
 							// Clear top buffer
 							ncs->clear();
 							ncs->refresh();
