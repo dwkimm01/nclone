@@ -50,8 +50,8 @@ void NCColor::forEachColor(std::function<void(const short, const short, const sh
 			std::make_tuple((short)CHAT_HIGHLIGHT, 		(short)COLOR_YELLOW, (short)COLOR_CYAN),
 			std::make_tuple((short)CHATBUDDY_NORMAL, 	(short)COLOR_RED, (short)-1),
 			std::make_tuple((short)CHATBUDDY_HIGHLIGHT,	(short)COLOR_RED, (short)COLOR_MAGENTA),
-			std::make_tuple((short)BUDDYLIST_NORMAL,	(short)COLOR_BLUE, (short)COLOR_GREEN),
-			std::make_tuple((short)BUDDYLIST_HIGHLIGHT,	(short)COLOR_YELLOW, (short)COLOR_BLUE),
+			std::make_tuple((short)BUDDYLIST_NORMAL,	(short)COLOR_WHITE, (short)COLOR_CYAN),
+			std::make_tuple((short)BUDDYLIST_HIGHLIGHT,	(short)COLOR_BLUE, (short)COLOR_BLACK),
 			std::make_tuple((short)CLOCK_NORMAL,		(short)COLOR_GREEN, (short)-1)
 
 	};

@@ -651,7 +651,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd + ", help menu:");
+							ncs->append(NCString(cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->append(" Commands");
 							ncs->append("  /exit     quit application");
 							ncs->append("  /quit     quit application");
@@ -693,7 +693,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd + ", command history:");
+							ncs->append(NCString(cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							for(auto x : cmdHist)
 							{
 								ncs->append(" " + x);
@@ -712,7 +712,7 @@ int doit(int argc, char* argv[])
 							//  login: user@gmail.com
 							//  password: xxxx
 							inputState = PROTOCOL;
-							ncs->append(" Creating new connection");
+							ncs->append(NCString(cmd + ", creating new connection:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->append("   Enter protocol (e.g. prpl-jabber)");
 							ncs->refresh();
 						}
@@ -721,7 +721,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd + ", Window list:");
+							ncs->append(NCString(cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							app.forEachChild([&](ncobject::NCObject* obj)
 							{
 								ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
@@ -735,11 +735,11 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/refresh")
+					else if(cmd == "/refresh, refresh all windows")
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
+							ncs->append(NCString(cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->append("");
 						}
 						app.refresh();
@@ -753,7 +753,7 @@ int doit(int argc, char* argv[])
 							// TODO, do we want to do set on all of the (chat) windows
 							if("wrap" == cmdParam[1])
 							{
-								ncs->append("setting wrap type \"" + cmdParam[2] + "\"");
+								ncs->append(NCString(cmd + ", setting wrap type \"" + cmdParam[2] + "\"", nccolor::NCColor::COMMAND_HIGHLIGHT));
 								if("length" == cmdParam[2])
 								{
 									ncs->setWrapLength();
@@ -785,7 +785,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
+//							ncs->append(cmd);
 							// Clear top buffer
 							ncs->clear();
 							ncs->refresh();
@@ -795,6 +795,8 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
+							ncs->append(NCString(cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
 							// Create the window list, if there is no window listed add current/top window to list
 							std::string winList = cmd;
 							boost::replace_all(winList, "/info", "");
@@ -808,7 +810,7 @@ int doit(int argc, char* argv[])
 									i != ItrType(); ++i)
 				        {
 				        	const std::string winName = boost::copy_range<std::string>(*i);
-				        	if(winName != "/info")
+				        	if(winName != "/info")  // TODO, don't think we have to check for this now
 				        	{
 				        		app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
 				        		{
@@ -835,7 +837,7 @@ int doit(int argc, char* argv[])
 					}
 					else if(cmd.find("/jump") == 0)
 					{
-						ncs->append(cmd);
+						ncs->append(NCString(cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 						typedef boost::split_iterator<std::string::iterator> ItrType;
 				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
 				             i != ItrType();
@@ -862,7 +864,7 @@ int doit(int argc, char* argv[])
 					}
 					else if(cmd.find("/newwin") == 0)
 					{
-						ncs->append(cmd);
+						ncs->append(NCString(cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 						typedef boost::split_iterator<std::string::iterator> ItrType;
 				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
 				             i != ItrType();
@@ -873,7 +875,7 @@ int doit(int argc, char* argv[])
 				        	if("/newwin" != winName)
 				        	{
 				        		cfg.p_title = winName;
-				        		ncs->append("Creating new window " + cfg.p_title);
+				        		ncs->append(" Creating new window \"" + cfg.p_title + "\"");
 				        		auto myNewWin = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 				        		ncs->refresh();
 				        		myNewWin->append("Opened win " + cfg.p_title);
@@ -885,7 +887,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
+							ncs->append(NCString(cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							const int max = ncs->getConfig().p_h;
 							for(int i = 1; i < max*5; ++i)
 							{
@@ -903,6 +905,8 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
+							ncs->append(NCString(cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
 							for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
 							{
 								ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
@@ -914,15 +918,17 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
+							ncs->append(NCString(cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
 							NCString entry
 								= NCTimeUtils::getPrintableColorTimeStamp()
-								+ NCString(" " + testexampletext::TestExampleText::get(), 6);
+								+ NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
 							// Change color of e's for fun
 							entry.forEach([](char &c, char &color)
 							{
 								if('e' == c)
 								{
-									color = 1;
+									color = nccolor::NCColor::CHAT_NORMAL;
 								}
 							});
 
@@ -934,7 +940,7 @@ int doit(int argc, char* argv[])
 					{
 						if(ncs)
 						{
-							ncs->append(cmd + ", unknown command");
+							ncs->append(NCString(cmd + ", unknown command", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->refresh();
 						}
 					}
