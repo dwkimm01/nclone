@@ -1,5 +1,7 @@
 TODO list
 
+- winScrollBack->append("") does not show a line....
+
 - Save command history to a file
  . save periodically and when app exits
  . load at startup

@@ -53,39 +53,6 @@ using namespace ncpp;
 // Main method
 int doit(int argc, char* argv[])
 {
-
-	using namespace ncpp::nccolor;
-
-#if 0
-	const NCString pre("[", nccolor::NCColor::DEFAULT);
-	const NCString post("]", nccolor::NCColor::DEFAULT);
-	const NCString thing("HOWDY", nccolor::NCColor::BUDDYLIST_NORMAL);
-
-//	auto cat = pre + thing + post;
-	auto cat = NCTimeUtils::getPrintableColorTimeStamp();
-
-	auto s = cat.getString();
-	auto c = cat.getColor();
-
-	for(auto i : s)
-	{
-		std::cout << i;
-	}
-	std::cout << std::endl;
-
-	for(auto i : c)
-	{
-		std::cout << (int)i;
-	}
-	std::cout << std::endl;
-	return -1;
-#endif
-
-//	NCColor color(2,1);
-//	std::cout << "1,1 => " << color.foreground() << ", " << color.background() << std::endl;
-//	std::cout << "    => " << (int)color.toUnsignedChar() << std::endl;
-//	return 0;
-
 	// Scope for NCApp
 	{
 		// Parse command line options
@@ -203,23 +170,12 @@ int doit(int argc, char* argv[])
 		ncwintime::NCWinTime winTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
 
 		// Color printing
-		winLog->append("Colors:");
-		NCColor::forEachColor([&](const short colorNum, const short foreground, const short background)
+		NCString allColorsString("Colors ", nccolor::NCColor::CHAT_NORMAL);
+		nccolor::NCColor::forEachColor([&](const short colorNum, const short foreground, const short background)
 		{
-			const NCString spce(" ", nccolor::NCColor::DEFAULT);
-			winLog->append(spce + NCString(boost::lexical_cast<std::string>(colorNum), colorNum));
+			allColorsString = allColorsString + NCString(boost::lexical_cast<std::string>(colorNum), colorNum);
 		});
-//		winLog->append(NCString(" Default", nccolor::NCColor::DEFAULT));
-//		winLog->append(NCString(" Black", nccolor::NCColor::BLACK));
-//		winLog->append(NCString(" Red", nccolor::NCColor::RED));
-//		winLog->append(NCString(" Green", nccolor::NCColor::GREEN));
-//		winLog->append(NCString(" Yellow", nccolor::NCColor::YELLOW));
-//		winLog->append(NCString(" BLUE", nccolor::NCColor::BLUE));
-//		winLog->append(NCString(" MAGENTA", nccolor::NCColor::MAGENTA));
-//		winLog->append(NCString(" CYAN", nccolor::NCColor::CYAN));
-//		winLog->append(NCString(" WHITE", nccolor::NCColor::WHITE));
-//		winLog->append(NCString(" Red", nccolor::NCColor::RED) + NCString(" Blue", nccolor::NCColor::BLUE));
-		winLog->append("");
+		winLog->append(allColorsString);
 
 		// Message received signal connect
 		msgSignal.connect
@@ -230,7 +186,7 @@ int doit(int argc, char* argv[])
 						{
 							// Prefix message with timestamp
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
-							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", NCColor::CHATBUDDY_NORMAL);
+							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", nccolor::NCColor::CHATBUDDY_NORMAL);
 							// Determine which window message will go to
 							const std::string titleToFind = (s == "DEBUG" || s == "INFO")?("Console"):(s);
 
@@ -964,7 +920,7 @@ int doit(int argc, char* argv[])
 								client->msgSend(buddyName, cmd);
 							}
 
-							const auto outgoingMsgColor = NCColor::CHAT_NORMAL;
+							const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
 							// Add msg to top (front) buffer
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + cmd, outgoingMsgColor);
 							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
