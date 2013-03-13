@@ -5,7 +5,10 @@
  *      Author: dwkimm01
  */
 
+#include <fstream>
+#include <boost/range/istream_range.hpp>
 #include "NCCmdHistory.h"
+#include "NCPathUtils.h"
 
 namespace ncpp
 {
@@ -13,14 +16,48 @@ namespace nccmdhistory
 {
 
 
+struct line_reader: std::ctype<char>
+{
+   line_reader()
+      : std::ctype<char>(get_table())
+   {
+   }
+
+   static std::ctype_base::mask const* get_table()
+   {
+      static std::vector<std::ctype_base::mask>
+         rc(table_size, std::ctype_base::mask());
+      rc['\n'] = std::ctype_base::space;
+      return &rc[0];
+   }
+};
+
+
+
 NCCmdHistory::NCCmdHistory(const int maxHistory)
 	: _cmds(maxHistory)
 	, _cmdsIndex(0)
 {
+	// Try to load saved history
+	std::ifstream file(ncpathutils::NCPathUtils::getHistoryFile());
+	file.imbue(std::locale(std::locale(), new line_reader()));
+	for(auto l : boost::range::istream_range<std::string>(file) )
+	{
+		add(l);
+	}
 }
 
 NCCmdHistory::~NCCmdHistory()
 {
+	// Try to create directory if it is not there
+	ncpathutils::NCPathUtils::createPath(ncpathutils::NCPathUtils::getSaveDir());
+	// Write output history file
+	std::ofstream of(ncpathutils::NCPathUtils::getHistoryFile());
+	for(auto x : *this)
+	{
+		of << x << "\n";
+	}
+
 }
 
 void NCCmdHistory::add(const std::string &cmd)

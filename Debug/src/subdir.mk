@@ -15,6 +15,7 @@ CPP_SRCS += \
 ../src/NCExceptionOutOfRange.cpp \
 ../src/NCMain.cpp \
 ../src/NCObject.cpp \
+../src/NCPathUtils.cpp \
 ../src/NCString.cpp \
 ../src/NCTimeUtils.cpp \
 ../src/NCWin.cpp \
@@ -34,6 +35,7 @@ OBJS += \
 ./src/NCExceptionOutOfRange.o \
 ./src/NCMain.o \
 ./src/NCObject.o \
+./src/NCPathUtils.o \
 ./src/NCString.o \
 ./src/NCTimeUtils.o \
 ./src/NCWin.o \
@@ -53,6 +55,7 @@ CPP_DEPS += \
 ./src/NCExceptionOutOfRange.d \
 ./src/NCMain.d \
 ./src/NCObject.d \
+./src/NCPathUtils.d \
 ./src/NCString.d \
 ./src/NCTimeUtils.d \
 ./src/NCWin.d \

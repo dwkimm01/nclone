@@ -1,5 +1,8 @@
 TODO list
 
+- Libpurple conv != null failed
+ . need better conversation integration with libpurple
+
 - Add an /uptime command to show how long app has been open
  . what about buddy list conversation uptimes?
 
