@@ -962,6 +962,7 @@ int doit(int argc, char* argv[])
 								) );
 
 							// TODO, no indication if connection failed or for what reason
+							// TODO, do not add password to cmdHist!!! 
 						}
 					}
 
