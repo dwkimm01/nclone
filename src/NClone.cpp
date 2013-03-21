@@ -24,31 +24,34 @@ NClone::~NClone()
 
 void NClone::setup
 	( ncapp::NCApp &app
-	, NCWinScrollback* winKeys
-	, NCWinScrollback* winLog
-	, NCWinScrollback* chats //  chats
-	, NCWinScrollback* winBl
-	, NCWinScrollback* winCmd
-	, std::function<NCWinScrollback*()> ncs
+	, NCWinScrollback* &winKeys
+	, NCWinScrollback* &winLog
+	, NCWinScrollback* &chats //  chats
+	, NCWinScrollback* &winBl
+	, NCWinScrollback* &winCmd
+	, std::function<NCWinScrollback*()> pncs
 	, std::string &cmd
 	, int &cmdIdx
 	, bool &stillRunning
 	, nccmdhistory::NCCmdHistory &cmdHist
 	, std::function<bool()> enteringPassword )
 {
+	ncs = pncs;
+
+
 	keyMap().set([&]()
 		{
-			if(!winKeys) return;
+			if(!winKeys || !winLog) return;
 			// Bring winKeys to top if it's not on top, if it is push it to the back
 			if(app.isOnTopOf(winKeys, winLog))
 			{
 				app.bringToBack(winKeys);
-					app.refresh();
+				app.refresh();
 			}
 			else
 			{
 				app.bringToFront(winKeys);
-					app.refresh();
+				app.refresh();
 			}
 		}
 		, "Win Keys toggle", KEY_F(4));
@@ -57,15 +60,17 @@ void NClone::setup
 		{
 			if(!chats || !winBl) return;
 			// Bring buddy list to top if it's not on top, if it is push it to the back
-			if(app.isOnTopOf(chats, winBl))
+			if(app.isOnTopOf(winBl, winLog))
 			{
 				app.bringToBack(winBl);
-				chats->refresh();
+//				chats->refresh();
+				app.refresh();
 			}
 			else
 			{
 				app.bringToFront(winBl);
-				winBl->refresh();
+//				winBl->refresh();
+				app.refresh();
 			}
 
 			/*winBlVisible = !winBlVisible;
@@ -290,8 +295,7 @@ void NClone::setup
 			if(cmd.empty()) return;
 			cmd.erase( cmd.begin() + (--cmdIdx));
 //			if(PASSWORD == inputState)
-//			if(enteringPassword())
-			if(false)
+			if(enteringPassword())
 			{
 				// If this is a password print x's instead
 				std::string xInput;
@@ -354,6 +358,7 @@ nckeymap::NCKeyMap& NClone::keyMap()
 {
 	return p_keyMap;
 }
+
 
 
 } // namespace nclone

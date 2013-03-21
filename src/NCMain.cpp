@@ -94,8 +94,8 @@ int doit(int argc, char* argv[])
 		cfg.p_hasBorder = true;
 		cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
 //		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
-		NCWinScrollback winCmd(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
-		winCmd.setWrapLength();
+		NCWinScrollback* winCmd = new NCWinScrollback(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
+		winCmd->setWrapLength();
 
 		// Set of chat windows
 		cfg.p_title = "Chats";
@@ -104,7 +104,7 @@ int doit(int argc, char* argv[])
 		cfg.p_x = 0;
 		cfg.p_y = 0;
 		cfg.p_hasBorder = true;
-		NCWinScrollback win3(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
+		NCWinScrollback* win3 = new NCWinScrollback(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
 
 //		{
 //			auto xxxCfg = cfg;
@@ -126,7 +126,7 @@ int doit(int argc, char* argv[])
 		cfg.p_y += 1;
 		cfg.p_hasBorder = false;
 		// TODO, forced to have one window here since there is no null check later on... fix this
-		NCWinScrollback* winLog = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+		NCWinScrollback* winLog = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
 // TODO, take this out when we can hide the window/autohide
 #define BUDDYLIST 1
@@ -194,7 +194,7 @@ int doit(int argc, char* argv[])
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
-							win3.forEachChild([&](ncobject::NCObject* o)
+							win3->forEachChild([&](ncobject::NCObject* o)
 							{
 								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
 								if(winMsg && titleToFind == winMsg->getConfig().p_title)
@@ -210,7 +210,7 @@ int doit(int argc, char* argv[])
 							if(!msgAdded)
 							{
 								cfg.p_title = s;
-								NCWinScrollback* addedWin = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+								NCWinScrollback* addedWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 								addedWin->append(line);
 							}
 
@@ -218,10 +218,10 @@ int doit(int argc, char* argv[])
 							// TODO, do we want to just skip this if we're not on top?
 							// Only issue is that sometimes windows underneath seemed to show through - maybe
 							// it's an NCURSES prob though.
-							win3.refresh();
+							win3->refresh();
 
 							// Put cursor back to cmd window
-							winCmd.refresh();
+							winCmd->refresh();
 						}
 					)
 				, _1
@@ -263,7 +263,7 @@ int doit(int argc, char* argv[])
 		// If there are cmd args use them to (jump) start/create a connection
 		if(!progArgs.connection().empty())
 		{
-			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
+			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
 			ncs->append(" Using cmd line account");
 			ncs->refresh();
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
@@ -289,15 +289,15 @@ int doit(int argc, char* argv[])
 
 #if BUDDYLIST
 			// Update Buddy List
-			if(winBl && app.isOnTopOf(&win3, winBl))
+			if(winBl && app.isOnTopOf(winBl, winLog))
 			{
-				auto topChatWin = dynamic_cast<ncwin::NCWin*>(win3.getTop());
+				auto topChatWin = dynamic_cast<ncwin::NCWin*>(win3->getTop());
 				const std::string topChatName = (topChatWin)
 						? (topChatWin->getConfig().p_title)
 						: ("");
 
 				winBl->clear();
-				win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
 				{
 					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(ncw)
@@ -330,17 +330,17 @@ int doit(int argc, char* argv[])
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
 			// All of this is to put the cursor in the correct place for editing a line
-			const int cmdWidth = winCmd.getConfig().p_w - ((winCmd.getConfig().p_hasBorder)?(2):(0));
+			const int cmdWidth = winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0));
 			const int cmdTotal = cmd.size() / cmdWidth;
 			const int cmdIdxLine = cmdIdx / cmdWidth;
-			winCmd.end();
-			winCmd.scrollUp(cmdTotal - cmdIdxLine);
-			winCmd.refresh();
-			winCmd.cursorSet(1+(/*cmdIdxLine*/ cmdIdx % cmdWidth), 1);
+			winCmd->end();
+			winCmd->scrollUp(cmdTotal - cmdIdxLine);
+			winCmd->refresh();
+			winCmd->cursorSet(1+(/*cmdIdxLine*/ cmdIdx % cmdWidth), 1);
 
 			// Get user input
 			int c = 0;
-			winCmd >> c;  // app >> c;
+			(*winCmd) >> c;  // app >> c;
 
 			// Show keystroke in keystroke debug window
 			if(KEY_TIMEOUT != c)
@@ -352,7 +352,7 @@ int doit(int argc, char* argv[])
 				winKeys->append(keyStroke);
 			}
 
-			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3.getTop());
+			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
 			if(ncs)
 			{
 
@@ -368,29 +368,12 @@ int doit(int argc, char* argv[])
 
 				// Use Keymap
 				nclone::NClone nclone;
-				nclone.setup(app, winKeys, winLog, &win3, winBl, &winCmd
-					, [&](){return dynamic_cast<NCWinScrollback*>(win3.getTop()); }
+				nclone.setup(app, winKeys, winLog, win3, winBl, winCmd
+					, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 					, cmd, cmdIdx, stillRunning, cmdHist
 					, [&](){return PASSWORD == inputState; });
-				nclone.keyMap()(c);
 
-
-//				( ncapp::NCApp &app
-//				, NCWinScrollback* winKeys
-//				, NCWinScrollback* winLog
-//				, NCWinScrollback* chats
-//				, NCWinScrollback* winBl
-//				, NCWinScrollback* winCmd
-//				, std::function<NCWinScrollback*()> ncs
-//				, std::string &cmd
-//				, int &cmdIdx
-//				, bool &stillRunning
-//				, nccmdhistory::NCCmdHistory &cmdHist);
-
-
-
-
-
+				if(! nclone.keyMap()(c) )
 
 			switch(c)
 			{
@@ -621,7 +604,7 @@ int doit(int argc, char* argv[])
 				        	const std::string winName = boost::copy_range<std::string>(*i);
 				        	if(winName != "/jump")
 				        	{
-				        		win3.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				        		win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
 				        		{
 				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
 				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
@@ -629,7 +612,7 @@ int doit(int argc, char* argv[])
 				        				// TODO, replace this logic for refreshing with more generic NCWin usage (refresh)
 				        				auto nobjsb = dynamic_cast<NCWinScrollback*>(nobjwin);
 				        				if(nobjsb) ncs = nobjsb;
-				        				win3.bringToFront(nobj);  // TODO, do we want to reorder the list like this?
+				        				win3->bringToFront(nobj);  // TODO, do we want to reorder the list like this?
 				        			}
 				        			return true;
 				        		});
@@ -651,10 +634,10 @@ int doit(int argc, char* argv[])
 				        	{
 				        		cfg.p_title = winName;
 				        		ncs->append(" Creating new window \"" + cfg.p_title + "\"");
-				        		auto myNewWin = new NCWinScrollback(&win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+				        		auto myNewWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 				        		ncs->refresh();
 				        		myNewWin->append("Opened win " + cfg.p_title);
-				        		win3.refresh();
+				        		win3->refresh();
 				        	}
 				        }
 					}
@@ -790,8 +773,8 @@ int doit(int argc, char* argv[])
 					// TODO, probably don't want/need to add standard cmds w/o params like help
 					cmd.clear();
 					cmdIdx = 0;
-					winCmd.clear();
-					winCmd.refresh();
+					winCmd->clear();
+					winCmd->refresh();
 
 				}
 				break;
@@ -809,11 +792,11 @@ int doit(int argc, char* argv[])
 						xInput.reserve(cmd.size());
 						for(unsigned int i = 0; cmd.size() > i; ++i)
 							xInput.push_back('x');
-						winCmd.append(xInput);
+						winCmd->append(xInput);
 					}
 					else
 					{
-						winCmd.append(cmd);
+						winCmd->append(cmd);
 					}
 				}
 				else

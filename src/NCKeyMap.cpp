@@ -42,17 +42,19 @@ void NCKeyMap::set(FuncType func, const std::string &name, const KeyType key)
 	_funcTable[key] = e;
 }
 
-void NCKeyMap::operator()(const KeyType key)
+bool NCKeyMap::operator()(const KeyType key)
 {
 	auto func = _funcTable.find(key);
 	if(func != _funcTable.end())
 	{
 		func->second.func(); // func->second.key, func->second.name);
+		return true;
 	}
 	else if(_default.func)
 	{
 		_default.func(); // key, _default.name);
 	}
+	return false;
 }
 
 /*void NCKeyMap::setKeyMap(const std::vector<std::tuple<int, KeyType>> &m, const bool clearFirst)

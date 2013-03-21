@@ -81,7 +81,7 @@ public:
 	/**
 	 * <b>Purpose:</b> Actual mapping
 	 */
-	void operator()(const KeyType key);
+	bool operator()(const KeyType key);
 
 
 	/**

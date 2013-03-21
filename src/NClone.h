@@ -27,12 +27,12 @@ public:
 
 	void setup
 	( ncapp::NCApp &app
-	, NCWinScrollback* winKeys
-	, NCWinScrollback* winLog
-	, NCWinScrollback* chats
-	, NCWinScrollback* winBl
-	, NCWinScrollback* winCmd
-	, std::function<NCWinScrollback*()> ncs
+	, NCWinScrollback* &winKeys
+	, NCWinScrollback* &winLog
+	, NCWinScrollback* &chats
+	, NCWinScrollback* &winBl
+	, NCWinScrollback* &winCmd
+	, std::function<NCWinScrollback*()> pncs
 	, std::string &cmd
 	, int &cmdIdx
 	, bool &stillRunning
@@ -51,6 +51,8 @@ private:
 
 	// Key map
 	nckeymap::NCKeyMap p_keyMap;
+	// Top chat window
+	std::function<NCWinScrollback*()> ncs;
 
 };
 
