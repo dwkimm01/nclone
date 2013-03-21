@@ -13,6 +13,8 @@
 namespace ncpp
 {
 
+
+// TODO, merge this class with NCKeyProcessor
 class NCInput
 {
 public:

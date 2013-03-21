@@ -33,6 +33,8 @@
 #include "NCException.h"
 #include "NCCmdHistory.h"
 #include "NCColor.h"
+#include "NCKeyMap.h"
+#include "NClone.h"
 using namespace std;
 using namespace ncpp;
 
@@ -144,7 +146,6 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs emptyResize;
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		winBl->setWrapCut();
-		bool winBlVisible = true;
 #endif
 
 		// Debug keystroke window
@@ -274,16 +275,13 @@ int doit(int argc, char* argv[])
 			ncs->refresh();
 		}
 
-#if STATUSTWIRL
-		// Simple non-blocking getch sample usage
-		unsigned int statusIndex = 0;
-		const std::vector<std::string> status = {"|", "/", "-", "\\"};
-#endif
 
 		// Input collector
 		std::string cmd;
 		int cmdIdx = 0;
 		bool stillRunning = true;
+
+
 
 		// Loop forever until input tells us to return
 		while(stillRunning)
@@ -291,7 +289,7 @@ int doit(int argc, char* argv[])
 
 #if BUDDYLIST
 			// Update Buddy List
-			if(winBl && winBlVisible)
+			if(winBl && app.isOnTopOf(&win3, winBl))
 			{
 				auto topChatWin = dynamic_cast<ncwin::NCWin*>(win3.getTop());
 				const std::string topChatName = (topChatWin)
@@ -368,6 +366,31 @@ int doit(int argc, char* argv[])
 				const ptime nowp = second_clock::local_time();
 				const ptime nowNext = now + minutes(15); // seconds(900); // 15 mins
 
+				// Use Keymap
+				nclone::NClone nclone;
+				nclone.setup(app, winKeys, winLog, &win3, winBl, &winCmd
+					, [&](){return dynamic_cast<NCWinScrollback*>(win3.getTop()); }
+					, cmd, cmdIdx, stillRunning, cmdHist
+					, [&](){return PASSWORD == inputState; });
+				nclone.keyMap()(c);
+
+
+//				( ncapp::NCApp &app
+//				, NCWinScrollback* winKeys
+//				, NCWinScrollback* winLog
+//				, NCWinScrollback* chats
+//				, NCWinScrollback* winBl
+//				, NCWinScrollback* winCmd
+//				, std::function<NCWinScrollback*()> ncs
+//				, std::string &cmd
+//				, int &cmdIdx
+//				, bool &stillRunning
+//				, nccmdhistory::NCCmdHistory &cmdHist);
+
+
+
+
+
 
 			switch(c)
 			{
@@ -391,213 +414,9 @@ int doit(int argc, char* argv[])
 					}
 				}
 
+				break;
 
 
-#if STATUSTWIRL
-				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
-				if(statusIndex >= status.size())
-				{
-					statusIndex = 0;
-				}
-#endif
-
-//				winCmd.refresh();
-//				ncs->append("KEY " + boost::lexical_cast<std::string>(c) + " " + boost::lexical_cast<std::string>(statusIndex));
-//				ncs->refresh();
-
-
-				break;
-			case KEY_PPAGE:
-				ncs->pageUp();
-				ncs->refresh();
-				break;
-			case KEY_NPAGE:
-				ncs->pageDown();
-				ncs->refresh();
-				break;
-			case KEY_HOME:
-				ncs->home();
-				ncs->refresh();
-				break;
-			case KEY_END:
-				ncs->end();
-				ncs->refresh();
-				break;
-			case KEY_SR: // 01007: // KEY_SUP
-				ncs->scrollUp(1);
-				ncs->refresh();
-				break;
-			case KEY_SF:
-				ncs->scrollDown(1);
-				ncs->refresh();
-				break;
-			case KEY_UP: // Command history Up
-// TODO, going up when the history is blank erases everything...
-				cmd = (--cmdHist).getCommand();
-				cmdIdx = cmd.size();
-				winCmd.clear();
-				winCmd.append(cmd);
-				winCmd.refresh();
-				break;
-			case KEY_DOWN: // Command history down
-				cmd = (++cmdHist).getCommand();
-				cmdIdx = cmd.size();
-				winCmd.clear();
-				winCmd.append(cmd);
-				winCmd.refresh();
-				break;
-			case KEY_LEFT:
-				if(0 < cmdIdx) --cmdIdx;
-				break;
-			case KEY_RIGHT:
-				if(cmd.size() > cmdIdx) ++cmdIdx;
-				break;
-			case 539: // CTRL-LEFT
-				// Move cursor to previous word start
-				// find first nonwhite character
-				for(int nsp = cmdIdx-1; nsp > 0; --nsp)
-				{
-					if(' ' != cmd[nsp])
-					{
-						// Find last non-white character
-						for(int wd = nsp-1; wd > 0; --wd)
-						{
-							if(' ' == cmd[wd])
-							{
-								cmdIdx = wd+1;
-								nsp = 0;
-								break;
-							}
-						}
-						// Didn't set cmdIdx yet so we're at the beginning
-						if(0 != nsp)
-						{
-							cmdIdx = 0;
-						}
-					}
-				}
-				break;
-			case 554: // CTRL-RIGHT
-				// Move cursor to next word end (space)
-				for(unsigned int sp = cmdIdx+1; sp <= cmd.size(); ++sp)
-				{
-					if(' ' == cmd[sp] || cmd.size() == sp)
-					{
-						cmdIdx = sp;
-						break;
-					}
-				}
-				break;
-			case '\t': // 9
-				win3.rotate();
-				win3.refresh();
-				break;
-			case KEY_BTAB:
-				win3.rotateBack();
-				win3.refresh();
-				break;
-			case 1: // CTRL-a
-				// TODO
-				break;
-			case 27: // Escape
-			case 3: // CTRL-c
-				stillRunning = false; // return 0;
-				break;
-			case 21: // CTRL-u
-				// TODO, change to only delete what is in front of the cursor
-				cmd.clear();
-				cmdIdx = 0;
-				winCmd.clear();
-				winCmd.refresh();
-				break;
-//			case KEY_IL: // TODO, INSERT doesn't seem to work on laptop
-//				if(ncs)
-//				{
-//					ncs->append("<Insert>");
-//					ncs->refresh();
-//					cmd.clear();
-//					winCmd.clear();
-//					winCmd.refresh();
-//				}
-//				break;
-			case KEY_BACKSPACE_MAC: // PASS THRU For MAC Delete
-			case KEY_BACKSPACE:
-				if(!cmd.empty())
-				{
-					cmd.erase( cmd.begin() + (--cmdIdx));
-					if(PASSWORD == inputState)
-					{
-						// If this is a password print x's instead
-						std::string xInput;
-						xInput.reserve(cmd.size());
-						for(unsigned int i = 0; cmd.size() > i; ++i)
-							xInput.push_back('x');
-						winCmd.append(xInput);
-					}
-					else
-					{
-						winCmd.append(cmd);
-					}
-					winCmd.refresh();
-				}
-				break;
-			case KEY_F(2):
-				if(ncs)
-				{
-					// TODO, toggle visible dropdown (from top) console window
-					ncs->append("<Console window toggle>");
-					ncs->refresh();
-				}
-				break;
-			case KEY_F(3):
-				if(ncs)
-				{
-					winBlVisible = !winBlVisible;
-					// ncs->append("<Toggle Contacts Window visibility " + boost::lexical_cast<std::string>(winBlVisible) + ">");
-					// ncs->refresh();
-
-					if(!winBlVisible)
-					{
-						app.bringToBack(winBl);
-						win3.refresh();
-					}
-					else
-					{
-						app.bringToFront(winBl);
-						winBl->refresh();
-					}
-				}
-				break;
-			case KEY_F(4):
-				if(winKeys)
-				{
-					// Bring winKeys to top if it's not on top, if it is push it to back
-					if(app.isOnTopOf(winKeys, winLog))
-					{
-						app.bringToBack(winKeys);
-						app.refresh();
-					}
-					else
-					{
-						app.bringToFront(winKeys);
-						app.refresh();
-					}
-				}
-				break;
-			case KEY_F(5):
-				app.refresh();
-				break;
-			case KEY_F(7):
-				if(winBl)
-				{
-					const int oldColor = winBl->getConfig().p_backgroundColor;
-					winBl->setBackground(oldColor+1);
-					if(ncs)
-					{
-						ncs->append(std::string("Next color ") + boost::lexical_cast<std::string>(oldColor+1));
-					}
-				}
-				break;
 			case 10:
 			case KEY_ENTER:
 				if(!cmd.empty())
@@ -976,25 +795,6 @@ int doit(int argc, char* argv[])
 
 				}
 				break;
-			case 18: // CTRL-r
-				if(ncs)
-				{
-					// TODO, reverse history search
-					ncs->append("CTRL-r");
-					ncs->refresh();
-				}
-				break;
-			case 14: // CTRL-n
-				// TODO, find next window with update we want to see
-				if(ncs)
-				{
-					ncs->append("CTRL-n");
-					ncs->refresh();
-				}
-				break;
-			case KEY_RESIZE:
-				app.refresh();
-				break;
 			default:
 				//Filter out non-printable characters
 				//TODO, implement as boost ns::print
@@ -1021,7 +821,7 @@ int doit(int argc, char* argv[])
 					if(ncs)
 					{
 						// Not printable - but didn't get accepted by any other rules
-						// TODO, print octal (and hexidecimal version) as well
+						// TODO, print octal (and hexadecimal version) as well
 						ncs->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)c)));
 						ncs->refresh();
 					}
