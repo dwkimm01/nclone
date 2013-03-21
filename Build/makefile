@@ -5,6 +5,7 @@ SOURCES=../src/NCApp.cpp \
 ../src/NCClientIf.cpp \
 ../src/NCClientPurple.cpp \
 ../src/NCCmdHistory.cpp \
+../src/NCCommandHandler.cpp \
 ../src/NCEnvironmentVariables.cpp \
 ../src/NCException.cpp \
 ../src/NCExceptionCurses.cpp \

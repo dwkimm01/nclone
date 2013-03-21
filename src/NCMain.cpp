@@ -32,6 +32,7 @@
 #include "NCString.h"
 #include "NCException.h"
 #include "NCCmdHistory.h"
+#include "NCCmd.h"
 using namespace std;
 using namespace ncpp;
 
@@ -249,13 +250,7 @@ int doit(int argc, char* argv[])
 		std::string clientUsername;
 		std::string clientPassword;
 		// New Connection input state/mode
-		enum InputState
-		{
-			NORMAL,
-			PROTOCOL,
-			USERNAME,
-			PASSWORD
-		} inputState = NORMAL;
+		NCCmd::InputState inputState = NCCmd::NORMAL;
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
 		// If there are cmd args use them to (jump) start/create a connection
@@ -267,7 +262,7 @@ int doit(int argc, char* argv[])
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 
 			clientUsername = cstr.username() + "@" + cstr.hostname();
-			inputState = PASSWORD;  // Jump to end of connection user input
+			inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
 			clientProtocol = cstr.protocol();
 			ncs->append(" Enter password for " + clientUsername + " (" + clientProtocol + ")");
 			ncs->refresh();
@@ -499,7 +494,7 @@ int doit(int argc, char* argv[])
 				{
 					cmd.erase( cmd.begin() + (--cmdIdx));
 					winCmd.clear();
-					if(PASSWORD == inputState)
+					if(NCCmd::PASSWORD == inputState)
 					{
 						// If this is a password print x's instead
 						std::for_each(cmd.begin(), cmd.end(), [&](const char ) { winCmd.print("x"); } );
@@ -612,7 +607,7 @@ int doit(int argc, char* argv[])
 							//  protocol: prpl-jabber
 							//  login: user@gmail.com
 							//  password: xxxx
-							inputState = PROTOCOL;
+							inputState = NCCmd::PROTOCOL;
 							ncs->append(" Creating new connection");
 							ncs->append("   Enter protocol (e.g. prpl-jabber)");
 							ncs->refresh();
@@ -829,7 +824,7 @@ int doit(int argc, char* argv[])
 					}
 					else
 					{
-						if(NORMAL == inputState)
+						if(NCCmd::NORMAL == inputState)
 						{
 							ncclientif::NCClientIf* client = 0;
 
@@ -853,26 +848,26 @@ int doit(int argc, char* argv[])
 							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
 							ncs->refresh();
 						}
-						else if(PROTOCOL == inputState)
+						else if(NCCmd::PROTOCOL == inputState)
 						{
-							inputState = USERNAME;
+							inputState = NCCmd::USERNAME;
 							clientProtocol = cmd;
 							ncs->append("    protocol: " + cmd);
 							ncs->append("   Enter user login");
 							ncs->refresh();
 						}
-						else if(USERNAME == inputState)
+						else if(NCCmd::USERNAME == inputState)
 						{
 							// TODO, need to turn off the echo to the screen
-							inputState = PASSWORD;
+							inputState = NCCmd::PASSWORD;
 							clientUsername = cmd;
 							ncs->append("    username: " + cmd);
 							ncs->append("   Enter password");
 							ncs->refresh();
 						}
-						else if(PASSWORD == inputState)
+						else if(NCCmd::PASSWORD == inputState)
 						{
-							inputState = NORMAL;
+							inputState = NCCmd::NORMAL;
 							clientPassword = cmd;
 							ncs->append("   creating new connection..");
 							typedef ncclientpurple::NCClientPurple::String String;
@@ -929,7 +924,7 @@ int doit(int argc, char* argv[])
 					// Add characters to cmd string, refresh
 					cmd.insert(cmd.begin() + cmdIdx, c);
 					++cmdIdx;
-					if(PASSWORD == inputState)
+					if(NCCmd::PASSWORD == inputState)
 					{
 						winCmd.append(std::string('x', cmd.size()));
 					}
