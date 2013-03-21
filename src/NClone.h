@@ -41,13 +41,7 @@ public:
 
 	nckeymap::NCKeyMap& keyMap();
 
-
 private:
-	// Windows
-/*	ncapp::NCApp p_app;
-	NCWinScrollback p_winDebugKeys;
-	NCWinScrollback p_winLog;
-*/
 
 	// Key map
 	nckeymap::NCKeyMap p_keyMap;

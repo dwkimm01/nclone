@@ -8,7 +8,6 @@
 #include <ncurses.h>
 #include "NClone.h"
 
-
 namespace ncpp
 {
 namespace nclone
@@ -36,6 +35,7 @@ void NClone::setup
 	, nccmdhistory::NCCmdHistory &cmdHist
 	, std::function<bool()> enteringPassword )
 {
+	// Save function for later use
 	ncs = pncs;
 
 
@@ -63,27 +63,15 @@ void NClone::setup
 			if(app.isOnTopOf(winBl, winLog))
 			{
 				app.bringToBack(winBl);
-//				chats->refresh();
-				app.refresh();
+				chats->refresh();
+//				app.refresh();
 			}
 			else
 			{
 				app.bringToFront(winBl);
-//				winBl->refresh();
-				app.refresh();
+				winBl->refresh();
+//				app.refresh();
 			}
-
-			/*winBlVisible = !winBlVisible;
-			if(!winBlVisible)
-			{
-				app.bringToBack(winBl);
-				chats.refresh();
-			}
-			else
-			{
-				app.bringToFront(winBl);
-					winBl->refresh();
-			}*/
 		}
 		, "Buddy List Toggle", KEY_F(3));
 
@@ -294,7 +282,6 @@ void NClone::setup
 		{
 			if(cmd.empty()) return;
 			cmd.erase( cmd.begin() + (--cmdIdx));
-//			if(PASSWORD == inputState)
 			if(enteringPassword())
 			{
 				// If this is a password print x's instead
@@ -322,7 +309,6 @@ void NClone::setup
 		{
 			if(cmd.empty()) return;
 			cmd.erase( cmd.begin() + (--cmdIdx));
-//			if(PASSWORD == inputState)
 			if(enteringPassword())
 			{
 				// If this is a password print x's instead
@@ -346,8 +332,6 @@ void NClone::setup
 			}
 			// TODO, merge this with the regular KEY_BACKSPACE
 		}, "Backspace", 0177); // KEY_BACKSPACE_MAC);
-
-
 
 
 	// KEY_IL: // TODO, INSERT doesn't seem to work on laptop
