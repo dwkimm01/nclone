@@ -1,5 +1,8 @@
 TODO list
 
+- Cursor stops blinking
+ . is this caused by the timeout?
+
 - Libpurple conv != null failed
  . need better conversation integration with libpurple
 

@@ -38,6 +38,7 @@ void NCWinTime::refresh()
 
 
 
+
 #if 0
 	const auto currTime = NCTimeUtils::getPrintableColorTimeStamp();
 

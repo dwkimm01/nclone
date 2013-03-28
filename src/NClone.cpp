@@ -7,6 +7,11 @@
 
 #include <ncurses.h>
 #include "NClone.h"
+#include "NCTimeUtils.h"
+
+
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace ncpp
 {
@@ -15,6 +20,7 @@ namespace nclone
 
 NClone::NClone()
 {
+	now = second_clock::local_time();
 }
 
 NClone::~NClone()
@@ -28,6 +34,7 @@ void NClone::setup
 	, NCWinScrollback* &chats //  chats
 	, NCWinScrollback* &winBl
 	, NCWinScrollback* &winCmd
+	, ncwin::NCWin* &winTime
 	, std::function<NCWinScrollback*()> pncs
 	, std::string &cmd
 	, int &cmdIdx
@@ -332,6 +339,37 @@ void NClone::setup
 			}
 			// TODO, merge this with the regular KEY_BACKSPACE
 		}, "Backspace", 0177); // KEY_BACKSPACE_MAC);
+
+	keyMap().set([&]()
+		{
+			if(!winTime) return;
+			// Update timestamp
+			winTime->refresh();
+
+			// Update last time a key was pressed for idle timeout
+			now = second_clock::local_time();
+
+
+			// Get time current time and calculate timeout for idle timeout check
+			const ptime nowp = second_clock::local_time();
+			const ptime nowNext = now + minutes(15); // seconds(900); // 15 mins
+
+			// Checkout idle status
+			// Check to see if there was an idle timeout
+			if(nowp > nowNext)
+			{
+				if(ncs)
+				{
+					const NCString TimeoutStr("  -- Timeout -- ", 2);
+					ncs()->append(NCTimeUtils::getPrintableColorTimeStamp() + TimeoutStr);
+					ncs()->refresh();
+					// Finally, update timeout so we don't do this again right away
+					now = second_clock::local_time();
+				}
+			}
+
+
+		}, "Timeout", -1); // KEY_TIMEOUT);
 
 
 	// KEY_IL: // TODO, INSERT doesn't seem to work on laptop

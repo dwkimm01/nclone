@@ -9,6 +9,7 @@
 #define NCLONE_H_
 
 #include <functional>
+#include <boost/date_time.hpp>
 #include "NCApp.h"
 #include "NCWinScrollback.h"
 #include "NCKeyMap.h"
@@ -32,6 +33,7 @@ public:
 	, NCWinScrollback* &chats
 	, NCWinScrollback* &winBl
 	, NCWinScrollback* &winCmd
+	, ncwin::NCWin* &winTime
 	, std::function<NCWinScrollback*()> pncs
 	, std::string &cmd
 	, int &cmdIdx
@@ -47,6 +49,10 @@ private:
 	nckeymap::NCKeyMap p_keyMap;
 	// Top chat window
 	std::function<NCWinScrollback*()> ncs;
+
+	// Timeout/idle count
+	boost::posix_time::ptime now;
+
 
 };
 

@@ -13,7 +13,6 @@
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/date_time.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
 
@@ -37,7 +36,6 @@
 #include "NClone.h"
 using namespace std;
 using namespace ncpp;
-
 
 
 //keys that naim supported
@@ -169,7 +167,8 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs timeResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 4; });
 
 		// TODO, perhaps the parent of winTime should be the parent of the chat windows
-		ncwintime::NCWinTime winTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
+		// ncwintime::NCWinTime* winTime = new ncwintime::NCWinTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
+		ncwin::NCWin* winTime = new ncwintime::NCWinTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
 
 		// Color printing
 		NCString allColorsString("Colors ", nccolor::NCColor::CHAT_NORMAL);
@@ -238,10 +237,6 @@ int doit(int argc, char* argv[])
 		// Command history
 		nccmdhistory::NCCmdHistory cmdHist;
 
-		// Timeout/idle count
-		using namespace boost::gregorian;
-		using namespace boost::posix_time;
-		ptime now = second_clock::local_time();
 
 		// Draw/show entire app by refreshing
 		app.refresh();
@@ -355,20 +350,9 @@ int doit(int argc, char* argv[])
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
 			if(ncs)
 			{
-
-				// Update last time a key was pressed for idle timeout
-				if(KEY_TIMEOUT != c)
-				{
-					now = second_clock::local_time();
-				}
-
-				// Get time current time and calculate timeout for idle timeout check
-				const ptime nowp = second_clock::local_time();
-				const ptime nowNext = now + minutes(15); // seconds(900); // 15 mins
-
 				// Use Keymap
 				nclone::NClone nclone;
-				nclone.setup(app, winKeys, winLog, win3, winBl, winCmd
+				nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
 					, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 					, cmd, cmdIdx, stillRunning, cmdHist
 					, [&](){return PASSWORD == inputState; });
@@ -377,28 +361,6 @@ int doit(int argc, char* argv[])
 
 			switch(c)
 			{
-
-			case KEY_TIMEOUT:
-				// Update timestamp
-				winTime.refresh();
-
-
-				// Checkout idle status
-				// Check to see if there was an idle timeout
-				if(nowp > nowNext)
-				{
-					if(ncs)
-					{
-						const NCString TimeoutStr("  -- Timeout -- ", 2);
-						ncs->append(NCTimeUtils::getPrintableColorTimeStamp() + TimeoutStr);
-						ncs->refresh();
-						// Finally, update timeout so we don't do this again right away
-						now = second_clock::local_time();
-					}
-				}
-
-				break;
-
 
 			case 10:
 			case KEY_ENTER:

@@ -45,6 +45,9 @@ public:
 	 */
 	virtual void refresh();
 
+
+private:
+
 };
 
 } // namespace ncwintime

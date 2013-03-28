@@ -57,6 +57,8 @@ public:
 	typedef int KeyType;
 	typedef std::function<void()> FuncType;
 
+	typedef void PMF(int, int);
+	std::function<PMF> mfnc;
 
 	/**
 	 * <b>Purpose:</b> CTOR
