@@ -6,6 +6,7 @@
  */
 
 #include <string>
+#include <map>
 #include <boost/lexical_cast.hpp>
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>
@@ -21,21 +22,20 @@ namespace ncpp{
 
 /**
  * Parameters needed:
- * bool stillRunning
  * NCWinScrollBack ncs
  * NCApp app
  * NCWinScrollback win3
- * enum inputState
+ * NCCmd ncCmd
  */
-NCCommandHandler::NCCommandHandler(bool& stillRunning, NCWinScrollback& ncs,
-		NCApp& app, NCWinScrollback& win3, NCCmd::InputState& inputState,
+NCCommandHandler::NCCommandHandler(NCWinScrollback& ncs,
+		NCApp& app, NCWinScrollback& win3, NCCmd::NCCmd& ncCmd,
 		nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg){
 
 	//Add a method that goes and gets the latest ncs window because it is not static
 	//Use getters to get anything that can change, like state, etc
 
-	cmdMap["/exit"] = [&](std::string cmd){ stillRunning = false; };
-	cmdMap["/quit"] = [&](std::string cmd){ stillRunning = false; };
+	cmdMap["/exit"] = [&](std::string cmd){ ncCmd.stillRunning = false; };
+	cmdMap["/quit"] = [&](std::string cmd){ ncCmd.stillRunning = false; };
 	cmdMap["/help"] = [&](std::string cmd){
 		if(&ncs != NULL)
 		{
@@ -97,7 +97,7 @@ NCCommandHandler::NCCommandHandler(bool& stillRunning, NCWinScrollback& ncs,
 			//  protocol: prpl-jabber
 			//  login: user@gmail.com
 			//  password: xxxx
-			inputState = NCCmd::PROTOCOL;
+			ncCmd.inputState = NCCmd::PROTOCOL;
 			ncs.append(" Creating new connection");
 			ncs.append("   Enter protocol (e.g. prpl-jabber)");
 			ncs.refresh();
@@ -312,6 +312,11 @@ NCCommandHandler::NCCommandHandler(bool& stillRunning, NCWinScrollback& ncs,
 void NCCommandHandler::ProcessCommand(std::string command){
 	//use command map.find, if not at end, then you've got it
 	//cmdMap[command];
+	auto it = cmdMap.find(command);
+	if (it == cmdMap.end()){
+		return;
+	}
+	it->second(command);
 }
 }
 

@@ -2,7 +2,7 @@
  * NCCmd.h
  *
  *  Created on: Feb 20, 2013
- *      Author: CJ
+ *      Author: Jeremy Myslinski
  */
 
 #ifndef NCCMD_H_
@@ -19,6 +19,12 @@ public:
 				USERNAME,
 				PASSWORD
 			};
+
+	InputState inputState;
+	bool stillRunning;
+
+	//Constructor
+	NCCmd();
 };
 
 }

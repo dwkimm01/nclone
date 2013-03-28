@@ -4,6 +4,7 @@ LDFLAGS=-stdlib=libc++
 SOURCES=../src/NCApp.cpp \
 ../src/NCClientIf.cpp \
 ../src/NCClientPurple.cpp \
+../src/NCCmd.cpp \
 ../src/NCCmdHistory.cpp \
 ../src/NCCommandHandler.cpp \
 ../src/NCEnvironmentVariables.cpp \

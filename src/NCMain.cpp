@@ -250,7 +250,8 @@ int doit(int argc, char* argv[])
 		std::string clientUsername;
 		std::string clientPassword;
 		// New Connection input state/mode
-		NCCmd::InputState inputState = NCCmd::NORMAL;
+		NCCmd::NCCmd ncCmd;
+		ncCmd.inputState = NCCmd::NORMAL;
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
 		// If there are cmd args use them to (jump) start/create a connection
@@ -262,7 +263,7 @@ int doit(int argc, char* argv[])
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 
 			clientUsername = cstr.username() + "@" + cstr.hostname();
-			inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
+			ncCmd.inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
 			clientProtocol = cstr.protocol();
 			ncs->append(" Enter password for " + clientUsername + " (" + clientProtocol + ")");
 			ncs->refresh();
@@ -277,10 +278,10 @@ int doit(int argc, char* argv[])
 		// Input collector
 		std::string cmd;
 		int cmdIdx = 0;
-		bool stillRunning = true;
+		ncCmd.stillRunning = true;
 
 		// Loop forever until input tells us to return
-		while(stillRunning)
+		while(ncCmd.stillRunning)
 		{
 
 #if BUDDYLIST
@@ -469,7 +470,7 @@ int doit(int argc, char* argv[])
 				break;
 			case 27: // Escape
 			case 3: // CTRL-c
-				stillRunning = false; // return 0;
+				ncCmd.stillRunning = false; // return 0;
 				break;
 			case 21: // CTRL-u
 				// TODO, change to only delete what is in front of the cursor
@@ -494,7 +495,7 @@ int doit(int argc, char* argv[])
 				{
 					cmd.erase( cmd.begin() + (--cmdIdx));
 					winCmd.clear();
-					if(NCCmd::PASSWORD == inputState)
+					if(NCCmd::PASSWORD == ncCmd.inputState)
 					{
 						// If this is a password print x's instead
 						std::for_each(cmd.begin(), cmd.end(), [&](const char ) { winCmd.print("x"); } );
@@ -541,8 +542,8 @@ int doit(int argc, char* argv[])
 			case KEY_ENTER:
 				if(!cmd.empty())
 				{
-					if(cmd == "/exit") stillRunning = false; // return 0;
-					if(cmd == "/quit") stillRunning = false; // return 0;
+					if(cmd == "/exit") ncCmd.stillRunning = false; // return 0;
+					if(cmd == "/quit") ncCmd.stillRunning = false; // return 0;
 					if(cmd == "/help")
 					{
 						if(ncs)
@@ -607,7 +608,7 @@ int doit(int argc, char* argv[])
 							//  protocol: prpl-jabber
 							//  login: user@gmail.com
 							//  password: xxxx
-							inputState = NCCmd::PROTOCOL;
+							ncCmd.inputState = NCCmd::PROTOCOL;
 							ncs->append(" Creating new connection");
 							ncs->append("   Enter protocol (e.g. prpl-jabber)");
 							ncs->refresh();
@@ -824,7 +825,7 @@ int doit(int argc, char* argv[])
 					}
 					else
 					{
-						if(NCCmd::NORMAL == inputState)
+						if(NCCmd::NORMAL == ncCmd.inputState)
 						{
 							ncclientif::NCClientIf* client = 0;
 
@@ -848,26 +849,26 @@ int doit(int argc, char* argv[])
 							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
 							ncs->refresh();
 						}
-						else if(NCCmd::PROTOCOL == inputState)
+						else if(NCCmd::PROTOCOL == ncCmd.inputState)
 						{
-							inputState = NCCmd::USERNAME;
+							ncCmd.inputState = NCCmd::USERNAME;
 							clientProtocol = cmd;
 							ncs->append("    protocol: " + cmd);
 							ncs->append("   Enter user login");
 							ncs->refresh();
 						}
-						else if(NCCmd::USERNAME == inputState)
+						else if(NCCmd::USERNAME == ncCmd.inputState)
 						{
 							// TODO, need to turn off the echo to the screen
-							inputState = NCCmd::PASSWORD;
+							ncCmd.inputState = NCCmd::PASSWORD;
 							clientUsername = cmd;
 							ncs->append("    username: " + cmd);
 							ncs->append("   Enter password");
 							ncs->refresh();
 						}
-						else if(NCCmd::PASSWORD == inputState)
+						else if(NCCmd::PASSWORD == ncCmd.inputState)
 						{
-							inputState = NCCmd::NORMAL;
+							ncCmd.inputState = NCCmd::NORMAL;
 							clientPassword = cmd;
 							ncs->append("   creating new connection..");
 							typedef ncclientpurple::NCClientPurple::String String;
@@ -924,7 +925,7 @@ int doit(int argc, char* argv[])
 					// Add characters to cmd string, refresh
 					cmd.insert(cmd.begin() + cmdIdx, c);
 					++cmdIdx;
-					if(NCCmd::PASSWORD == inputState)
+					if(NCCmd::PASSWORD == ncCmd.inputState)
 					{
 						winCmd.append(std::string('x', cmd.size()));
 					}

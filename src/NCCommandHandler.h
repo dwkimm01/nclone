@@ -24,7 +24,9 @@ public:
 	/**
 	 * <b>Purpose:</b> CTOR
 	 */
-	NCCommandHandler(bool& stillRunning, NCWinScrollback& ncs, NCApp& app, NCWinScrollback& win3, NCCmd::InputState& inputState, nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg);
+	NCCommandHandler(NCWinScrollback& ncs,
+			NCApp& app, NCWinScrollback& win3, NCCmd::NCCmd& ncCmd,
+			nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg);
 
 	/**
 	 * <b>Purpose:</b> DTOR
