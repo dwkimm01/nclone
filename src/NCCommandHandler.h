@@ -13,7 +13,7 @@
 #include <functional>
 #include "NCCmd.h"
 #include "NCCmdHistory.h"
-#include "NCWinScrollBack.h"
+#include "NCWinScrollback.h"
 #include "NCWinCfg.h"
 #include "NCApp.h"
 
@@ -25,7 +25,7 @@ public:
 	 * <b>Purpose:</b> CTOR
 	 */
 	NCCommandHandler(NCWinScrollback& ncs,
-			NCApp& app, NCWinScrollback& win3, NCCmd::NCCmd& ncCmd,
+			ncapp::NCApp& app, NCWinScrollback& win3, NCCmd& ncCmd,
 			nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg);
 
 	/**

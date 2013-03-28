@@ -7,9 +7,11 @@ CPP_SRCS += \
 ../src/NCApp.cpp \
 ../src/NCClientIf.cpp \
 ../src/NCClientPurple.cpp \
+../src/NCCmd.cpp \
 ../src/NCCmdHistory.cpp \
 ../src/NCColor.cpp \
 ../src/NCCommand.cpp \
+../src/NCCommandHandler.cpp \
 ../src/NCEnvironmentVariables.cpp \
 ../src/NCException.cpp \
 ../src/NCExceptionCurses.cpp \
@@ -30,9 +32,11 @@ OBJS += \
 ./src/NCApp.o \
 ./src/NCClientIf.o \
 ./src/NCClientPurple.o \
+./src/NCCmd.o \
 ./src/NCCmdHistory.o \
 ./src/NCColor.o \
 ./src/NCCommand.o \
+./src/NCCommandHandler.o \
 ./src/NCEnvironmentVariables.o \
 ./src/NCException.o \
 ./src/NCExceptionCurses.o \
@@ -53,9 +57,11 @@ CPP_DEPS += \
 ./src/NCApp.d \
 ./src/NCClientIf.d \
 ./src/NCClientPurple.d \
+./src/NCCmd.d \
 ./src/NCCmdHistory.d \
 ./src/NCColor.d \
 ./src/NCCommand.d \
+./src/NCCommandHandler.d \
 ./src/NCEnvironmentVariables.d \
 ./src/NCException.d \
 ./src/NCExceptionCurses.d \

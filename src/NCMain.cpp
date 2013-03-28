@@ -248,7 +248,7 @@ int doit(int argc, char* argv[])
 		std::string clientUsername;
 		std::string clientPassword;
 		// New Connection input state/mode
-		NCCmd::NCCmd ncCmd;
+		NCCmd ncCmd;
 		ncCmd.inputState = NCCmd::NORMAL;
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
@@ -352,7 +352,7 @@ int doit(int argc, char* argv[])
 				nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
 					, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 					, cmd, cmdIdx, ncCmd.stillRunning, cmdHist
-					, [&](){return PASSWORD == ncCmd.inputState; });
+					, [&](){return NCCmd::PASSWORD == ncCmd.inputState; });
 
 				if(! nclone.keyMap()(c) )
 

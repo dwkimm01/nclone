@@ -5,8 +5,6 @@
  *      Author: Jeremy Myslinski
  */
 
-#include <string>
-#include <map>
 #include <boost/lexical_cast.hpp>
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>
@@ -28,7 +26,7 @@ namespace ncpp{
  * NCCmd ncCmd
  */
 NCCommandHandler::NCCommandHandler(NCWinScrollback& ncs,
-		NCApp& app, NCWinScrollback& win3, NCCmd::NCCmd& ncCmd,
+		ncapp::NCApp& app, NCWinScrollback& win3, NCCmd& ncCmd,
 		nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg){
 
 	//Add a method that goes and gets the latest ncs window because it is not static
