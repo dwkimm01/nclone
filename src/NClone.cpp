@@ -181,8 +181,6 @@ void NClone::setup
 			if(cmd.size() > cmdIdx) ++cmdIdx;
 		}, "Cursor Right", KEY_RIGHT);
 
-
-
 	keyMap().set([&]()
 		{
 			if(!ncs()) return;
