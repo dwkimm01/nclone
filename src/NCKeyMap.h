@@ -100,10 +100,9 @@ private:
 		KeyType key;
 	};
 
-	std::map<int, EntryType> _funcTable;
+	std::map<KeyType, EntryType> _funcTable;
 	EntryType _default;
 
-//	std::map<int, KeyType> _keyMap;
 
 };
 

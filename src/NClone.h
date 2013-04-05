@@ -39,7 +39,7 @@ public:
 	, int &cmdIdx
 	, bool &stillRunning
 	, nccmdhistory::NCCmdHistory &cmdHist
-	, std::function<bool()> enteringPassword );
+	, std::function<bool()> penteringPassword );
 
 	nckeymap::NCKeyMap& keyMap();
 
@@ -49,6 +49,8 @@ private:
 	nckeymap::NCKeyMap p_keyMap;
 	// Top chat window
 	std::function<NCWinScrollback*()> ncs;
+	// Whether a password is being entered currently
+	std::function<bool()> enteringPassword;
 
 	// Timeout/idle count
 	boost::posix_time::ptime now;

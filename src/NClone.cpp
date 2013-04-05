@@ -13,6 +13,7 @@
 using namespace boost::gregorian;
 using namespace boost::posix_time;
 
+
 namespace ncpp
 {
 namespace nclone
@@ -40,10 +41,11 @@ void NClone::setup
 	, int &cmdIdx
 	, bool &stillRunning
 	, nccmdhistory::NCCmdHistory &cmdHist
-	, std::function<bool()> enteringPassword )
+	, std::function<bool()> penteringPassword )
 {
 	// Save function for later use
 	ncs = pncs;
+	enteringPassword = penteringPassword;
 
 
 	keyMap().set([&]()
@@ -310,6 +312,7 @@ void NClone::setup
 			}
 		}, "Backspace", KEY_BACKSPACE);
 
+
 	keyMap().set([&]()
 		{
 			if(cmd.empty()) return;
@@ -371,6 +374,19 @@ void NClone::setup
 
 
 	// KEY_IL: // TODO, INSERT doesn't seem to work on laptop
+
+//	keyMap().set([&]()
+//			{
+//				ncs()->append("JEremy wuz here.  Lol");
+//				ncs()->refresh();
+//			}, "Enter", KEY_ENTER);
+//
+//	keyMap().set([&]()
+//			{
+//				ncs()->append("JEremy wuz here.  Lol");
+//				ncs()->refresh();
+//			}, "Enter", '\n'); // 10);
+
 
 }
 

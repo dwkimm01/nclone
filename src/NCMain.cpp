@@ -273,6 +273,12 @@ int doit(int argc, char* argv[])
 		int cmdIdx = 0;
 		ncCmd.stillRunning = true;
 
+		// Processing keys (and command) setup
+		nclone::NClone nclone;
+		nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
+			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
+			, cmd, cmdIdx, ncCmd.stillRunning, cmdHist
+			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; });
 
 
 		// Loop forever until input tells us to return
@@ -348,16 +354,9 @@ int doit(int argc, char* argv[])
 			if(ncs)
 			{
 				// Use Keymap
-				nclone::NClone nclone;
-				nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
-					, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
-					, cmd, cmdIdx, ncCmd.stillRunning, cmdHist
-					, [&](){return NCCmd::PASSWORD == ncCmd.inputState; });
-
 				if(! nclone.keyMap()(c) )
-
-			switch(c)
-			{
+				switch(c)
+				{
 
 
 #if STATUSTWIRL
