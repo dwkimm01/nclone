@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <boost/iterator/iterator_facade.hpp>
 
 namespace ncpp
 {
@@ -54,11 +55,22 @@ public:
 	typedef std::function<void(const KeyType, const std::string &)> FuncType;
 	*/
 
+
 	typedef int KeyType;
 	typedef std::function<void()> FuncType;
 
 	typedef void PMF(int, int);
 	std::function<PMF> mfnc;
+
+	class EntryType
+	{
+	public:
+		FuncType func;
+		std::string name;
+	};
+
+	typedef std::map<KeyType, EntryType> MapType;
+
 
 	/**
 	 * <b>Purpose:</b> CTOR
@@ -91,14 +103,44 @@ public:
 	 */
 //	void setKeyMap(const std::vector<std::tuple<int, KeyType>> &m, const bool clearFirst);
 
+	/*
+    // -----------------------------------------------------------------------
+    // Iterator
+    class Iterator: public boost::iterator_facade
+       < Iterator  // CRTP, just use the Iterator name
+       , EntryType  // Value type of what is iterated over (contained element type)
+       , boost::forward_traversal_tag // type of traversal allowed
+       >  // Reference and Difference can be omitted
+    {
+    public:
+        Iterator(EntryType* index) : p_index(index) {}
+
+        // What we implement is determined by the boost::forward_traversal_tag
+        // template parameter
+    private:
+        friend class boost::iterator_core_access;
+
+        void increment() { ++p_index; }
+
+        bool equal(Iterator const& other) const
+        {
+            return this->p_index == other.p_index;
+        }
+
+        EntryType& dereference() const
+        {
+            return *p_index;
+        }
+
+    private:
+        EntryType* p_index;
+    };
+*/
+
+	MapType& getMap();
+
+
 private:
-	class EntryType
-	{
-	public:
-		FuncType func;
-		std::string name;
-		KeyType key;
-	};
 
 	std::map<KeyType, EntryType> _funcTable;
 	EntryType _default;

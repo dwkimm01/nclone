@@ -37,8 +37,7 @@ void NCKeyMap::set(FuncType func, const std::string &name, const KeyType key)
 	EntryType e;
 	e.func = func;
 	e.name = name;
-	e.key = key;
-	// Overwrite is ok
+	// Overwrite previous value is present
 	_funcTable[key] = e;
 }
 
@@ -69,6 +68,11 @@ bool NCKeyMap::operator()(const KeyType key)
 		_keyMap[std::get<0>(e)] = std::get<1>(e);
 	}
 }*/
+
+NCKeyMap::MapType& NCKeyMap::getMap()
+{
+	return _funcTable;
+}
 
 
 

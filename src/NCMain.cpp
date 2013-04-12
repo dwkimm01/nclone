@@ -13,6 +13,9 @@
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
+#include <boost/foreach.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
 
@@ -383,6 +386,8 @@ int doit(int argc, char* argv[])
 							ncs->append("  /quit     quit application");
 							ncs->append("  /clear    empty current window");
 							ncs->append("  /help     print this information");
+							ncs->append("  /keys     print list of assigned keys");
+							ncs->append("  /key xxx \"Command\"    remap number xxx to Command");
 							ncs->append("  /history  print command history");
 							ncs->append("  /list     print windows open");
 							ncs->append("  /refresh  refresh all windows");
@@ -414,6 +419,74 @@ int doit(int argc, char* argv[])
 							ncs->append("");
 							ncs->refresh();
 						}
+					}
+					else if(cmd == "/keys")
+					{
+						for(auto k : nclone.keyMap().getMap())
+						{
+							NCString space(" ", nccolor::NCColor::CHAT_NORMAL);
+
+							ncs->append
+								( space
+								+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
+								+ space
+								+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL) );
+						}
+						ncs->refresh();
+					}
+					else if(cmd.find("/key") == 0)
+					{
+
+						const string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
+						boost::regex re(binStr);
+//						string text = "/key \"Command home\" 123 /key \"Dude\" 56";
+						string text = cmd;
+						if(boost::regex_search(text, re))
+						{
+							BOOST_FOREACH(
+								const boost::match_results<string::const_iterator> &what,
+						        boost::make_iterator_range(boost::sregex_iterator(
+						            text.begin(),text.end(),boost::regex(binStr)),
+						            boost::sregex_iterator()))
+						    {
+								if(ncs)
+								{
+									ncs->append(" what size: " + boost::lexical_cast<std::string>(what.size()));
+									ncs->refresh();
+								}
+
+								if(what.size() == 3)
+								{
+									if(ncs)
+									{
+										ncs->append(" Remap: " + what[1].str() + " to " + what[2].str());
+										ncs->refresh();
+
+//										nclone.keyMap().getMap()
+										auto toRemap = nclone.keyMap().getMap().find(what[2]);
+										if(toRemap != nclone.keyMap().getMap().end())
+										{
+											auto toRemapFunc = nclone.keyMap().getMap()[what[2]];
+											nclone.keyMap().getMap().erase(toRemap);
+											nclone.keyMap().getMap()[what[]]
+
+										}
+									}
+								}
+
+						    }
+
+						   }
+						   else
+						   {
+							   if(ncs)
+							   {
+								   ncs->append(" " + cmd);
+								   ncs->append(" Does not match " + binStr);
+								   ncs->refresh();
+							   }
+						   }
+
 					}
 					else if(cmd == "/history")
 					{
