@@ -443,17 +443,18 @@ int doit(int argc, char* argv[])
 						string text = cmd;
 						if(boost::regex_search(text, re))
 						{
-							BOOST_FOREACH(
-								const boost::match_results<string::const_iterator> &what,
-						        boost::make_iterator_range(boost::sregex_iterator(
-						            text.begin(),text.end(),boost::regex(binStr)),
-						            boost::sregex_iterator()))
+//							BOOST_FOREACH(
+//								const boost::match_results<string::const_iterator> &what,
+//						        boost::make_iterator_range(boost::sregex_iterator(
+//						            text.begin(),text.end(),boost::regex(binStr)),
+//						            boost::sregex_iterator()))
+							for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(text.begin(),text.end(),boost::regex(binStr)),boost::sregex_iterator()) )
 						    {
-								if(ncs)
-								{
-									ncs->append(" what size: " + boost::lexical_cast<std::string>(what.size()));
-									ncs->refresh();
-								}
+//								if(ncs)
+//								{
+//									ncs->append(" what size: " + boost::lexical_cast<std::string>(what.size()));
+//									ncs->refresh();
+//								}
 
 								if(what.size() == 3)
 								{
