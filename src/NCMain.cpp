@@ -387,7 +387,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  /clear    empty current window");
 							ncs->append("  /help     print this information");
 							ncs->append("  /keys     print list of assigned keys");
-							ncs->append("  /key xxx \"Command\"    remap number xxx to Command");
+							ncs->append("  /key \"Command\" xxx    remap number xxx to Command");
 							ncs->append("  /history  print command history");
 							ncs->append("  /list     print windows open");
 							ncs->append("  /refresh  refresh all windows");
@@ -462,15 +462,27 @@ int doit(int argc, char* argv[])
 										ncs->append(" Remap: " + what[1].str() + " to " + what[2].str());
 										ncs->refresh();
 
-//										nclone.keyMap().getMap()
-										auto toRemap = nclone.keyMap().getMap().find(what[2]);
-										if(toRemap != nclone.keyMap().getMap().end())
+										for(auto km : nclone.keyMap().getMap())
 										{
-											auto toRemapFunc = nclone.keyMap().getMap()[what[2]];
-											nclone.keyMap().getMap().erase(toRemap);
-											nclone.keyMap().getMap()[what[]]
-
+											if(km.second.name == what[1].str())
+											{
+												auto kv = km.second.func;
+												nclone.keyMap().getMap().erase(km.first);
+												nclone.keyMap().set(kv, what[1], boost::lexical_cast<int>(what[2].str()));
+												break;
+											}
 										}
+
+
+////										nclone.keyMap().getMap()
+//										auto toRemap = nclone.keyMap().getMap().find(what[2]);
+//										if(toRemap != nclone.keyMap().getMap().end())
+//										{
+//											auto toRemapFunc = nclone.keyMap().getMap()[what[2]];
+//											nclone.keyMap().getMap().erase(toRemap);
+//											nclone.keyMap().getMap()[what[]]
+//
+//										}
 									}
 								}
 
