@@ -472,20 +472,8 @@ int doit(int argc, char* argv[])
 												break;
 											}
 										}
-
-
-////										nclone.keyMap().getMap()
-//										auto toRemap = nclone.keyMap().getMap().find(what[2]);
-//										if(toRemap != nclone.keyMap().getMap().end())
-//										{
-//											auto toRemapFunc = nclone.keyMap().getMap()[what[2]];
-//											nclone.keyMap().getMap().erase(toRemap);
-//											nclone.keyMap().getMap()[what[]]
-//
-//										}
 									}
 								}
-
 						    }
 
 						   }
