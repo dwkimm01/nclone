@@ -122,7 +122,7 @@ void NClone::setup
 			ncs()->scrollUp(1);
 			ncs()->refresh();
 		}
-		, "Scroll Up", KEY_SR); // 01007, KEY_SUP
+		, "Scroll Up", KEY_SR); // 01007, KEY_SUP, SHIFT-UP
 
 	keyMap().set([&]()
 		{
@@ -130,7 +130,7 @@ void NClone::setup
 			ncs()->scrollDown(1);
 			ncs()->refresh();
 		}
-		, "Scroll Down", KEY_SF);
+		, "Scroll Down", KEY_SF); // SHIFT-DOWN
 
 	keyMap().set([&]()
 		{
