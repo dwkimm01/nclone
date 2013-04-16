@@ -272,16 +272,19 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			stillRunning = false;
-		}, "Quit", 3); // CTRL-c
-
-	keyMap().set([&]()
-		{
-			// TODO, change to only delete what is in front of the cursor
 			cmd.clear();
 			cmdIdx = 0;
 			if(!winCmd) return;
 			winCmd->clear();
+			winCmd->refresh();
+		}, "Cancel Input", 3); // CTRL-c
+
+	keyMap().set([&]()
+		{
+			cmd.erase(0, cmdIdx);
+			cmdIdx = 0;
+			if(!winCmd) return;
+			winCmd->append(cmd);
 			winCmd->refresh();
 		}, "Delete Before Cursor", 21); // CTRL-u
 

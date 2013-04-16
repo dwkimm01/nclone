@@ -428,34 +428,23 @@ int doit(int argc, char* argv[])
 
 							ncs->append
 								( space
-								+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
+								+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL)
 								+ space
-								+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL) );
+								+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
+								);
 						}
 						ncs->refresh();
 					}
 					else if(cmd.find("/key") == 0)
 					{
-
+						// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
 						const string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
-						boost::regex re(binStr);
-//						string text = "/key \"Command home\" 123 /key \"Dude\" 56";
-						string text = cmd;
+						const boost::regex re(binStr);
+						const string text = cmd;
 						if(boost::regex_search(text, re))
 						{
-//							BOOST_FOREACH(
-//								const boost::match_results<string::const_iterator> &what,
-//						        boost::make_iterator_range(boost::sregex_iterator(
-//						            text.begin(),text.end(),boost::regex(binStr)),
-//						            boost::sregex_iterator()))
 							for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(text.begin(),text.end(),boost::regex(binStr)),boost::sregex_iterator()) )
 						    {
-//								if(ncs)
-//								{
-//									ncs->append(" what size: " + boost::lexical_cast<std::string>(what.size()));
-//									ncs->refresh();
-//								}
-
 								if(what.size() == 3)
 								{
 									if(ncs)
@@ -476,18 +465,16 @@ int doit(int argc, char* argv[])
 									}
 								}
 						    }
-
-						   }
-						   else
-						   {
-							   if(ncs)
-							   {
-								   ncs->append(" " + cmd);
-								   ncs->append(" Does not match " + binStr);
-								   ncs->refresh();
-							   }
-						   }
-
+						}
+						else
+						{
+							if(ncs)
+							{
+								ncs->append(" " + cmd);
+								ncs->append(" Does not match " + binStr);
+								ncs->refresh();
+							}
+						}
 					}
 					else if(cmd == "/history")
 					{
