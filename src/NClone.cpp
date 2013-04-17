@@ -37,10 +37,8 @@ void NClone::setup
 	, NCWinScrollback* &winCmd
 	, ncwin::NCWin* &winTime
 	, std::function<NCWinScrollback*()> pncs
-	, std::string &cmd
-	, int &cmdIdx
-	, bool &stillRunning
 	, nccmdhistory::NCCmdHistory &cmdHist
+	, NCCmd &ncCmd
 	, std::function<bool()> penteringPassword )
 {
 	// Save function for later use
@@ -155,40 +153,58 @@ void NClone::setup
 	keyMap().set([&]()
 		{
 			// TODO, going up when the history is blank erases everything...
-			cmd = (--cmdHist).getCommand();
-			cmdIdx = cmd.size();
+			ncCmd.cmd = (--cmdHist).getCommand();
+			ncCmd.cmdIdx = ncCmd.cmd.size();
 			if(!winCmd) return;
 			winCmd->clear();
-			winCmd->append(cmd);
+			winCmd->append(ncCmd.cmd);
 			winCmd->refresh();
 		}, "Command History Previous", KEY_UP);
 
 	keyMap().set([&]()
 		{
-			cmd = (++cmdHist).getCommand();
-			cmdIdx = cmd.size();
+			ncCmd.cmd = (++cmdHist).getCommand();
+			ncCmd.cmdIdx = ncCmd.cmd.size();
 			if(!winCmd) return;
 			winCmd->clear();
-			winCmd->append(cmd);
+			winCmd->append(ncCmd.cmd);
 			winCmd->refresh();
 		}, "Command History Next", KEY_DOWN);
 
 	keyMap().set([&]()
 		{
-			if(0 < cmdIdx) --cmdIdx;
+			if(0 < ncCmd.cmdIdx) --ncCmd.cmdIdx;
 		}, "Cursor Left", KEY_LEFT);
 
 	keyMap().set([&]()
 		{
-			if(cmd.size() > cmdIdx) ++cmdIdx;
+			if(ncCmd.cmd.size() > ncCmd.cmdIdx) ++ncCmd.cmdIdx;
 		}, "Cursor Right", KEY_RIGHT);
 
 	keyMap().set([&]()
 		{
 			if(!ncs()) return;
 			// TODO, reverse history search
-			ncs()->append("CTRL-r");
-			ncs()->refresh();
+			if(NCCmd::REVERSEISEARCH != ncCmd.inputState)
+			{
+				ncCmd.inputState = NCCmd::REVERSEISEARCH;
+				// TODO, might want to separate Reverse Search from CmdHistory and not reuse so much
+			}
+			else
+			{
+				// Already in reverse search state, need to find next match
+				--cmdHist;
+				for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
+				{
+					if((*itr).find(ncCmd.cmd) != std::string::npos)
+					{
+						winCmd->append(" srch: " + *itr + " " + boost::lexical_cast<std::string>(itr.getIndex()));
+						winCmd->refresh();
+						cmdHist.setIdx(itr);
+						break;
+					}
+				}
+			}
 		}
 		, "Reverse Search", 18); // CTRL-r
 
@@ -204,24 +220,24 @@ void NClone::setup
 		{
 			// Move cursor to previous word start
 			// find first non-white character
-			for(int nsp = cmdIdx-1; nsp > 0; --nsp)
+			for(int nsp = ncCmd.cmdIdx-1; nsp > 0; --nsp)
 			{
-				if(' ' != cmd[nsp])
+				if(' ' != ncCmd.cmd[nsp])
 				{
 					// Find last non-white character
 					for(int wd = nsp-1; wd > 0; --wd)
 					{
-						if(' ' == cmd[wd])
+						if(' ' == ncCmd.cmd[wd])
 						{
-							cmdIdx = wd+1;
+							ncCmd.cmdIdx = wd+1;
 							nsp = 0;
 							break;
 						}
 					}
-					// Didn't set cmdIdx yet so we're at the beginning
+					// Didn't set ncCmd.cmdIdx yet so we're at the beginning
 					if(0 != nsp)
 					{
-						cmdIdx = 0;
+						ncCmd.cmdIdx = 0;
 					}
 				}
 			}
@@ -231,11 +247,11 @@ void NClone::setup
 	keyMap().set([&]()
 		{
 			// Move cursor to next word end (space)
-			for(unsigned int sp = cmdIdx+1; sp <= cmd.size(); ++sp)
+			for(unsigned int sp = ncCmd.cmdIdx+1; sp <= ncCmd.cmd.size(); ++sp)
 			{
-				if(' ' == cmd[sp] || cmd.size() == sp)
+				if(' ' == ncCmd.cmd[sp] || ncCmd.cmd.size() == sp)
 				{
-					cmdIdx = sp;
+					ncCmd.cmdIdx = sp;
 					break;
 				}
 			}
@@ -267,13 +283,14 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			stillRunning = false;
+			ncCmd.stillRunning = false;
 		}, "Quit", 27); // Escape
 
 	keyMap().set([&]()
 		{
-			cmd.clear();
-			cmdIdx = 0;
+			ncCmd.cmd.clear();
+			ncCmd.cmdIdx = 0;
+			ncCmd.inputState = NCCmd::NORMAL;
 			if(!winCmd) return;
 			winCmd->clear();
 			winCmd->refresh();
@@ -281,23 +298,23 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			cmd.erase(0, cmdIdx);
-			cmdIdx = 0;
+			ncCmd.cmd.erase(0, ncCmd.cmdIdx);
+			ncCmd.cmdIdx = 0;
 			if(!winCmd) return;
-			winCmd->append(cmd);
+			winCmd->append(ncCmd.cmd);
 			winCmd->refresh();
 		}, "Delete Before Cursor", 21); // CTRL-u
 
 	keyMap().set([&]()
 		{
-			if(cmd.empty()) return;
-			cmd.erase( cmd.begin() + (--cmdIdx));
+			if(ncCmd.cmd.empty()) return;
+			ncCmd.cmd.erase(ncCmd.cmd.begin() + (--ncCmd.cmdIdx));
 			if(enteringPassword())
 			{
 				// If this is a password print x's instead
 				std::string xInput;
-				xInput.reserve(cmd.size());
-				for(unsigned int i = 0; cmd.size() > i; ++i)
+				xInput.reserve(ncCmd.cmd.size());
+				for(unsigned int i = 0; ncCmd.cmd.size() > i; ++i)
 					xInput.push_back('x');
 				if(winCmd)
 				{
@@ -309,7 +326,7 @@ void NClone::setup
 			{
 				if(winCmd)
 				{
-					winCmd->append(cmd);
+					winCmd->append(ncCmd.cmd);
 					winCmd->refresh();
 				}
 			}
@@ -318,14 +335,14 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			if(cmd.empty()) return;
-			cmd.erase( cmd.begin() + (--cmdIdx));
+			if(ncCmd.cmd.empty()) return;
+			ncCmd.cmd.erase(ncCmd.cmd.begin() + (--ncCmd.cmdIdx));
 			if(enteringPassword())
 			{
 				// If this is a password print x's instead
 				std::string xInput;
-				xInput.reserve(cmd.size());
-				for(unsigned int i = 0; cmd.size() > i; ++i)
+				xInput.reserve(ncCmd.cmd.size());
+				for(unsigned int i = 0; ncCmd.cmd.size() > i; ++i)
 					xInput.push_back('x');
 				if(winCmd)
 				{
@@ -337,7 +354,7 @@ void NClone::setup
 			{
 				if(winCmd)
 				{
-					winCmd->append(cmd);
+					winCmd->append(ncCmd.cmd);
 					winCmd->refresh();
 				}
 			}

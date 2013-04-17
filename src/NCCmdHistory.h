@@ -65,16 +65,22 @@ public:
     class iterator: public boost::iterator_facade
        < iterator  // CRTP, just use the Iterator name
        , std::string  // Value type of what is iterated over (contained element type)
-       , boost::forward_traversal_tag // type of traversal allowed
+//       , boost::forward_traversal_tag // type of traversal allowed
+       , boost::bidirectional_traversal_tag
        >  // Reference and Difference can be omitted
     {
     public:
         iterator(NCCmdHistory& cmds, const unsigned int index) : p_cmds(cmds), p_index(index) {}
 
+        unsigned int getIndex() const { return p_index; }
+
     private:
         friend class boost::iterator_core_access;
 
         void increment() { ++p_index; }
+
+        void decrement() { --p_index; }
+
 
         bool equal(iterator const& other) const
         {
@@ -86,6 +92,7 @@ public:
             return p_cmds[p_index];
         }
 
+
     private:
         NCCmdHistory &p_cmds;
         unsigned int p_index;
@@ -95,6 +102,9 @@ public:
     iterator begin() { return iterator(*this, 0); }
     iterator end() { return iterator(*this, _cmds.size()); }
 
+    // TODO, make this return a reverse iterator from current index for NClone::CTRL-r reverse i search
+    iterator itr() { return iterator(*this, _cmdsIndex); }
+    void setIdx(const iterator &itr) { _cmdsIndex = itr.getIndex(); }
 
 private:
 	boost::circular_buffer<std::string> _cmds;

@@ -7,12 +7,15 @@
 
 #include "NCCmd.h"
 
-namespace ncpp{
+namespace ncpp
+{
 
-	//Constructor
-	NCCmd::NCCmd(){
-		inputState = NORMAL;
-		stillRunning = true;
-	}
-
+// Constructor
+NCCmd::NCCmd()
+	: inputState(NORMAL)
+	, stillRunning(true)
+	, cmdIdx(0)
+{
 }
+
+} // namespace ncpp

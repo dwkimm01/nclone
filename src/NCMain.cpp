@@ -250,11 +250,18 @@ int doit(int argc, char* argv[])
 		std::string clientProtocol;
 		std::string clientUsername;
 		std::string clientPassword;
-		// New Connection input state/mode
+
+		// TODO, put everything into NCCmd
+		// Input collector
 		NCCmd ncCmd;
-		ncCmd.inputState = NCCmd::NORMAL;
+//		ncCmd.inputState = NCCmd::NORMAL;
+//		ncCmd.stillRunning = true;
+//		std::string cmd;
+//		int ncCmd.cmdIdx = 0;
+
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
+		// New Connection input state/mode
 		// If there are cmd args use them to (jump) start/create a connection
 		if(!progArgs.connection().empty())
 		{
@@ -271,16 +278,12 @@ int doit(int argc, char* argv[])
 		}
 
 
-		// Input collector
-		std::string cmd;
-		int cmdIdx = 0;
-		ncCmd.stillRunning = true;
 
 		// Processing keys (and command) setup
 		nclone::NClone nclone;
 		nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
 			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
-			, cmd, cmdIdx, ncCmd.stillRunning, cmdHist
+			, cmdHist, ncCmd
 			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; });
 
 
@@ -332,12 +335,12 @@ int doit(int argc, char* argv[])
 			// TODO, also we will want to do some updating possibly no matter what?
 			// All of this is to put the cursor in the correct place for editing a line
 			const int cmdWidth = winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0));
-			const int cmdTotal = cmd.size() / cmdWidth;
-			const int cmdIdxLine = cmdIdx / cmdWidth;
+			const int cmdTotal = ncCmd.cmd.size() / cmdWidth;
+			const int cmdIdxLine = ncCmd.cmdIdx / cmdWidth;
 			winCmd->end();
 			winCmd->scrollUp(cmdTotal - cmdIdxLine);
 			winCmd->refresh();
-			winCmd->cursorSet(1+(/*cmdIdxLine*/ cmdIdx % cmdWidth), 1);
+			winCmd->cursorSet(1+(/*ncCmd.cmdIdxLine*/ ncCmd.cmdIdx % cmdWidth), 1);
 
 			// Get user input
 			int c = 0;
@@ -372,15 +375,15 @@ int doit(int argc, char* argv[])
 
 			case 10:
 			case KEY_ENTER:
-				if(!cmd.empty())
+				if(!ncCmd.cmd.empty())
 				{
-					if(cmd == "/exit") ncCmd.stillRunning = false; // return 0;
-					if(cmd == "/quit") ncCmd.stillRunning = false; // return 0;
-					if(cmd == "/help")
+					if(ncCmd.cmd == "/exit") ncCmd.stillRunning = false; // return 0;
+					if(ncCmd.cmd == "/quit") ncCmd.stillRunning = false; // return 0;
+					if(ncCmd.cmd == "/help")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->append(" Commands");
 							ncs->append("  /exit     quit application");
 							ncs->append("  /quit     quit application");
@@ -420,7 +423,7 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/keys")
+					else if(ncCmd.cmd == "/keys")
 					{
 						for(auto k : nclone.keyMap().getMap())
 						{
@@ -435,12 +438,12 @@ int doit(int argc, char* argv[])
 						}
 						ncs->refresh();
 					}
-					else if(cmd.find("/key") == 0)
+					else if(ncCmd.cmd.find("/key") == 0)
 					{
 						// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
 						const string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
 						const boost::regex re(binStr);
-						const string text = cmd;
+						const string text = ncCmd.cmd;
 						if(boost::regex_search(text, re))
 						{
 							for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(text.begin(),text.end(),boost::regex(binStr)),boost::sregex_iterator()) )
@@ -470,17 +473,17 @@ int doit(int argc, char* argv[])
 						{
 							if(ncs)
 							{
-								ncs->append(" " + cmd);
+								ncs->append(" " + ncCmd.cmd);
 								ncs->append(" Does not match " + binStr);
 								ncs->refresh();
 							}
 						}
 					}
-					else if(cmd == "/history")
+					else if(ncCmd.cmd == "/history")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							for(auto x : cmdHist)
 							{
 								ncs->append(" " + x);
@@ -489,26 +492,26 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/newconn")
+					else if(ncCmd.cmd == "/newconn")
 					{
 						if(ncs)
 						{
-							ncs->append(cmd);
+							ncs->append(ncCmd.cmd);
 							// Collect up user information:
 							//  protocol: prpl-jabber
 							//  login: user@gmail.com
 							//  password: xxxx
 							ncCmd.inputState = NCCmd::PROTOCOL;
-							ncs->append(NCString(cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->append("   Enter protocol (e.g. prpl-jabber)");
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/list")
+					else if(ncCmd.cmd == "/list")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							app.forEachChild([&](ncobject::NCObject* obj)
 							{
 								ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
@@ -522,25 +525,25 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/refresh, refresh all windows")
+					else if(ncCmd.cmd == "/refresh, refresh all windows")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->append("");
 						}
 						app.refresh();
 					}
-					else if (cmd.find("/set") == 0)
+					else if (ncCmd.cmd.find("/set") == 0)
 					{
 						std::vector<std::string> cmdParam;
-						boost::split(cmdParam, cmd, boost::is_space()); // boost::is_any_of("\t"));
+						boost::split(cmdParam, ncCmd.cmd, boost::is_space()); // boost::is_any_of("\t"));
 						if(cmdParam.size() == 3 && "/set" == cmdParam[0])
 						{
 							// TODO, do we want to do set on all of the (chat) windows
 							if("wrap" == cmdParam[1])
 							{
-								ncs->append(NCString(cmd + ", setting wrap type \"" + cmdParam[2] + "\"", nccolor::NCColor::COMMAND_HIGHLIGHT));
+								ncs->append(NCString(ncCmd.cmd + ", setting wrap type \"" + cmdParam[2] + "\"", nccolor::NCColor::COMMAND_HIGHLIGHT));
 								if("length" == cmdParam[2])
 								{
 									ncs->setWrapLength();
@@ -568,7 +571,7 @@ int doit(int argc, char* argv[])
 						}
 
 					}
-					else if(cmd == "/clear")
+					else if(ncCmd.cmd == "/clear")
 					{
 						if(ncs)
 						{
@@ -577,14 +580,14 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd.find("/info") == 0)
+					else if(ncCmd.cmd.find("/info") == 0)
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
 							// Create the window list, if there is no window listed add current/top window to list
-							std::string winList = cmd;
+							std::string winList = ncCmd.cmd;
 							boost::replace_all(winList, "/info", "");
 							if(winList.size() == 0)
 							{
@@ -621,11 +624,11 @@ int doit(int argc, char* argv[])
 				        ncs->refresh();
 						}
 					}
-					else if(cmd.find("/jump") == 0)
+					else if(ncCmd.cmd.find("/jump") == 0)
 					{
-						ncs->append(NCString(cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+						ncs->append(NCString(ncCmd.cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 						typedef boost::split_iterator<std::string::iterator> ItrType;
-				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+				        for (ItrType i = boost::make_split_iterator(ncCmd.cmd, boost::first_finder(" ", boost::is_iequal()));
 				             i != ItrType();
 				             ++i)
 				        {
@@ -648,11 +651,11 @@ int doit(int argc, char* argv[])
 				        }
 				        ncs->refresh();
 					}
-					else if(cmd.find("/newwin") == 0)
+					else if(ncCmd.cmd.find("/newwin") == 0)
 					{
-						ncs->append(NCString(cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+						ncs->append(NCString(ncCmd.cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 						typedef boost::split_iterator<std::string::iterator> ItrType;
-				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+				        for (ItrType i = boost::make_split_iterator(ncCmd.cmd, boost::first_finder(" ", boost::is_iequal()));
 				             i != ItrType();
 				             ++i)
 				        {
@@ -669,11 +672,11 @@ int doit(int argc, char* argv[])
 				        	}
 				        }
 					}
-					else if(cmd == "/d1")
+					else if(ncCmd.cmd == "/d1")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							const int max = ncs->getConfig().p_h;
 							for(int i = 1; i < max*5; ++i)
 							{
@@ -687,11 +690,11 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/d2")
+					else if(ncCmd.cmd == "/d2")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
 							for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
 							{
@@ -700,11 +703,11 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd == "/lorem")
+					else if(ncCmd.cmd == "/lorem")
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
 							NCString entry
 								= NCTimeUtils::getPrintableColorTimeStamp()
@@ -722,16 +725,26 @@ int doit(int argc, char* argv[])
 							ncs->refresh();
 						}
 					}
-					else if(cmd.find("/") == 0)
+					else if(ncCmd.cmd.find("/") == 0)
 					{
 						if(ncs)
 						{
-							ncs->append(NCString(cmd + ", unknown command", nccolor::NCColor::COMMAND_HIGHLIGHT));
+							ncs->append(NCString(ncCmd.cmd + ", unknown command", nccolor::NCColor::COMMAND_HIGHLIGHT));
 							ncs->refresh();
 						}
 					}
 					else
 					{
+						// First check to see if we're in the REVERSEISEARCH state
+						if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
+						{
+							ncCmd.cmd = cmdHist.getCommand();
+							cmdHist.resetIndex();
+							ncCmd.inputState = NCCmd::NORMAL;
+						}
+						// TODO, what about the PASSWORD state?
+
+
 						if(NCCmd::NORMAL == ncCmd.inputState)
 						{
 							ncclientif::NCClientIf* client = 0;
@@ -747,20 +760,20 @@ int doit(int argc, char* argv[])
 
 							if(client)
 							{
-								client->msgSend(buddyName, cmd);
+								client->msgSend(buddyName, ncCmd.cmd);
 							}
 
 							const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
 							// Add msg to top (front) buffer
-							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + cmd, outgoingMsgColor);
+							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
 							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
 							ncs->refresh();
 						}
 						else if(NCCmd::PROTOCOL == ncCmd.inputState)
 						{
 							ncCmd.inputState = NCCmd::USERNAME;
-							clientProtocol = cmd;
-							ncs->append("    protocol: " + cmd);
+							clientProtocol = ncCmd.cmd;
+							ncs->append("    protocol: " + ncCmd.cmd);
 							ncs->append("   Enter user login");
 							ncs->refresh();
 						}
@@ -768,20 +781,20 @@ int doit(int argc, char* argv[])
 						{
 							// TODO, need to turn off the echo to the screen
 							ncCmd.inputState = NCCmd::PASSWORD;
-							clientUsername = cmd;
-							ncs->append("    username: " + cmd);
+							clientUsername = ncCmd.cmd;
+							ncs->append("    username: " + ncCmd.cmd);
 							ncs->append("   Enter password");
 							ncs->refresh();
 						}
 						else if(NCCmd::PASSWORD == ncCmd.inputState)
 						{
 							ncCmd.inputState = NCCmd::NORMAL;
-							clientPassword = cmd;
+							clientPassword = ncCmd.cmd;
 							ncs->append("   creating new connection..");
 							typedef ncclientpurple::NCClientPurple::String String;
 
 							connections.push_back
-								( new  ncclientpurple::NCClientPurple
+								( new ncclientpurple::NCClientPurple
 								( clientUsername 
 								, clientPassword
 								, clientProtocol
@@ -796,14 +809,14 @@ int doit(int argc, char* argv[])
 						}
 					}
 
+
 					// Reset command window and assume it needs updating
-					cmdHist.add(cmd);
+					cmdHist.add(ncCmd.cmd);
 					// TODO, probably don't want/need to add standard cmds w/o params like help
-					cmd.clear();
-					cmdIdx = 0;
+					ncCmd.cmd.clear();
+					ncCmd.cmdIdx = 0;
 					winCmd->clear();
 					winCmd->refresh();
-
 				}
 				break;
 			default:
@@ -812,19 +825,37 @@ int doit(int argc, char* argv[])
 				if (ncstringutils::NCStringUtils::isPrint(c))
 				{
 					// Add characters to cmd string, refresh
-					cmd.insert(cmd.begin() + cmdIdx, c);
-					++cmdIdx;
+					ncCmd.cmd.insert(ncCmd.cmd.begin() + ncCmd.cmdIdx, c);
+					++ncCmd.cmdIdx;
 					if(NCCmd::PASSWORD == ncCmd.inputState)
 					{
 						std::string xInput;
-						xInput.reserve(cmd.size());
-						for(unsigned int i = 0; cmd.size() > i; ++i)
+						xInput.reserve(ncCmd.cmd.size());
+						for(unsigned int i = 0; ncCmd.cmd.size() > i; ++i)
 							xInput.push_back('x');
 						winCmd->append(xInput);
 					}
 					else
 					{
-						winCmd->append(cmd);
+						if(NCCmd::NORMAL == ncCmd.inputState)
+						{
+							winCmd->append(ncCmd.cmd);
+						}
+						else if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
+						{
+							// Already in reverse search state, need to find next match
+							--cmdHist;
+							for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
+							{
+								if((*itr).find(ncCmd.cmd) != std::string::npos)
+								{
+									winCmd->append(" srch: " + *itr + " " + boost::lexical_cast<std::string>(itr.getIndex()));
+									winCmd->refresh();
+									cmdHist.setIdx(itr);
+									break;
+								}
+							}
+						}
 					}
 				}
 				else

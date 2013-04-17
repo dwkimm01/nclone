@@ -8,26 +8,34 @@
 #ifndef NCCMD_H_
 #define NCCMD_H_
 
-namespace ncpp{
+#include <string>
 
-class NCCmd{
+namespace ncpp
+{
+
+class NCCmd
+{
 public:
 	enum InputState
-			{
-				NORMAL,
-				PROTOCOL,
-				USERNAME,
-				PASSWORD
-			};
+	{
+		NORMAL,
+		PROTOCOL,
+		USERNAME,
+		PASSWORD,
+		REVERSEISEARCH
+	};
 
 	InputState inputState;
 	bool stillRunning;
+	std::string cmd;
+	int cmdIdx;
 
-	//Constructor
+	/**
+	 * <b>Purpose:</b> CTOR
+	 */
 	NCCmd();
 };
 
-}
+} // namespace ncpp
 
-
-#endif /* NCCMD_H_ */
+#endif // NCCMD_H_
