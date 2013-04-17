@@ -1,7 +1,14 @@
 TODO list
 
+- Finish CTRL-r implementation
+
+- Add function to clear history
+- Add function to get history entry from an index
+- Add ability to load settings such as key mappings etc
+- Add loading of previously saved settings 
+
 - Cursor stops blinking
- . is this caused by the timeout?
+ . is this caused by the timeout?  timeout causing clock to get updated?
 
 - Libpurple conv != null failed
  . need better conversation integration with libpurple
