@@ -1,5 +1,8 @@
 TODO list
 
+- Fix backspacing on a wrapped cmd entry that doesn't move the cursor
+back to the right hand side until the second backspace
+
 - Finish CTRL-r implementation
 
 - Add function to clear history

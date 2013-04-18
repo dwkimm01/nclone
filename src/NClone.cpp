@@ -196,11 +196,18 @@ void NClone::setup
 				--cmdHist;
 				for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
 				{
-					if((*itr).find(ncCmd.cmd) != std::string::npos)
+					const auto pos = (*itr).find(ncCmd.cmd);
+					if(pos != std::string::npos)
 					{
-						winCmd->append(" srch: " + *itr + " " + boost::lexical_cast<std::string>(itr.getIndex()));
+// dogg
+						ncCmd.prefix(" srch: ");
+						ncCmd.postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
+						ncCmd.foundCmd = *itr;
+
+						winCmd->append(ncCmd.display());
 						winCmd->refresh();
 						cmdHist.setIdx(itr);
+						ncCmd.foundIdx = pos;
 						break;
 					}
 				}

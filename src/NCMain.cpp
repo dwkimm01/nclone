@@ -251,13 +251,8 @@ int doit(int argc, char* argv[])
 		std::string clientUsername;
 		std::string clientPassword;
 
-		// TODO, put everything into NCCmd
 		// Input collector
 		NCCmd ncCmd;
-//		ncCmd.inputState = NCCmd::NORMAL;
-//		ncCmd.stillRunning = true;
-//		std::string cmd;
-//		int ncCmd.cmdIdx = 0;
 
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
@@ -334,13 +329,10 @@ int doit(int argc, char* argv[])
 			// Refresh the command window to move the cursor back
 			// TODO, also we will want to do some updating possibly no matter what?
 			// All of this is to put the cursor in the correct place for editing a line
-			const int cmdWidth = winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0));
-			const int cmdTotal = ncCmd.cmd.size() / cmdWidth;
-			const int cmdIdxLine = ncCmd.cmdIdx / cmdWidth;
 			winCmd->end();
-			winCmd->scrollUp(cmdTotal - cmdIdxLine);
+			winCmd->scrollUp(ncCmd.getScrollUp(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))));
 			winCmd->refresh();
-			winCmd->cursorSet(1+(/*ncCmd.cmdIdxLine*/ ncCmd.cmdIdx % cmdWidth), 1);
+			winCmd->cursorSet(ncCmd.getScrollIdx(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))), 1);
 
 			// Get user input
 			int c = 0;
@@ -375,7 +367,7 @@ int doit(int argc, char* argv[])
 
 			case 10:
 			case KEY_ENTER:
-				if(!ncCmd.cmd.empty())
+				if(!ncCmd.empty())
 				{
 					if(ncCmd.cmd == "/exit") ncCmd.stillRunning = false; // return 0;
 					if(ncCmd.cmd == "/quit") ncCmd.stillRunning = false; // return 0;
@@ -443,7 +435,7 @@ int doit(int argc, char* argv[])
 						// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
 						const string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
 						const boost::regex re(binStr);
-						const string text = ncCmd.cmd;
+						const string text = ncCmd.cmd;  // TODO, refactor and take out this var
 						if(boost::regex_search(text, re))
 						{
 							for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(text.begin(),text.end(),boost::regex(binStr)),boost::sregex_iterator()) )
@@ -813,8 +805,9 @@ int doit(int argc, char* argv[])
 					// Reset command window and assume it needs updating
 					cmdHist.add(ncCmd.cmd);
 					// TODO, probably don't want/need to add standard cmds w/o params like help
-					ncCmd.cmd.clear();
-					ncCmd.cmdIdx = 0;
+//					ncCmd.cmd.clear();
+//					ncCmd.cmdIdx = 0;
+					ncCmd.clear();
 					winCmd->clear();
 					winCmd->refresh();
 				}
@@ -847,11 +840,19 @@ int doit(int argc, char* argv[])
 							--cmdHist;
 							for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
 							{
-								if((*itr).find(ncCmd.cmd) != std::string::npos)
+								const auto pos = (*itr).find(ncCmd.cmd);
+								if(pos != std::string::npos)
 								{
-									winCmd->append(" srch: " + *itr + " " + boost::lexical_cast<std::string>(itr.getIndex()));
+//dogg
+									ncCmd.prefix(" srch: ");
+									ncCmd.postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
+									ncCmd.foundCmd = *itr;
+									ncCmd.foundIdx = pos;
+
+									winCmd->append(ncCmd.display());
 									winCmd->refresh();
 									cmdHist.setIdx(itr);
+
 									break;
 								}
 							}

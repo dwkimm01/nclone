@@ -38,7 +38,7 @@ public:
 	, std::function<NCWinScrollback*()> pncs
 	, nccmdhistory::NCCmdHistory &cmdHist
 	, NCCmd &ncCmd
-	, std::function<bool()> penteringPassword );
+	, std::function<bool()> penteringPassword );  // TODO, takeout penteringPassowrd and just use ncCmd
 
 	nckeymap::NCKeyMap& keyMap();
 
