@@ -199,15 +199,14 @@ void NClone::setup
 					const auto pos = (*itr).find(ncCmd.cmd);
 					if(pos != std::string::npos)
 					{
-// dogg
 						ncCmd.prefix(" srch: ");
 						ncCmd.postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
 						ncCmd.foundCmd = *itr;
+						ncCmd.foundIdx = pos;
 
 						winCmd->append(ncCmd.display());
 						winCmd->refresh();
 						cmdHist.setIdx(itr);
-						ncCmd.foundIdx = pos;
 						break;
 					}
 				}

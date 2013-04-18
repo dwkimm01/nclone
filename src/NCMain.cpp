@@ -843,7 +843,6 @@ int doit(int argc, char* argv[])
 								const auto pos = (*itr).find(ncCmd.cmd);
 								if(pos != std::string::npos)
 								{
-//dogg
 									ncCmd.prefix(" srch: ");
 									ncCmd.postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
 									ncCmd.foundCmd = *itr;

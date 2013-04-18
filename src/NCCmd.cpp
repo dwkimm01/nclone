@@ -50,34 +50,17 @@ void NCCmd::postfix(const std::string &post)
 
 int NCCmd::getScrollUp(const int windowWidth) const
 {
-	const int cmdWidth = windowWidth; // winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0));
-	const int cmdTotal = cmd.size() / cmdWidth; // ncCmd.cmd.size() / cmdWidth;
-	const int cmdIdxLine = displayIdx() / cmdWidth; // cmdIdx / cmdWidth; // ncCmd.cmdIdx / cmdWidth;
-//	winCmd->end();
-//	winCmd->scrollUp(cmdTotal - cmdIdxLine);
-//	winCmd->refresh();
-//	winCmd->cursorSet(1+(/*ncCmd.cmdIdxLine*/ ncCmd.cmdIdx % cmdWidth), 1);
+	const int cmdTotal = cmd.size() / windowWidth;
+	const int cmdIdxLine = displayIdx() / windowWidth;
 	return cmdTotal - cmdIdxLine;
+
+//	(cmd.size() / windowWidth) - (displayIdx() / windowWidth);
 }
 
 int NCCmd::getScrollIdx(const int windowWidth) const
 {
-	const int cmdWidth = windowWidth; // winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0));
-//	const int cmdTotal = cmd.size() / cmdWidth; // ncCmd.cmd.size() / cmdWidth;
-//	const int cmdIdxLine = cmdIdx / cmdWidth; // ncCmd.cmdIdx / cmdWidth;
-
-//	return 1 + (cmdIdx % cmdWidth);
-	return 1 + (displayIdx() % cmdWidth);
-
+	return 1 + (displayIdx() % windowWidth);
 }
-
-//			const int cmdWidth = winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0));
-//			const int cmdTotal = ncCmd.cmd.size() / cmdWidth;
-//			const int cmdIdxLine = ncCmd.cmdIdx / cmdWidth;
-//			winCmd->end();
-//			winCmd->scrollUp(cmdTotal - cmdIdxLine);
-//			winCmd->refresh();
-//			winCmd->cursorSet(1+(/*ncCmd.cmdIdxLine*/ ncCmd.cmdIdx % cmdWidth), 1);
 
 
 bool NCCmd::empty() const
@@ -92,7 +75,6 @@ void NCCmd::clear()
 	p_prefix.clear();
 	p_postfix.clear();
 }
-
 
 
 
