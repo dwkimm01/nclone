@@ -3,8 +3,6 @@ TODO list
 - Fix backspacing on a wrapped cmd entry that doesn't move the cursor
 back to the right hand side until the second backspace
 
-- Finish CTRL-r implementation
-
 - Add function to clear history
 - Add function to get history entry from an index
 - Add ability to load settings such as key mappings etc
@@ -206,7 +204,7 @@ DONE . Could be helpful for Cmd History
   . Page up goes up too far when there are wrapping lines
  - Fix initial text windows when there isn't enough text to fill window
   . Right now we start from top but I want the text entered down near the cmd window
-
+ - Finish CTRL-r implementation
 
 
 ----------------------------------------------------
