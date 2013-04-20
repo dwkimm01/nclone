@@ -173,12 +173,39 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
+			if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
+			{
+				ncCmd.inputState = NCCmd::NORMAL;
+				ncCmd.cmd = ncCmd.foundCmd;
+				ncCmd.foundCmd = "";
+				ncCmd.prefix("");
+				ncCmd.postfix("");
+				ncCmd.cmdIdx = ncCmd.foundIdx;
+				ncCmd.foundIdx = 0;
+				if(!winCmd) return;
+				winCmd->append(ncCmd.display());
+				winCmd->refresh();
+			}
 			if(0 < ncCmd.cmdIdx) --ncCmd.cmdIdx;
+
 		}, "Cursor Left", KEY_LEFT);
 
 	keyMap().set([&]()
 		{
-			if(ncCmd.cmd.size() > ncCmd.cmdIdx) ++ncCmd.cmdIdx;
+			if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
+			{
+				ncCmd.inputState = NCCmd::NORMAL;
+				ncCmd.cmd = ncCmd.foundCmd;
+				ncCmd.foundCmd = "";
+				ncCmd.prefix("");
+				ncCmd.postfix("");
+				ncCmd.cmdIdx = ncCmd.foundIdx;
+				ncCmd.foundIdx = 0;
+				if(!winCmd) return;
+				winCmd->append(ncCmd.display());
+				winCmd->refresh();
+			}
+			if(ncCmd.cmd.size() > (unsigned int)ncCmd.cmdIdx) ++ncCmd.cmdIdx;
 		}, "Cursor Right", KEY_RIGHT);
 
 	keyMap().set([&]()
@@ -189,6 +216,13 @@ void NClone::setup
 			{
 				ncCmd.inputState = NCCmd::REVERSEISEARCH;
 				// TODO, might want to separate Reverse Search from CmdHistory and not reuse so much
+				ncCmd.prefix(" srch: ");
+//				ncCmd.postfix(" 0");
+				ncCmd.foundIdx = 0;
+				if(!winCmd) return;
+				winCmd->append(ncCmd.display());
+				winCmd->refresh();
+
 			}
 			else
 			{
@@ -297,6 +331,11 @@ void NClone::setup
 			ncCmd.cmd.clear();
 			ncCmd.cmdIdx = 0;
 			ncCmd.inputState = NCCmd::NORMAL;
+			ncCmd.foundIdx = 0;
+			ncCmd.foundCmd = "";
+			ncCmd.prefix("");
+			ncCmd.postfix("");
+			cmdHist.resetIndex();
 			if(!winCmd) return;
 			winCmd->clear();
 			winCmd->refresh();
