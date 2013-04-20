@@ -377,6 +377,13 @@ void NClone::setup
 			}
 		}, "Backspace", KEY_BACKSPACE);
 
+	keyMap().set([&]()
+		{
+			ncCmd.cmd.erase(ncCmd.cmdIdx, 1);
+			if(!winCmd) return;
+			winCmd->append(ncCmd.display());
+			winCmd->refresh();
+		}, "Delete", KEY_DC);
 
 	keyMap().set([&]()
 		{
