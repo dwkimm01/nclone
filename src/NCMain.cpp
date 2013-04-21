@@ -759,7 +759,7 @@ int doit(int argc, char* argv[])
 							const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
 							// Add msg to top (front) buffer
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
-							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
+							ncs->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
 							ncs->refresh();
 						}
 						else if(NCCmd::PROTOCOL == ncCmd.inputState)
@@ -831,7 +831,7 @@ int doit(int argc, char* argv[])
 					}
 					else
 					{
-						if(NCCmd::NORMAL == ncCmd.inputState)
+						if(NCCmd::NORMAL == ncCmd.inputState || NCCmd::PROTOCOL == ncCmd.inputState || NCCmd::USERNAME == ncCmd.inputState)
 						{
 							winCmd->append(ncCmd.cmd);
 						}

@@ -6,6 +6,7 @@
  */
 
 #include "NCCmd.h"
+#include "NCColor.h"
 
 namespace ncpp
 {
@@ -19,13 +20,18 @@ NCCmd::NCCmd()
 {
 }
 
-std::string NCCmd::display() const
+NCString NCCmd::display() const
 {
-	if(REVERSEISEARCH == inputState)
-	{
-		return p_prefix + foundCmd + p_postfix;
-	}
-	return cmd;
+
+	return (REVERSEISEARCH == inputState)
+			? NCString(p_prefix, nccolor::NCColor::COMMAND_HIGHLIGHT) + NCString(foundCmd + p_postfix, nccolor::NCColor::COMMAND_NORMAL)
+			: NCString(cmd, nccolor::NCColor::COMMAND_NORMAL);
+
+//	if()
+//	{
+//		return ;
+//	}
+//	return cmd;
 }
 
 int NCCmd::displayIdx() const

@@ -9,6 +9,7 @@
 #define NCCMD_H_
 
 #include <string>
+#include "NCString.h"
 
 namespace ncpp
 {
@@ -42,7 +43,7 @@ public:
 	 * <b>Purpose:</b> Get the display version of the command
 	 * @return std::string with [prefix,] cmd [, postfix] highlighting etc
 	 */
-	std::string display() const;
+	NCString display() const;
 	int displayIdx() const;
 	void prefix(const std::string &pre);
 	void postfix(const std::string &post);
