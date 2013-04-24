@@ -1,5 +1,75 @@
 TODO list
 
+- Cleanup
+ Finish cmd map
+ Merge Jeremy and my views
+ Auto hide buddy list (animated)
+ CTRL n for next new msg
+ New msg/online buddies don't put (new) window on top
+ Save chat logs
+ Make colors configurable
+ Save config: key remap, autologin, etc
+ A /msg command
+ A /time command
+ A /about command
+ A /away msg command
+ A /uptime command
+ An auto away message
+ Escape doesn't quit - exits reverse search
+ Color enum string names
+ /help shows dynamic key mapping
+ Search chat history, highlight
+ Execute command and pipe output to chat or at least screen
+ Fix backspace for last char doesn't put cursor on the far right soon enough
+ Console drop down window
+
+- Auto complete
+ Dimmed completed letters
+ Tab to finish
+
+- Status bar
+
+- Server client improvements
+ Use gloox
+ Replace libpurple (ms communicator)
+ Multiple connections (command management etc)
+ Reconnect
+ Offline, Online, Away Status
+ Group chats
+ Add buddy, request new buddy
+ Set nickname
+ Download files
+ Upload files
+ Connection status
+ Info on a buddy (away, busy, idle time)
+ IRC
+ Encrypted chat
+
+- Port to
+ Windows
+ Build scripts for OS X, Linux, Windows
+
+- Long term
+ Plugins for client libs (boost ext)
+ Plugins for extra behavior, bots, etc
+ Tile chat windows
+ Twitter
+ RSS
+ iChat
+ Txt msging
+ Use gmail?
+
+
+
+
+
+
+
+
+
+
+OLD
+
 - Fix backspacing on a wrapped cmd entry that doesn't move the cursor
 back to the right hand side until the second backspace
 
