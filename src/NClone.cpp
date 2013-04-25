@@ -328,6 +328,7 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
+                        // TODO, print msg to ncs if canceling ncCmd.inputState != NORMAL... 
 			ncCmd.cmd.clear();
 			ncCmd.cmdIdx = 0;
 			ncCmd.inputState = NCCmd::NORMAL;

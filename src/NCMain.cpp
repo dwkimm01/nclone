@@ -394,6 +394,7 @@ int doit(int argc, char* argv[])
 							ncs->append("  /newwin name(s)  create a window named name");
 							ncs->append("  /info win(s)   get info about a window");
 							ncs->append("  /jump win(s)   jump to window (reorder)");
+							ncs->append("  /time     print current time");
 							ncs->append("  /d1       print debug output to test text wrapping");
 							ncs->append("  /d2       print debug shorter string output to test page up/down");
 							ncs->append("  /lorem    print debug lorem text to test space wrapping");
@@ -401,7 +402,8 @@ int doit(int argc, char* argv[])
 							ncs->append(" Shortcuts");
 							// TODO, would be cool if dynamically mapping keystrokes would show up here in the
 							// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
-							ncs->append("  CTRL-c     quit");
+							ncs->append("  Escape     quit");
+							ncs->append("  CTRL-c     cancel current input");
 							ncs->append("  TAB        go to next window");
 							ncs->append("  SHIFT-TAB  go to previous window");
 							ncs->append("  CTRL-u     clear input window");
@@ -643,6 +645,16 @@ int doit(int argc, char* argv[])
 				        	}
 				        }
 				        ncs->refresh();
+					}
+					else if(ncCmd.cmd.find("/time") == 0)
+					{
+						if(ncs)
+						{
+							// TODO, really want this to be part of the string processing so
+							// the user can type something like "see you at $now+10mins ??
+							ncs->append(NCTimeUtils::getPrintableColorTimeStamp());
+							ncs->refresh();
+						}
 					}
 					else if(ncCmd.cmd.find("/newwin") == 0)
 					{

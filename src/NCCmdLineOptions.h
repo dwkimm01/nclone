@@ -76,7 +76,7 @@ public:
 			// Version
 			if(p_vm.count("version"))
 			{
-				std::cout << "nc version 0.0.2" << std::endl;
+				std::cout << "nc version 0.0.3" << std::endl;
 				p_shouldExit = true;
 			}
 
