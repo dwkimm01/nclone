@@ -352,434 +352,437 @@ int doit(int argc, char* argv[])
 				nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
 					, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 					, cmd, cmdIdx, ncCmd.stillRunning, cmdHist
-					, [&](){return NCCmd::PASSWORD == ncCmd.inputState; });
+					, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
+					, ncCmd
+					, cfg);
 
-				if(! nclone.keyMap()(c) )
+				//if(! nclone.keyMap()(c) )
+				nclone.keyMap()(c);
 
-			switch(c)
-			{
-
-
-#if STATUSTWIRL
-				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
-				if(statusIndex >= status.size())
-				{
-					statusIndex = 0;
-				}
-#endif
-
-			case 10:
-			case KEY_ENTER:
-				if(!cmd.empty())
-				{
-					if(cmd == "/exit") ncCmd.stillRunning = false; // return 0;
-					if(cmd == "/quit") ncCmd.stillRunning = false; // return 0;
-					if(cmd == "/help")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
-							ncs->append(" Commands");
-							ncs->append("  /exit     quit application");
-							ncs->append("  /quit     quit application");
-							ncs->append("  /clear    empty current window");
-							ncs->append("  /help     print this information");
-							ncs->append("  /history  print command history");
-							ncs->append("  /list     print windows open");
-							ncs->append("  /refresh  refresh all windows");
-							ncs->append("  /set wrap (length|word|cut)");
-							ncs->append("  /newconn  create a new connection");
-							ncs->append("      protocol		username");
-							ncs->append("      prpl-sipe	user@domain.com,domain\\user");
-							ncs->append("      prpl-jabber	user@gmail.com");
-							ncs->append("  /newwin name(s)  create a window named name");
-							ncs->append("  /info win(s)   get info about a window");
-							ncs->append("  /jump win(s)   jump to window (reorder)");
-							ncs->append("  /d1       print debug output to test text wrapping");
-							ncs->append("  /d2       print debug shorter string output to test page up/down");
-							ncs->append("  /lorem    print debug lorem text to test space wrapping");
-							ncs->append("");
-							ncs->append(" Shortcuts");
-							// TODO, would be cool if dynamically mapping keystrokes would show up here in the
-							// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
-							ncs->append("  CTRL-c     quit");
-							ncs->append("  TAB        go to next window");
-							ncs->append("  SHIFT-TAB  go to previous window");
-							ncs->append("  CTRL-u     clear input window");
-							ncs->append("  PAGE-Up    Scroll up a window length");
-							ncs->append("  PAGE-Down  Scroll down a window length");
-							ncs->append("  Home       Scroll to top of scrollback");
-							ncs->append("  End        Scroll to bottom of scrollback");
-							ncs->append("  Enter      Send Message or process command");
-							ncs->append("  F3         Toggle Contact list window visibility");
-							ncs->append("");
-							ncs->refresh();
-						}
-					}
-					else if(cmd == "/history")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
-							for(auto x : cmdHist)
-							{
-								ncs->append(" " + x);
-							}
-							ncs->append("");
-							ncs->refresh();
-						}
-					}
-					else if(cmd == "/newconn")
-					{
-						if(ncs)
-						{
-							ncs->append(cmd);
-							// Collect up user information:
-							//  protocol: prpl-jabber
-							//  login: user@gmail.com
-							//  password: xxxx
-							ncCmd.inputState = NCCmd::PROTOCOL;
-							ncs->append(NCString(cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
-							ncs->append("   Enter protocol (e.g. prpl-jabber)");
-							ncs->refresh();
-						}
-					}
-					else if(cmd == "/list")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
-							app.forEachChild([&](ncobject::NCObject* obj)
-							{
-								ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
-								if(lwin)
-								{
-									ncs->append("  " + lwin->getConfig().p_title);
-								}
-								return true;  // keep going
-							});
-							ncs->append("");
-							ncs->refresh();
-						}
-					}
-					else if(cmd == "/refresh, refresh all windows")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
-							ncs->append("");
-						}
-						app.refresh();
-					}
-					else if (cmd.find("/set") == 0)
-					{
-						std::vector<std::string> cmdParam;
-						boost::split(cmdParam, cmd, boost::is_space()); // boost::is_any_of("\t"));
-						if(cmdParam.size() == 3 && "/set" == cmdParam[0])
-						{
-							// TODO, do we want to do set on all of the (chat) windows
-							if("wrap" == cmdParam[1])
-							{
-								ncs->append(NCString(cmd + ", setting wrap type \"" + cmdParam[2] + "\"", nccolor::NCColor::COMMAND_HIGHLIGHT));
-								if("length" == cmdParam[2])
-								{
-									ncs->setWrapLength();
-								}
-								else if("word" == cmdParam[2])
-								{
-									ncs->setWrapWordLength();
-								}
-								else if("cut" == cmdParam[2])
-								{
-									ncs->setWrapCut();
-								}
-								else
-								{
-									ncs->append(" Unknown wrap type.  Should be: length, word, cut");
-								}
-								ncs->refresh();
-							}
-							else
-							{
-								ncs->append("Unknown set option \"" + cmdParam[1] + "\"");
-								ncs->refresh();
-							}
-
-						}
-
-					}
-					else if(cmd == "/clear")
-					{
-						if(ncs)
-						{
-							// Clear top buffer
-							ncs->clear();
-							ncs->refresh();
-						}
-					}
-					else if(cmd.find("/info") == 0)
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
-
-							// Create the window list, if there is no window listed add current/top window to list
-							std::string winList = cmd;
-							boost::replace_all(winList, "/info", "");
-							if(winList.size() == 0)
-							{
-								winList = ncs->getConfig().p_title;
-							}
-
-							typedef boost::split_iterator<std::string::iterator> ItrType;
-							for (ItrType i = boost::make_split_iterator(winList, boost::first_finder(" ", boost::is_iequal()));
-									i != ItrType(); ++i)
-				        {
-				        	const std::string winName = boost::copy_range<std::string>(*i);
-				        	if(winName != "/info")  // TODO, don't think we have to check for this now
-				        	{
-				        		app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
-				        		{
-				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
-				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
-				        			{
-				        				ncs->append("  Window " + winName);
-				        				ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
-				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
-				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
-				        				ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
-				        				const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
-				        				ncs->append(std::string("     border: ") + borderVal);
-				        			        NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
-                                                                        if(nwstmp)	
-                                                                           ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) ); 
-				        			}
-				        			return true;
-				        		});
-				        	}
-				        }
-				        ncs->refresh();
-						}
-					}
-					else if(cmd.find("/jump") == 0)
-					{
-						ncs->append(NCString(cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
-						typedef boost::split_iterator<std::string::iterator> ItrType;
-				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
-				             i != ItrType();
-				             ++i)
-				        {
-				        	const std::string winName = boost::copy_range<std::string>(*i);
-				        	if(winName != "/jump")
-				        	{
-				        		win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
-				        		{
-				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
-				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
-				        			{
-				        				// TODO, replace this logic for refreshing with more generic NCWin usage (refresh)
-				        				auto nobjsb = dynamic_cast<NCWinScrollback*>(nobjwin);
-				        				if(nobjsb) ncs = nobjsb;
-				        				win3->bringToFront(nobj);  // TODO, do we want to reorder the list like this?
-				        			}
-				        			return true;
-				        		});
-				        	}
-				        }
-				        ncs->refresh();
-					}
-					else if(cmd.find("/newwin") == 0)
-					{
-						ncs->append(NCString(cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
-						typedef boost::split_iterator<std::string::iterator> ItrType;
-				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
-				             i != ItrType();
-				             ++i)
-				        {
-				        	// TODO, make sure there isn't a window with that name already?
-				        	const std::string winName = boost::copy_range<std::string>(*i);
-				        	if("/newwin" != winName)
-				        	{
-				        		cfg.p_title = winName;
-				        		ncs->append(" Creating new window \"" + cfg.p_title + "\"");
-				        		auto myNewWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
-				        		ncs->refresh();
-				        		myNewWin->append("Opened win " + cfg.p_title);
-				        		win3->refresh();
-				        	}
-				        }
-					}
-					else if(cmd == "/d1")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
-							const int max = ncs->getConfig().p_h;
-							for(int i = 1; i < max*5; ++i)
-							{
-								std::string sToPrint;
-								for(int j = 0; j < i; ++j)
-								{
-									sToPrint.push_back( 'a' + ((i-1)%26) );
-								}
-								ncs->append(">> " + boost::lexical_cast<std::string>(i) + " " + sToPrint);
-							}
-							ncs->refresh();
-						}
-					}
-					else if(cmd == "/d2")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
-
-							for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
-							{
-								ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
-							}
-							ncs->refresh();
-						}
-					}
-					else if(cmd == "/lorem")
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
-
-							NCString entry
-								= NCTimeUtils::getPrintableColorTimeStamp()
-								+ NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
-							// Change color of e's for fun
-							entry.forEach([](char &c, char &color)
-							{
-								if('e' == c)
-								{
-									color = nccolor::NCColor::CHAT_NORMAL;
-								}
-							});
-
-							ncs->append(entry);
-							ncs->refresh();
-						}
-					}
-					else if(cmd.find("/") == 0)
-					{
-						if(ncs)
-						{
-							ncs->append(NCString(cmd + ", unknown command", nccolor::NCColor::COMMAND_HIGHLIGHT));
-							ncs->refresh();
-						}
-					}
-					else
-					{
-						if(NCCmd::NORMAL == ncCmd.inputState)
-						{
-							ncclientif::NCClientIf* client = 0;
-
-							// TODO, need to fix the way this connection is picked
-							if(connections.size() > 0)
-							{
-								client = connections[0];
-							}
-
-							// Pick buddy
-							const string buddyName = ncs->getConfig().p_title;
-
-							if(client)
-							{
-								client->msgSend(buddyName, cmd);
-							}
-
-							const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
-							// Add msg to top (front) buffer
-							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + cmd, outgoingMsgColor);
-							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
-							ncs->refresh();
-						}
-						else if(NCCmd::PROTOCOL == ncCmd.inputState)
-						{
-							ncCmd.inputState = NCCmd::USERNAME;
-							clientProtocol = cmd;
-							ncs->append("    protocol: " + cmd);
-							ncs->append("   Enter user login");
-							ncs->refresh();
-						}
-						else if(NCCmd::USERNAME == ncCmd.inputState)
-						{
-							// TODO, need to turn off the echo to the screen
-							ncCmd.inputState = NCCmd::PASSWORD;
-							clientUsername = cmd;
-							ncs->append("    username: " + cmd);
-							ncs->append("   Enter password");
-							ncs->refresh();
-						}
-						else if(NCCmd::PASSWORD == ncCmd.inputState)
-						{
-							ncCmd.inputState = NCCmd::NORMAL;
-							clientPassword = cmd;
-							ncs->append("   creating new connection..");
-							typedef ncclientpurple::NCClientPurple::String String;
-
-							connections.push_back
-								( new  ncclientpurple::NCClientPurple
-								( clientUsername 
-								, clientPassword
-								, clientProtocol
-								, [&](const String &s, const int, const int) { }  // connectionStepCB
-								, [&](const String &s, const String &t) { msgSignal(s, t); }  // msgReceivedCB
-								, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
-								, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
-								) );
-
-							// TODO, no indication if connection failed or for what reason
-							// TODO, do not add password to cmdHist!!! 
-						}
-					}
-
-					// Reset command window and assume it needs updating
-					cmdHist.add(cmd);
-					// TODO, probably don't want/need to add standard cmds w/o params like help
-					cmd.clear();
-					cmdIdx = 0;
-					winCmd->clear();
-					winCmd->refresh();
-
-				}
-				break;
-			default:
-				//Filter out non-printable characters
-				//TODO, implement as boost ns::print
-				if (ncstringutils::NCStringUtils::isPrint(c))
-				{
-					// Add characters to cmd string, refresh
-					cmd.insert(cmd.begin() + cmdIdx, c);
-					++cmdIdx;
-					if(NCCmd::PASSWORD == ncCmd.inputState)
-					{
-						std::string xInput;
-						xInput.reserve(cmd.size());
-						for(unsigned int i = 0; cmd.size() > i; ++i)
-							xInput.push_back('x');
-						winCmd->append(xInput);
-					}
-					else
-					{
-						winCmd->append(cmd);
-					}
-				}
-				else
-				{
-					if(ncs)
-					{
-						// Not printable - but didn't get accepted by any other rules
-						// TODO, print octal (and hexadecimal version) as well
-						ncs->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)c)));
-						ncs->refresh();
-					}
-				}
-				break;
-				// nothing
-			}
+//			switch(c)
+//			{
+//
+//
+//#if STATUSTWIRL
+//				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
+//				if(statusIndex >= status.size())
+//				{
+//					statusIndex = 0;
+//				}
+//#endif
+//
+//			case 10:
+//			case KEY_ENTER:
+//				if(!cmd.empty())
+//				{
+//					if(cmd == "/exit") ncCmd.stillRunning = false; // return 0;
+//					if(cmd == "/quit") ncCmd.stillRunning = false; // return 0;
+//					if(cmd == "/help")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							ncs->append(" Commands");
+//							ncs->append("  /exit     quit application");
+//							ncs->append("  /quit     quit application");
+//							ncs->append("  /clear    empty current window");
+//							ncs->append("  /help     print this information");
+//							ncs->append("  /history  print command history");
+//							ncs->append("  /list     print windows open");
+//							ncs->append("  /refresh  refresh all windows");
+//							ncs->append("  /set wrap (length|word|cut)");
+//							ncs->append("  /newconn  create a new connection");
+//							ncs->append("      protocol		username");
+//							ncs->append("      prpl-sipe	user@domain.com,domain\\user");
+//							ncs->append("      prpl-jabber	user@gmail.com");
+//							ncs->append("  /newwin name(s)  create a window named name");
+//							ncs->append("  /info win(s)   get info about a window");
+//							ncs->append("  /jump win(s)   jump to window (reorder)");
+//							ncs->append("  /d1       print debug output to test text wrapping");
+//							ncs->append("  /d2       print debug shorter string output to test page up/down");
+//							ncs->append("  /lorem    print debug lorem text to test space wrapping");
+//							ncs->append("");
+//							ncs->append(" Shortcuts");
+//							// TODO, would be cool if dynamically mapping keystrokes would show up here in the
+//							// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
+//							ncs->append("  CTRL-c     quit");
+//							ncs->append("  TAB        go to next window");
+//							ncs->append("  SHIFT-TAB  go to previous window");
+//							ncs->append("  CTRL-u     clear input window");
+//							ncs->append("  PAGE-Up    Scroll up a window length");
+//							ncs->append("  PAGE-Down  Scroll down a window length");
+//							ncs->append("  Home       Scroll to top of scrollback");
+//							ncs->append("  End        Scroll to bottom of scrollback");
+//							ncs->append("  Enter      Send Message or process command");
+//							ncs->append("  F3         Toggle Contact list window visibility");
+//							ncs->append("");
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd == "/history")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							for(auto x : cmdHist)
+//							{
+//								ncs->append(" " + x);
+//							}
+//							ncs->append("");
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd == "/newconn")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(cmd);
+//							// Collect up user information:
+//							//  protocol: prpl-jabber
+//							//  login: user@gmail.com
+//							//  password: xxxx
+//							ncCmd.inputState = NCCmd::PROTOCOL;
+//							ncs->append(NCString(cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							ncs->append("   Enter protocol (e.g. prpl-jabber)");
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd == "/list")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							app.forEachChild([&](ncobject::NCObject* obj)
+//							{
+//								ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
+//								if(lwin)
+//								{
+//									ncs->append("  " + lwin->getConfig().p_title);
+//								}
+//								return true;  // keep going
+//							});
+//							ncs->append("");
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd == "/refresh, refresh all windows")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							ncs->append("");
+//						}
+//						app.refresh();
+//					}
+//					else if (cmd.find("/set") == 0)
+//					{
+//						std::vector<std::string> cmdParam;
+//						boost::split(cmdParam, cmd, boost::is_space()); // boost::is_any_of("\t"));
+//						if(cmdParam.size() == 3 && "/set" == cmdParam[0])
+//						{
+//							// TODO, do we want to do set on all of the (chat) windows
+//							if("wrap" == cmdParam[1])
+//							{
+//								ncs->append(NCString(cmd + ", setting wrap type \"" + cmdParam[2] + "\"", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//								if("length" == cmdParam[2])
+//								{
+//									ncs->setWrapLength();
+//								}
+//								else if("word" == cmdParam[2])
+//								{
+//									ncs->setWrapWordLength();
+//								}
+//								else if("cut" == cmdParam[2])
+//								{
+//									ncs->setWrapCut();
+//								}
+//								else
+//								{
+//									ncs->append(" Unknown wrap type.  Should be: length, word, cut");
+//								}
+//								ncs->refresh();
+//							}
+//							else
+//							{
+//								ncs->append("Unknown set option \"" + cmdParam[1] + "\"");
+//								ncs->refresh();
+//							}
+//
+//						}
+//
+//					}
+//					else if(cmd == "/clear")
+//					{
+//						if(ncs)
+//						{
+//							// Clear top buffer
+//							ncs->clear();
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd.find("/info") == 0)
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//
+//							// Create the window list, if there is no window listed add current/top window to list
+//							std::string winList = cmd;
+//							boost::replace_all(winList, "/info", "");
+//							if(winList.size() == 0)
+//							{
+//								winList = ncs->getConfig().p_title;
+//							}
+//
+//							typedef boost::split_iterator<std::string::iterator> ItrType;
+//							for (ItrType i = boost::make_split_iterator(winList, boost::first_finder(" ", boost::is_iequal()));
+//									i != ItrType(); ++i)
+//				        {
+//				        	const std::string winName = boost::copy_range<std::string>(*i);
+//				        	if(winName != "/info")  // TODO, don't think we have to check for this now
+//				        	{
+//				        		app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+//				        		{
+//				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
+//				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
+//				        			{
+//				        				ncs->append("  Window " + winName);
+//				        				ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
+//				        				ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
+//				        				ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
+//				        				ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
+//				        				const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
+//				        				ncs->append(std::string("     border: ") + borderVal);
+//				        			        NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
+//                                                                        if(nwstmp)
+//                                                                           ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) );
+//				        			}
+//				        			return true;
+//				        		});
+//				        	}
+//				        }
+//				        ncs->refresh();
+//						}
+//					}
+//					else if(cmd.find("/jump") == 0)
+//					{
+//						ncs->append(NCString(cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//						typedef boost::split_iterator<std::string::iterator> ItrType;
+//				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+//				             i != ItrType();
+//				             ++i)
+//				        {
+//				        	const std::string winName = boost::copy_range<std::string>(*i);
+//				        	if(winName != "/jump")
+//				        	{
+//				        		win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
+//				        		{
+//				        			auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
+//				        			if(nobjwin && nobjwin->getConfig().p_title == winName)
+//				        			{
+//				        				// TODO, replace this logic for refreshing with more generic NCWin usage (refresh)
+//				        				auto nobjsb = dynamic_cast<NCWinScrollback*>(nobjwin);
+//				        				if(nobjsb) ncs = nobjsb;
+//				        				win3->bringToFront(nobj);  // TODO, do we want to reorder the list like this?
+//				        			}
+//				        			return true;
+//				        		});
+//				        	}
+//				        }
+//				        ncs->refresh();
+//					}
+//					else if(cmd.find("/newwin") == 0)
+//					{
+//						ncs->append(NCString(cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//						typedef boost::split_iterator<std::string::iterator> ItrType;
+//				        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+//				             i != ItrType();
+//				             ++i)
+//				        {
+//				        	// TODO, make sure there isn't a window with that name already?
+//				        	const std::string winName = boost::copy_range<std::string>(*i);
+//				        	if("/newwin" != winName)
+//				        	{
+//				        		cfg.p_title = winName;
+//				        		ncs->append(" Creating new window \"" + cfg.p_title + "\"");
+//				        		auto myNewWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+//				        		ncs->refresh();
+//				        		myNewWin->append("Opened win " + cfg.p_title);
+//				        		win3->refresh();
+//				        	}
+//				        }
+//					}
+//					else if(cmd == "/d1")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							const int max = ncs->getConfig().p_h;
+//							for(int i = 1; i < max*5; ++i)
+//							{
+//								std::string sToPrint;
+//								for(int j = 0; j < i; ++j)
+//								{
+//									sToPrint.push_back( 'a' + ((i-1)%26) );
+//								}
+//								ncs->append(">> " + boost::lexical_cast<std::string>(i) + " " + sToPrint);
+//							}
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd == "/d2")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//
+//							for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
+//							{
+//								ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
+//							}
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd == "/lorem")
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//
+//							NCString entry
+//								= NCTimeUtils::getPrintableColorTimeStamp()
+//								+ NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
+//							// Change color of e's for fun
+//							entry.forEach([](char &c, char &color)
+//							{
+//								if('e' == c)
+//								{
+//									color = nccolor::NCColor::CHAT_NORMAL;
+//								}
+//							});
+//
+//							ncs->append(entry);
+//							ncs->refresh();
+//						}
+//					}
+//					else if(cmd.find("/") == 0)
+//					{
+//						if(ncs)
+//						{
+//							ncs->append(NCString(cmd + ", unknown command", nccolor::NCColor::COMMAND_HIGHLIGHT));
+//							ncs->refresh();
+//						}
+//					}
+//					else
+//					{
+//						if(NCCmd::NORMAL == ncCmd.inputState)
+//						{
+//							ncclientif::NCClientIf* client = 0;
+//
+//							// TODO, need to fix the way this connection is picked
+//							if(connections.size() > 0)
+//							{
+//								client = connections[0];
+//							}
+//
+//							// Pick buddy
+//							const string buddyName = ncs->getConfig().p_title;
+//
+//							if(client)
+//							{
+//								client->msgSend(buddyName, cmd);
+//							}
+//
+//							const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
+//							// Add msg to top (front) buffer
+//							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + cmd, outgoingMsgColor);
+//							ncs->append(nMsg + NCString("  (to " + buddyName + ")", outgoingMsgColor));
+//							ncs->refresh();
+//						}
+//						else if(NCCmd::PROTOCOL == ncCmd.inputState)
+//						{
+//							ncCmd.inputState = NCCmd::USERNAME;
+//							clientProtocol = cmd;
+//							ncs->append("    protocol: " + cmd);
+//							ncs->append("   Enter user login");
+//							ncs->refresh();
+//						}
+//						else if(NCCmd::USERNAME == ncCmd.inputState)
+//						{
+//							// TODO, need to turn off the echo to the screen
+//							ncCmd.inputState = NCCmd::PASSWORD;
+//							clientUsername = cmd;
+//							ncs->append("    username: " + cmd);
+//							ncs->append("   Enter password");
+//							ncs->refresh();
+//						}
+//						else if(NCCmd::PASSWORD == ncCmd.inputState)
+//						{
+//							ncCmd.inputState = NCCmd::NORMAL;
+//							clientPassword = cmd;
+//							ncs->append("   creating new connection..");
+//							typedef ncclientpurple::NCClientPurple::String String;
+//
+//							connections.push_back
+//								( new  ncclientpurple::NCClientPurple
+//								( clientUsername
+//								, clientPassword
+//								, clientProtocol
+//								, [&](const String &s, const int, const int) { }  // connectionStepCB
+//								, [&](const String &s, const String &t) { msgSignal(s, t); }  // msgReceivedCB
+//								, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
+//								, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
+//								) );
+//
+//							// TODO, no indication if connection failed or for what reason
+//							// TODO, do not add password to cmdHist!!!
+//						}
+//					}
+//
+//					// Reset command window and assume it needs updating
+//					cmdHist.add(cmd);
+//					// TODO, probably don't want/need to add standard cmds w/o params like help
+//					cmd.clear();
+//					cmdIdx = 0;
+//					winCmd->clear();
+//					winCmd->refresh();
+//
+//				}
+//				break;
+//			default:
+//				//Filter out non-printable characters
+//				//TODO, implement as boost ns::print
+//				if (ncstringutils::NCStringUtils::isPrint(c))
+//				{
+//					// Add characters to cmd string, refresh
+//					cmd.insert(cmd.begin() + cmdIdx, c);
+//					++cmdIdx;
+//					if(NCCmd::PASSWORD == ncCmd.inputState)
+//					{
+//						std::string xInput;
+//						xInput.reserve(cmd.size());
+//						for(unsigned int i = 0; cmd.size() > i; ++i)
+//							xInput.push_back('x');
+//						winCmd->append(xInput);
+//					}
+//					else
+//					{
+//						winCmd->append(cmd);
+//					}
+//				}
+//				else
+//				{
+//					if(ncs)
+//					{
+//						// Not printable - but didn't get accepted by any other rules
+//						// TODO, print octal (and hexadecimal version) as well
+//						ncs->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)c)));
+//						ncs->refresh();
+//					}
+//				}
+//				break;
+//				// nothing
+//			}
 		} // if ncs
 
 		}

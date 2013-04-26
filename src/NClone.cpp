@@ -7,6 +7,7 @@
 
 #include <ncurses.h>
 #include "NClone.h"
+#include "NCStringUtils.h"
 #include "NCTimeUtils.h"
 
 
@@ -40,11 +41,14 @@ void NClone::setup
 	, int &cmdIdx
 	, bool &stillRunning
 	, nccmdhistory::NCCmdHistory &cmdHist
-	, std::function<bool()> enteringPassword )
+	, std::function<bool()> enteringPassword
+	, ncpp::NCCmd &ncCmd
+	, NCWinCfg &cfg )
 {
 	// Save function for later use
 	ncs = pncs;
 
+	cmdMap.Setup(ncs, app, chats, ncCmd, cmdHist, cfg);
 
 	keyMap().set([&]()
 		{
@@ -369,8 +373,58 @@ void NClone::setup
 
 		}, "Timeout", -1); // KEY_TIMEOUT);
 
+	keyMap().set([&]()
+			{
+
+				// Reset command window and assume it needs updating
+				cmdHist.add(cmd);
+				bool success = cmdMap.ProcessCommand(cmd);
+				if (!success){
+				ncs()->append(cmd);
+				ncs()->refresh();//
+				}
+				// TODO, probably don't want/need to add standard cmds w/o params like help
+				cmd.clear();
+				cmdIdx = 0;
+				winCmd->clear();
+				winCmd->refresh();
+			},
+	"Enter", '\n');
 
 	// KEY_IL: // TODO, INSERT doesn't seem to work on laptop
+	keyMap().set([&](nckeymap::NCKeyMap::KeyType key)
+			{
+		//Filter out non-printable characters
+						//TODO, implement as boost ns::print
+						if (ncstringutils::NCStringUtils::isPrint(key))
+						{
+							// Add characters to cmd string, refresh
+							cmd.insert(cmd.begin() + cmdIdx, key);
+							++cmdIdx;
+							if(NCCmd::PASSWORD == ncCmd.inputState)
+							{
+								std::string xInput;
+								xInput.reserve(cmd.size());
+								for(unsigned int i = 0; cmd.size() > i; ++i)
+									xInput.push_back('x');
+								winCmd->append(xInput);
+							}
+							else
+							{
+								winCmd->append(cmd);
+							}
+						}
+						else
+						{
+							if(ncs)
+							{
+								// Not printable - but didn't get accepted by any other rules
+								// TODO, print octal (and hexadecimal version) as well
+								ncs()->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)key)));
+								ncs()->refresh();
+							}
+						}
+			});
 
 }
 

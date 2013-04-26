@@ -24,9 +24,7 @@ public:
 	/**
 	 * <b>Purpose:</b> CTOR
 	 */
-	NCCommandHandler(NCWinScrollback& ncs,
-			ncapp::NCApp& app, NCWinScrollback& win3, NCCmd& ncCmd,
-			nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg);
+	NCCommandHandler();
 
 	/**
 	 * <b>Purpose:</b> DTOR
@@ -34,13 +32,22 @@ public:
 	~NCCommandHandler();
 
 	/**
+	 * Setup
+	 */
+	void Setup(std::function<NCWinScrollback*()> pncs,
+			ncapp::NCApp& app, NCWinScrollback* &win3, NCCmd& ncCmd,
+			nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg);
+
+	/**
 	 * Process Commands
 	 */
-	void ProcessCommand(std::string command);
+	//std::string
+	bool ProcessCommand(std::string command);
 
 
 private:
 	std::map<std::string, std::function<void(const std::string &cmd)>> cmdMap;
+	std::function<NCWinScrollback*()> fncs;
 	const int defaultScrollback = 500;
 };
 }

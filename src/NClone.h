@@ -14,6 +14,7 @@
 #include "NCWinScrollback.h"
 #include "NCKeyMap.h"
 #include "NCCmdHistory.h"
+#include "NCCommandHandler.h"
 
 namespace ncpp
 {
@@ -39,9 +40,12 @@ public:
 	, int &cmdIdx
 	, bool &stillRunning
 	, nccmdhistory::NCCmdHistory &cmdHist
-	, std::function<bool()> enteringPassword );
+	, std::function<bool()> enteringPassword
+	, ncpp::NCCmd &ncCmd
+	, NCWinCfg &cfg);
 
 	nckeymap::NCKeyMap& keyMap();
+	ncpp::NCCommandHandler cmdMap;
 
 private:
 
