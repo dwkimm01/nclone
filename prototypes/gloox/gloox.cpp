@@ -2,9 +2,15 @@
 #include <iostream>
 #include <gloox/client.h>
 #include <gloox/messagehandler.h>
+#include <gloox/messageeventhandler.h>
+#include <gloox/messageeventfilter.h>
+#include <gloox/messagesessionhandler.h>
+#include <gloox/chatstatehandler.h>
+#include <gloox/chatstatefilter.h>
 #include <gloox/connectionhttpproxy.h>
 #include <gloox/connectiontcpclient.h>
 #include <gloox/connectionlistener.h>
+#include <gloox/stanzaextension.h>
 
 using namespace gloox;
 
@@ -14,69 +20,120 @@ class TestLogHandler: public LogHandler
         LogArea area,
         const std::string & message)
     {
-        // std::cout<<"Log:"<<level<<" "<<message<<std::endl;
-
+        std::cout<<"Log:"<<level<<" "<<message<<std::endl;
     }
 };
 
-class Bot : ConnectionListener, public MessageHandler
+class Bot : 
+    ConnectionListener, 
+    public MessageHandler,
+    public MessageEventHandler,
+    public MessageSessionHandler,
+    public ChatStateHandler
 {
 public:
     Bot()
-       : jid("user@gmail.com")
+       : jid("wellsureitis@gmail.com")
+       , p_messageSession(0)
+       , p_messageEventFilter(0)
     {
-       j = new Client( jid, "password"); // , 443);
-       j->logInstance().registerLogHandler(LogLevelDebug, LogAreaAll, new
- TestLogHandler());
+        j = new Client( jid, "tt115938"); // , 443);
+        j->logInstance().registerLogHandler(LogLevelDebug, LogAreaAll, new TestLogHandler());
 
-//       j->setServer("talk.google.com");
+        // j->setServer("talk.google.com");
 
-       j->registerConnectionListener( this );
-       j->registerMessageHandler( this );
-      // j->setPresence(jid, Presence::Available, 0);  //  const std::string& status = EmptyString );
+        j->registerConnectionListener( this );
+        j->registerMessageHandler( this );
+        j->registerMessageSessionHandler( this );
+        j->setPresence(PresenceAway, 0, "Meh");
 
-std::cout << "BEFORE CONNECT" << std::endl;
-       j->connect();
-std::cout << "AFTER CONNECT" << std::endl;
-      // j->setPresence(jid, Presence::Available, 120);  //  const std::string& status = EmptyString );
+        std::cout << "Connecting..." << std::endl;
+        j->connect();
+        std::cout << "Connected" << std::endl;
     }
-    virtual void handleMessage( Stanza* stanza,
-    //virtual void handleMessage( const gloox::Message& stanza,
+
+    virtual void handleMessageEvent( const JID& from, MessageEventType event )
+    {
+       std::cout << "HANDLE MESSAGE EVENT" << std::endl;
+    }
+
+    virtual void handleMessage( Stanza* stanza,   // Older version was type Message&
                                 MessageSession* session = 0 )
     {
-      std::cout<<"MSGIN(" << stanza->body() << ") "
+        std::cout << "MSGIN(" << stanza->body() << ") "
           << "[" << stanza->subtype() << "] "
           << "[" << stanza->type() << "] "
+          // << "[" << stanza->id() << "] "
+          << "[" << stanza->presence() << "] "
+          // << "[" << stanza->priority() << "] "
+          // << "[" << stanza->status() << "] "
+          << "[" << stanza->extensions().size() << "] "
+          << std::endl;
 
-          <<std::endl;
-      Stanza *s = Stanza::createMessageStanza(
-          stanza->from().full(), "hello world" );
-      j->send( s );
+          if(stanza->extensions().size() > 0)
+          {
+             std::cout << "  << ";
+             for(StanzaExtensionList::const_iterator itr = stanza->extensions().begin(); 
+                 itr != stanza->extensions().end(); 
+                 ++itr)
+             {
+                 std::cout << " " << (*itr)->type();
+             }
+             std::cout << " >>" << std::endl;
+          }
+//p_messageEventFilter->raiseMessageEvent( MessageEventComposing );
+//p_chatStateFilter->setChatState( ChatStateComposing );
+
+        Stanza *s = Stanza::createMessageStanza(
+            stanza->from().full(), "GOT: " + stanza->body() );
+        j->send( s );
     }
 
-/*virtual void handleMessage(const gloox::Message&, gloox::MessageSession*)
-   {
-      std::cout << "\nHANDLE MESSAGE\n" << std::endl;
-   }*/
-
-    virtual void onConnect() {
-        std::cout<<"\nON CONNECT\n"<<std::endl;
+    virtual void handleMessageSession( MessageSession *session )
+    {
+        // TODO, this will leak if you talk to this bot from more than one full JID.
+        p_messageSession = session;
+        std::cout << "got new session" << std::endl;
+        p_messageSession->registerMessageHandler( this );
+        p_messageEventFilter = new MessageEventFilter( p_messageSession );
+        p_messageEventFilter->registerMessageEventHandler( this );
+        p_chatStateFilter = new ChatStateFilter( p_messageSession );
+        p_chatStateFilter->registerChatStateHandler( this );
     }
 
-    virtual bool onTLSConnect( const CertInfo& info ) {
-        std::cout<<"\nON TLS CONNECT\n"<<std::endl;
-//      j->setPresence(jid, Presence::Available, 0);  //  const std::string& status = EmptyString );
-//sleep(1);
+    virtual void handleChatState( const JID& from, ChatStateType state )
+    {
+        std::cout << "GOT STATE" << std::endl;
+//      printf( "received state: %d from: %s\n", state, from.full().c_str() );
+    }
+
+    virtual void onConnect() 
+    {
+        std::cout << "On connect" << std::endl;
+    }
+
+    virtual bool onTLSConnect( const CertInfo& info ) 
+    {
+        std::cout << "On TLS connect" 
+            << " status " << info.status
+            << " issuer " << info.issuer.c_str()
+            << " server " << info.server.c_str()
+            << " protocol " << info.protocol.c_str()
+            << " mac " << info.mac.c_str()
+            << " cipher " << info.cipher.c_str()
+            << " compression " << info.compression.c_str()
+            << std::endl;
         return true;
     }
-    virtual void onDisconnect(ConnectionError e) {
-        std::cout<<"\nON DISCONNECT (" << e << ")\n" << std::endl;
+
+    virtual void onDisconnect(ConnectionError e) 
+    {
+        std::cout << "On disconnect (" << e << ")" << std::endl;
     }
 
    virtual void onStreamEvent( StreamEvent event )
    // { (void) (event); }
    {
-//sleep(1);
       switch(event)
       {
          case StreamEventConnecting:
@@ -99,7 +156,6 @@ std::cout << "AFTER CONNECT" << std::endl;
             break;
          case StreamEventSessionCreation:
             std::cout << "StreamEventSessionCreation" << std::endl;
-            //sleep(1);
             break;
          case StreamEventRoster:
             std::cout << "StreamEventRoster" << std::endl;
@@ -111,20 +167,21 @@ std::cout << "AFTER CONNECT" << std::endl;
             std::cout << "Stream Event unknown" << std::endl;
             break;
       }
-
    }
 
 
-
-  private:
+private:
     Client* j;
     JID jid;
- };
+    MessageSession* p_messageSession;  // TODO, need to be able to handle multiple ones
+    MessageEventFilter* p_messageEventFilter;
+    ChatStateFilter* p_chatStateFilter;
+};
 
-
- int main( int argc, char* argv[] )
- {
-   std::cout<<"bot created"<<std::endl;
-   Bot b;
-
- }
+// Main
+int main(int argc, char* argv[])
+{
+    std::cout << "Bot created" << std::endl;
+    Bot b;
+    return 0;
+}
