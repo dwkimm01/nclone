@@ -47,7 +47,8 @@ void NClone::setup
 	ncs = pncs;
 	enteringPassword = penteringPassword;
 
-	cmdMap.Setup(ncs, app, chats, ncCmd, cmdHist, cfg);
+	cmdMap.Setup(ncs, app, chats, p_keyMap,
+			ncCmd, cmdHist, cfg);
 
 	keyMap().set([&]()
 		{
@@ -456,8 +457,9 @@ void NClone::setup
 				const bool success = cmdMap.ProcessCommand(ncCmd.cmd);
 				if (!success)
 				{
-					ncs()->append(ncCmd.cmd);
-					ncs()->refresh();
+					// TODO, either do this here or in the NCCommandHandler::ProcessCommand
+//					ncs()->append(ncCmd.cmd);
+//					ncs()->refresh();
 				}
 				// TODO, probably don't want/need to add standard cmds w/o params like help
 				ncCmd.cmd.clear();
