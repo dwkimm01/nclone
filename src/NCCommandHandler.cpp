@@ -463,6 +463,8 @@ bool NCCommandHandler::ProcessCommand(std::string command)
 	// Determine command
 	const std::string cmdStr = "[[:space:]]*/([[:word:]]+)";
 	const boost::regex re(cmdStr);
+
+	bool cmdProcessed = false;
 	for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(command.begin(),command.end(),boost::regex(cmdStr)),boost::sregex_iterator()) )
 	{
 		// TODO, remove the '/' at the beginning and take it out of the command map
@@ -479,9 +481,10 @@ bool NCCommandHandler::ProcessCommand(std::string command)
 			}
 			return false;
 		}
+		cmdProcessed = true;
 		it->second(command);
 	}
-	return true;
+	return cmdProcessed;
 }
 
 } // namespace ncpp

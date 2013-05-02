@@ -279,8 +279,9 @@ int doit(int argc, char* argv[])
 			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 			, cmdHist, ncCmd
 			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
-			, cfg);
-
+			, cfg
+			, connections
+			, msgSignal);
 
 		// Loop forever until input tells us to return
 		while(ncCmd.stillRunning)
@@ -461,61 +462,6 @@ int doit(int argc, char* argv[])
 				}
 				break;
 			default:
-				//Filter out non-printable characters
-				//TODO, implement as boost ns::print
-				if (ncstringutils::NCStringUtils::isPrint(c))
-				{
-					// Add characters to cmd string, refresh
-					ncCmd.cmd.insert(ncCmd.cmd.begin() + ncCmd.cmdIdx, c);
-					++ncCmd.cmdIdx;
-					if(NCCmd::PASSWORD == ncCmd.inputState)
-					{
-						std::string xInput;
-						xInput.reserve(ncCmd.cmd.size());
-						for(unsigned int i = 0; ncCmd.cmd.size() > i; ++i)
-							xInput.push_back('x');
-						winCmd->append(xInput);
-					}
-					else
-					{
-						if(NCCmd::NORMAL == ncCmd.inputState || NCCmd::PROTOCOL == ncCmd.inputState || NCCmd::USERNAME == ncCmd.inputState)
-						{
-							winCmd->append(ncCmd.cmd);
-						}
-						else if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
-						{
-							// Already in reverse search state, need to find next match
-							--cmdHist;
-							for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
-							{
-								const auto pos = (*itr).find(ncCmd.cmd);
-								if(pos != std::string::npos)
-								{
-									ncCmd.prefix(" srch: ");
-									ncCmd.postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
-									ncCmd.foundCmd = *itr;
-									ncCmd.foundIdx = pos;
-
-									winCmd->append(ncCmd.display());
-									winCmd->refresh();
-									cmdHist.setIdx(itr);
-
-									break;
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					if(ncs)
-					{
-						// Not printable - but didn't get accepted by any other rules
-						// TODO, print octal (and hexadecimal version) as well
-						ncs->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)c)));
-						ncs->refresh();
-					}
-				}
 				break;
 				// nothing
 			}
