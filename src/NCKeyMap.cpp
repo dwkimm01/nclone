@@ -41,6 +41,11 @@ void NCKeyMap::set(FuncType func, const std::string &name, const KeyType key)
 	_funcTable[key] = e;
 }
 
+void NCKeyMap::set(FuncDefaultType func)
+{
+	_default = func;
+}
+
 bool NCKeyMap::operator()(const KeyType key)
 {
 	auto func = _funcTable.find(key);
@@ -49,9 +54,9 @@ bool NCKeyMap::operator()(const KeyType key)
 		func->second.func(); // func->second.key, func->second.name);
 		return true;
 	}
-	else if(_default.func)
+	else if(_default)
 	{
-		_default.func(); // key, _default.name);
+		_default(key); // key, _default.name);
 	}
 	return false;
 }

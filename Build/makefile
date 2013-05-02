@@ -7,12 +7,16 @@ SOURCES=../src/NCApp.cpp \
 ../src/NCCmd.cpp \
 ../src/NCCmdHistory.cpp \
 ../src/NCCommandHandler.cpp \
+../src/NCColor.cpp \
 ../src/NCEnvironmentVariables.cpp \
 ../src/NCException.cpp \
 ../src/NCExceptionCurses.cpp \
 ../src/NCExceptionOutOfRange.cpp \
+../src/NCKeyMap.cpp \
+../src/NClone.cpp \
 ../src/NCMain.cpp \
 ../src/NCObject.cpp \
+../src/NCPathUtils.cpp \
 ../src/NCString.cpp \
 ../src/NCTimeUtils.cpp \
 ../src/NCWin.cpp \
@@ -30,7 +34,9 @@ LIBS= -lpurple \
 -lboost_regex \
 -lboost_system \
 -lpthread \
--lboost_signals
+-lboost_signals \
+-lboost_filesystem
+
 
 LIBPATHS= -L/usr/local/Cellar/Boost/lib
 

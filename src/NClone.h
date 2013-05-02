@@ -15,6 +15,7 @@
 #include "NCKeyMap.h"
 #include "NCCmdHistory.h"
 #include "NCCmd.h"
+#include "NCCommandHandler.h"
 
 namespace ncpp
 {
@@ -38,9 +39,11 @@ public:
 	, std::function<NCWinScrollback*()> pncs
 	, nccmdhistory::NCCmdHistory &cmdHist
 	, NCCmd &ncCmd
-	, std::function<bool()> penteringPassword );  // TODO, takeout penteringPassowrd and just use ncCmd
+	, std::function<bool()> penteringPassword  // TODO, takeout penteringPassowrd and just use ncCmd
+	, NCWinCfg &cfg );
 
 	nckeymap::NCKeyMap& keyMap();
+	ncpp::NCCommandHandler cmdMap;
 
 private:
 
