@@ -150,7 +150,7 @@ public:
 private:
 
 	std::map<KeyType, EntryType> _funcTable;
-	EntryType _default;
+	FuncDefaultType _default;
 
 };
 
