@@ -1,5 +1,8 @@
 TODO list
 
+ Fix Eclipse build settings so that can be used
+should just generate makefiles automatically
+
 - Cleanup
  Finish cmd map
  Merge Jeremy and my views
