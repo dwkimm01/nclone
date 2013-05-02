@@ -16,10 +16,13 @@
 #include "NCWinScrollback.h"
 #include "NCWinCfg.h"
 #include "NCApp.h"
+#include "NCKeyMap.h"
 
-namespace ncpp{
+namespace ncpp
+{
 
-class NCCommandHandler{
+class NCCommandHandler
+{
 public:
 	/**
 	 * <b>Purpose:</b> CTOR
@@ -34,22 +37,25 @@ public:
 	/**
 	 * Setup
 	 */
-	void Setup(std::function<NCWinScrollback*()> pncs,
-			ncapp::NCApp& app, NCWinScrollback* &win3, NCCmd& ncCmd,
-			nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg);
+	void Setup
+		( std::function<NCWinScrollback*()> pncs
+		, ncapp::NCApp& app
+		, NCWinScrollback* &win3
+		, nckeymap::NCKeyMap &ncKeyMap
+		, NCCmd& ncCmd
+		, nccmdhistory::NCCmdHistory& cmdHist
+		, NCWinCfg& cfg);
 
 	/**
 	 * Process Commands
 	 */
-	//std::string
 	bool ProcessCommand(std::string command);
-
 
 private:
 	std::map<std::string, std::function<void(const std::string &cmd)>> cmdMap;
 	std::function<NCWinScrollback*()> fncs;
 	const int defaultScrollback = 500;
 };
-}
+} // namespace ncpp
 
-#endif /* NCCOMMANDHANDLER_H_ */
+#endif // NCCOMMANDHANDLER_H_

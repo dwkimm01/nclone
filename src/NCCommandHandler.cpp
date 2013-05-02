@@ -11,12 +11,18 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time.hpp>
+#include <boost/regex.hpp>
+
 #include "NCCommandHandler.h"
 #include "NCString.h"
 #include "NCWinCfg.h"
 #include "TestExampleText.h"
+#include "NCColor.h"
+#include "NCException.h"
+#include "NCTimeUtils.h"
 
-namespace ncpp{
+namespace ncpp
+{
 
 /**
  * Parameters needed:
@@ -25,13 +31,18 @@ namespace ncpp{
  * NCWinScrollback win3
  * NCCmd ncCmd
  */
-NCCommandHandler::NCCommandHandler(){
-}
-NCCommandHandler::~NCCommandHandler(){}
+NCCommandHandler::NCCommandHandler() {}
+NCCommandHandler::~NCCommandHandler() {}
 
-void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
-		ncapp::NCApp& app, NCWinScrollback* &win3, NCCmd& ncCmd,
-		nccmdhistory::NCCmdHistory& cmdHist, NCWinCfg& cfg){
+void NCCommandHandler::Setup
+	( std::function<NCWinScrollback*()> pncs
+	, ncapp::NCApp& app
+	, NCWinScrollback* &win3
+	, nckeymap::NCKeyMap &ncKeyMap
+	, NCCmd& ncCmd
+	, nccmdhistory::NCCmdHistory& cmdHist
+	, NCWinCfg& cfg )
+{
 
 	fncs = pncs;
 
@@ -44,12 +55,14 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-			ncs->append(cmd + ", help menu:");
+			ncs->append(NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			ncs->append(" Commands");
 			ncs->append("  /exit     quit application");
 			ncs->append("  /quit     quit application");
 			ncs->append("  /clear    empty current window");
 			ncs->append("  /help     print this information");
+			ncs->append("  /keys     print list of assigned keys");
+			ncs->append("  /key \"Command\" xxx    remap number xxx to Command");
 			ncs->append("  /history  print command history");
 			ncs->append("  /list     print windows open");
 			ncs->append("  /refresh  refresh all windows");
@@ -61,6 +74,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			ncs->append("  /newwin name(s)  create a window named name");
 			ncs->append("  /info win(s)   get info about a window");
 			ncs->append("  /jump win(s)   jump to window (reorder)");
+			ncs->append("  /time     print current time");
 			ncs->append("  /d1       print debug output to test text wrapping");
 			ncs->append("  /d2       print debug shorter string output to test page up/down");
 			ncs->append("  /lorem    print debug lorem text to test space wrapping");
@@ -68,7 +82,8 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			ncs->append(" Shortcuts");
 			// TODO, would be cool if dynamically mapping keystrokes would show up here in the
 			// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
-			ncs->append("  CTRL-c     quit");
+			ncs->append("  Escape     quit");
+			ncs->append("  CTRL-c     cancel current input");
 			ncs->append("  TAB        go to next window");
 			ncs->append("  SHIFT-TAB  go to previous window");
 			ncs->append("  CTRL-u     clear input window");
@@ -78,24 +93,91 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			ncs->append("  End        Scroll to bottom of scrollback");
 			ncs->append("  Enter      Send Message or process command");
 			ncs->append("  F3         Toggle Contact list window visibility");
+			ncs->append("  CTRL-r     Reverse search");
 			ncs->append("");
 			ncs->refresh();
 		}
 	};
-	cmdMap["/history"] = [&](std::string cmd){
+
+	cmdMap["/keys"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
+		if(ncs)
 		{
-			ncs->append(cmd + ", command history:");
+			for(auto k : ncKeyMap.getMap())
+			{
+				NCString space(" ", nccolor::NCColor::CHAT_NORMAL);
+
+				ncs->append
+					( space
+					+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL)
+					+ space
+					+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
+					);
+			}
+			ncs->refresh();
+		}
+	};
+
+	cmdMap["/key"] = [&](std::string cmd)
+	{
+// TODO		if(ncCmd.cmd.find("/key") == 0)
+		// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
+		const std::string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
+		const boost::regex re(binStr);
+		const std::string text = ncCmd.cmd;  // TODO, refactor and take out this var
+		if(boost::regex_search(text, re))
+		{
+			for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(text.begin(),text.end(),boost::regex(binStr)),boost::sregex_iterator()) )
+			{
+				if(what.size() == 3)
+				{
+					if(fncs && fncs())
+					{
+						fncs()->append(" Remap: " + what[1].str() + " to " + what[2].str());
+						fncs()->refresh();
+
+						for(auto km : ncKeyMap.getMap())
+						{
+							if(km.second.name == what[1].str())
+							{
+								auto kv = km.second.func;
+								ncKeyMap.getMap().erase(km.first);
+								ncKeyMap.set(kv, what[1], boost::lexical_cast<int>(what[2].str()));
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if(fncs && fncs())
+			{
+				fncs()->append(" " + ncCmd.cmd);
+				fncs()->append(" Does not match " + binStr);
+				fncs()->refresh();
+			}
+		}
+	};
+
+	cmdMap["/history"] = [&](std::string cmd)
+	{
+		if(fncs && fncs())
+		{
+			fncs()->append(NCString(ncCmd.cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			for(auto x : cmdHist)
 			{
-				ncs->append(" " + x);
+				fncs()->append(" " + x);
 			}
-			ncs->append("");
-			ncs->refresh();
+			fncs()->append("");
+			fncs()->refresh();
 		}
 	};
-	cmdMap["/newconn"] = [&](std::string cmd){
+
+	cmdMap["/newconn"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
@@ -105,16 +187,18 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			//  login: user@gmail.com
 			//  password: xxxx
 			ncCmd.inputState = NCCmd::PROTOCOL;
-			ncs->append(" Creating new connection");
+			ncs->append(NCString(ncCmd.cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			ncs->append("   Enter protocol (e.g. prpl-jabber)");
 			ncs->refresh();
 		}
 	};
-	cmdMap["/list"] = [&](std::string cmd){
+
+	cmdMap["/list"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-			ncs->append(cmd + ", Window list:");
+			ncs->append(NCString(ncCmd.cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			app.forEachChild([&](ncobject::NCObject* obj)
 			{
 				ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
@@ -122,24 +206,26 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 				{
 					ncs->append("  " + lwin->getConfig().p_title);
 				}
-				return true;  // keep going
+				return true;  // keep going through windows
 			});
 			ncs->append("");
 			ncs->refresh();
 		}
 	};
-	cmdMap["/refresh"] = [&](std::string cmd){
-		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
+
+	cmdMap["/refresh"] = [&](std::string cmd)
+	{
+		if(fncs && fncs())
 		{
-			ncs->append(cmd);
-			ncs->append("");
+			fncs()->append(NCString(ncCmd.cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
+			fncs()->append("");
 		}
 		app.refresh();
 	};
 
 	//Add a method to parse 'set' out of the command string
-	cmdMap["/set"] = [&](std::string cmd){
+	cmdMap["/set"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		std::vector<std::string> cmdParam;
 		boost::split(cmdParam, cmd, boost::is_space()); // boost::is_any_of("\t"));
@@ -174,22 +260,25 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			}
 		}
 	};
-	cmdMap["/clear"] = [&](std::string cmd){
+
+	cmdMap["/clear"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-			ncs->append(cmd);
 			// Clear top buffer
 			ncs->clear();
 			ncs->refresh();
 		}
 	};
 
-	//Add a method to parse 'info' out of cmd
+	// Add a method to parse 'info' out of cmd
 	cmdMap["/info"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
+			ncs->append(NCString(ncCmd.cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
 			// Create the window list, if there is no window listed add current/top window to list
 			std::string winList = cmd;
 			boost::replace_all(winList, "/info", "");
@@ -217,6 +306,10 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 						ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
 						const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
 						ncs->append(std::string("     border: ") + borderVal);
+    			        NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
+    			        if(nwstmp)
+    			        	ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) );
+
 					}
 					return true;
 				});
@@ -226,10 +319,12 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 		}
 	};
 
-	//Add a method to parse 'jump' out of cmd
-	cmdMap["/jump"] = [&](std::string cmd){
+	// Add a method to parse 'jump' out of cmd
+	cmdMap["/jump"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
-		ncs->append(cmd);
+		ncs->append(NCString(ncCmd.cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
 		typedef boost::split_iterator<std::string::iterator> ItrType;
 		for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
 			 i != ItrType();
@@ -255,9 +350,23 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 		ncs->refresh();
 	};
 
-	//Add a method to parse 'jump' out of cmd
-	cmdMap["/newwin"] = [&](std::string cmd){
+	cmdMap["/time"] = [&](std::string cmd)
+	{
+		if(fncs && fncs())
+		{
+			fncs()->append(NCTimeUtils::getPrintableColorTimeStamp());
+			fncs()->refresh();
+		}
+	};
+
+
+	// Add a method to parse 'jump' out of cmd
+	cmdMap["/newwin"] = [&](std::string cmd)
+	{
+		// TODO, check fncs and fcs() everywhere!!
 		NCWinScrollback* ncs = fncs();
+		ncs->append(NCString(ncCmd.cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
 		ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 1 - ncwin->getConfig().p_x; } );
 		ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 5; } );
 		ncs->append(cmd);
@@ -279,11 +388,13 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
         	}
         }
 	};
-	cmdMap["/d1"] = [&](std::string cmd){
+
+	cmdMap["/d1"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-			ncs->append(cmd);
+			ncs->append(NCString(ncCmd.cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			const int max = ncs->getConfig().p_h;
 			for(int i = 1; i < max*5; ++i)
 			{
@@ -297,10 +408,13 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			ncs->refresh();
 		}
 	};
-	cmdMap["/d2"] = [&](std::string cmd){
+
+	cmdMap["/d2"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
+			ncs->append(NCString(ncCmd.cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
 			{
 				ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
@@ -308,11 +422,26 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 			ncs->refresh();
 		}
 	};
-	cmdMap["/lorem"] = [&](std::string cmd){
+
+	cmdMap["/lorem"] = [&](std::string cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-			const NCString entry = NCString(" " + testexampletext::TestExampleText::get(), 6);
+			ncs->append(NCString(ncCmd.cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
+			NCString entry
+				= NCTimeUtils::getPrintableColorTimeStamp()
+				+ NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
+			// Change color of e's for fun
+			entry.forEach([](char &c, char &color)
+			{
+				if('e' == c)
+				{
+					color = nccolor::NCColor::CHAT_NORMAL;
+				}
+			});
+
 			ncs->append(entry);
 			ncs->refresh();
 		}
@@ -327,17 +456,32 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 }
 
-bool NCCommandHandler::ProcessCommand(std::string command){
-	//use command map.find, if not at end, then you've got it
-	//cmdMap[command];
-	auto it = cmdMap.find(command);
-	if (it == cmdMap.end()){
-		return false;
+bool NCCommandHandler::ProcessCommand(std::string command)
+{
+	// Use command map.find, if not at end, then you've got it
+
+	// Determine command
+	const std::string cmdStr = "[[:space:]]*/([[:word:]]+)";
+	const boost::regex re(cmdStr);
+	for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(command.begin(),command.end(),boost::regex(cmdStr)),boost::sregex_iterator()) )
+	{
+		// TODO, remove the '/' at the beginning and take it out of the command map
+		// TODO, make it so we can use something besides / for command starts, like ':'
+		const std::string foundCmd = "/" + what[1].str();
+		const auto it = cmdMap.find( foundCmd );
+
+		if (it == cmdMap.end())
+		{
+			if(fncs && fncs())
+			{
+				fncs()->append(NCString(foundCmd + ", unknown command", nccolor::NCColor::COMMAND_HIGHLIGHT));
+				fncs()->refresh();
+			}
+			return false;
+		}
+		it->second(command);
 	}
-	it->second(command);
 	return true;
 }
-}
 
-
-
+} // namespace ncpp
