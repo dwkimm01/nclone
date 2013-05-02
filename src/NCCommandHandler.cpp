@@ -42,7 +42,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	cmdMap["/quit"] = [&](std::string cmd){ ncCmd.stillRunning = false; };
 	cmdMap["/help"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd + ", help menu:");
 			ncs->append(" Commands");
@@ -84,7 +84,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/history"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd + ", command history:");
 			for(auto x : cmdHist)
@@ -97,7 +97,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/newconn"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd);
 			// Collect up user information:
@@ -112,7 +112,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/list"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd + ", Window list:");
 			app.forEachChild([&](ncobject::NCObject* obj)
@@ -130,7 +130,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/refresh"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd);
 			ncs->append("");
@@ -176,7 +176,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/clear"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd);
 			// Clear top buffer
@@ -188,7 +188,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	//Add a method to parse 'info' out of cmd
 	cmdMap["/info"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			// Create the window list, if there is no window listed add current/top window to list
 			std::string winList = cmd;
@@ -281,7 +281,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/d1"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd);
 			const int max = ncs->getConfig().p_h;
@@ -299,7 +299,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/d2"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
 			{
@@ -310,7 +310,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/lorem"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			const NCString entry = NCString(" " + testexampletext::TestExampleText::get(), 6);
 			ncs->append(entry);
@@ -319,7 +319,7 @@ void NCCommandHandler::Setup(std::function<NCWinScrollback*()> pncs,
 	};
 	cmdMap["/"] = [&](std::string cmd){
 		NCWinScrollback* ncs = fncs();
-		if(&ncs != NULL)
+		if(ncs != NULL)
 		{
 			ncs->append(cmd + ", unknown command");
 			ncs->refresh();

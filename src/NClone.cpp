@@ -452,15 +452,16 @@ void NClone::setup
 			{
 
 				// Reset command window and assume it needs updating
-				cmdHist.add(cmd);
-				bool success = cmdMap.ProcessCommand(cmd);
-				if (!success){
-				ncs()->append(cmd);
-				ncs()->refresh();//
+				cmdHist.add(ncCmd.cmd);
+				const bool success = cmdMap.ProcessCommand(ncCmd.cmd);
+				if (!success)
+				{
+					ncs()->append(ncCmd.cmd);
+					ncs()->refresh();
 				}
 				// TODO, probably don't want/need to add standard cmds w/o params like help
-				cmd.clear();
-				cmdIdx = 0;
+				ncCmd.cmd.clear();
+				ncCmd.cmdIdx = 0;
 				winCmd->clear();
 				winCmd->refresh();
 			},
@@ -474,19 +475,19 @@ void NClone::setup
 						if (ncstringutils::NCStringUtils::isPrint(key))
 						{
 							// Add characters to cmd string, refresh
-							cmd.insert(cmd.begin() + cmdIdx, key);
-							++cmdIdx;
+							ncCmd.cmd.insert(ncCmd.cmd.begin() + ncCmd.cmdIdx, key);
+							++ncCmd.cmdIdx;
 							if(NCCmd::PASSWORD == ncCmd.inputState)
 							{
 								std::string xInput;
-								xInput.reserve(cmd.size());
-								for(unsigned int i = 0; cmd.size() > i; ++i)
+								xInput.reserve(ncCmd.cmd.size());
+								for(unsigned int i = 0; ncCmd.cmd.size() > i; ++i)
 									xInput.push_back('x');
 								winCmd->append(xInput);
 							}
 							else
 							{
-								winCmd->append(cmd);
+								winCmd->append(ncCmd.cmd);
 							}
 						}
 						else

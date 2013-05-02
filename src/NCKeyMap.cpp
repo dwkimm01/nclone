@@ -57,6 +57,7 @@ bool NCKeyMap::operator()(const KeyType key)
 	else if(_default)
 	{
 		_default(key); // key, _default.name);
+		return true;
 	}
 	return false;
 }

@@ -279,7 +279,8 @@ int doit(int argc, char* argv[])
 		nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
 			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 			, cmdHist, ncCmd
-			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; });
+			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
+			, cfg);
 
 
 		// Loop forever until input tells us to return
