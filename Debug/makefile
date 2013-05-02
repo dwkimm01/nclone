@@ -44,7 +44,7 @@ all: hw
 hw: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	g++ -L/home/dwkimm01/apps/lib -o "hw" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/home/dwkimm01/apps/boost_1_52_0/lib -o "hw" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
