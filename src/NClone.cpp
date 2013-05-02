@@ -420,13 +420,11 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			if(!winTime) return;
-			// Update timestamp
-			winTime->refresh();
-
-			// Update last time a key was pressed for idle timeout
-			now = second_clock::local_time();
-
+			if(winTime)
+			{
+				// Update timestamp
+				winTime->refresh();
+			}
 
 			// Get time current time and calculate timeout for idle timeout check
 			const ptime nowp = second_clock::local_time();
@@ -445,8 +443,6 @@ void NClone::setup
 					now = second_clock::local_time();
 				}
 			}
-
-
 		}, "Timeout", -1); // KEY_TIMEOUT);
 
 	keyMap().set([&]()
