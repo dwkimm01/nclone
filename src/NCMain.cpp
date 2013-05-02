@@ -349,6 +349,7 @@ int doit(int argc, char* argv[])
 			}
 
 			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
+
 			if(ncs)
 			{
 				// Use Keymap
