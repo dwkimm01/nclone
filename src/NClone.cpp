@@ -9,11 +9,11 @@
 #include "NClone.h"
 #include "NCStringUtils.h"
 #include "NCTimeUtils.h"
-
+#include "NCColor.h"
+#include "NCClientPurple.h"
 
 using namespace boost::gregorian;
 using namespace boost::posix_time;
-
 
 namespace ncpp
 {
@@ -41,7 +41,9 @@ void NClone::setup
 	, nccmdhistory::NCCmdHistory &cmdHist
 	, NCCmd &ncCmd
 	, std::function<bool()> penteringPassword
-	, NCWinCfg &cfg )
+	, NCWinCfg &cfg
+	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+	, boost::signal<void(const std::string&, const std::string&)> &msgSignal )
 {
 	// Save function for later use
 	ncs = pncs;
@@ -446,28 +448,126 @@ void NClone::setup
 		}, "Timeout", -1); // KEY_TIMEOUT);
 
 	keyMap().set([&]()
+	{
+#if 0
+		// Reset command window and assume it needs updating
+		cmdHist.add(ncCmd.cmd);
+		const bool success = cmdMap.ProcessCommand(ncCmd.cmd);
+		if (!success)
+		{
+			// TODO, either do this here or in the NCCommandHandler::ProcessCommand
+//			ncs()->append(ncCmd.cmd);
+//			ncs()->refresh();
+		}
+		// TODO, probably don't want/need to add standard cmds w/o params like help
+		ncCmd.cmd.clear();
+		ncCmd.cmdIdx = 0;
+		winCmd->clear();
+		winCmd->refresh();
+#endif
+
+//		if(cmdMap.ProcessCommand(ncCmd.cmd))
+//		{
+//			ncCmd.clear();
+//			return;
+//		}
+
+		// First check to see if we're in the REVERSEISEARCH state
+		if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
+		{
+			ncCmd.cmd = cmdHist.getCommand();
+			cmdHist.resetIndex();
+			ncCmd.inputState = NCCmd::NORMAL;
+		}
+		// TODO, what about the PASSWORD state?
+
+		if(NCCmd::NORMAL == ncCmd.inputState)
+		{
+			cmdHist.add(ncCmd.cmd);
+
+			if(!cmdMap.ProcessCommand(ncCmd.cmd))
 			{
 
-				// Reset command window and assume it needs updating
-				cmdHist.add(ncCmd.cmd);
-				const bool success = cmdMap.ProcessCommand(ncCmd.cmd);
-				if (!success)
-				{
-					// TODO, either do this here or in the NCCommandHandler::ProcessCommand
-//					ncs()->append(ncCmd.cmd);
-//					ncs()->refresh();
-				}
-				// TODO, probably don't want/need to add standard cmds w/o params like help
-				ncCmd.cmd.clear();
-				ncCmd.cmdIdx = 0;
-				winCmd->clear();
-				winCmd->refresh();
-			},
-	"Enter", '\n');
+			ncclientif::NCClientIf* client = 0;
+
+			// TODO, need to fix the way this connection is picked
+			if(connections.size() > 0)
+			{
+				client = connections[0];
+			}
+
+			// Pick buddy
+			const std::string buddyName = ncs()->getConfig().p_title;
+
+			if(client)
+			{
+				client->msgSend(buddyName, ncCmd.cmd);
+			}
+
+			const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
+			// Add msg to top (front) buffer
+			const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
+			ncs()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
+			ncs()->refresh();
+
+			}
+		}
+		else if(NCCmd::PROTOCOL == ncCmd.inputState)
+		{
+			ncCmd.inputState = NCCmd::USERNAME;
+			clientProtocol = ncCmd.cmd;
+			ncs()->append("    protocol: " + ncCmd.cmd);
+			ncs()->append("   Enter user login");
+			ncs()->refresh();
+		}
+		else if(NCCmd::USERNAME == ncCmd.inputState)
+		{
+			// TODO, need to turn off the echo to the screen
+			ncCmd.inputState = NCCmd::PASSWORD;
+			clientUsername = ncCmd.cmd;
+			ncs()->append("    username: " + ncCmd.cmd);
+			ncs()->append("   Enter password");
+			ncs()->refresh();
+		}
+		else if(NCCmd::PASSWORD == ncCmd.inputState)
+		{
+			ncCmd.inputState = NCCmd::NORMAL;
+			clientPassword = ncCmd.cmd;
+			ncs()->append("   creating new connection..");
+			typedef ncclientpurple::NCClientPurple::String String;
+
+			connections.push_back
+				( new ncclientpurple::NCClientPurple
+					( clientUsername
+					, clientPassword
+					, clientProtocol
+					, [&](const String &s, const int, const int) { }  // connectionStepCB
+					, [&](const String &s, const String &t) { msgSignal(s, t); }  // msgReceivedCB
+					, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
+					, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
+					) );
+
+			// TODO, no indication if connection failed or for what reason
+			// TODO, do not add password to cmdHist!!!
+		}
+//			}
+//}
+//}
+
+			// Reset command window and assume it needs updating
+			// TODO, probably don't want/need to add standard cmds w/o params like help
+//					ncCmd.cmd.clear();
+//					ncCmd.cmdIdx = 0;
+			ncCmd.clear();
+			winCmd->clear();
+			winCmd->refresh();
+
+	}, "Enter", '\n');
 
 	// KEY_IL: // TODO, INSERT doesn't seem to work on laptop
 	keyMap().set([&](nckeymap::NCKeyMap::KeyType key)
-			{
+	{
+#if 0
 		//Filter out non-printable characters
 						//TODO, implement as boost ns::print
 						if (ncstringutils::NCStringUtils::isPrint(key))
@@ -498,7 +598,64 @@ void NClone::setup
 								ncs()->refresh();
 							}
 						}
-			});
+#endif
+
+		// Filter out non-printable characters
+		// TODO, implement as boost ns::print
+		if (ncstringutils::NCStringUtils::isPrint(key))
+		{
+			// Add characters to cmd string, refresh
+			ncCmd.cmd.insert(ncCmd.cmd.begin() + ncCmd.cmdIdx, key);
+			++ncCmd.cmdIdx;
+			if(NCCmd::PASSWORD == ncCmd.inputState)
+			{
+				std::string xInput;
+				xInput.reserve(ncCmd.cmd.size());
+				for(unsigned int i = 0; ncCmd.cmd.size() > i; ++i)
+					xInput.push_back('x');
+				winCmd->append(xInput);
+			}
+			else
+			{
+				if(NCCmd::NORMAL == ncCmd.inputState || NCCmd::PROTOCOL == ncCmd.inputState || NCCmd::USERNAME == ncCmd.inputState)
+				{
+					winCmd->append(ncCmd.cmd);
+				}
+				else if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
+				{
+					// Already in reverse search state, need to find next match
+					--cmdHist;
+					for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
+					{
+						const auto pos = (*itr).find(ncCmd.cmd);
+						if(pos != std::string::npos)
+						{
+							ncCmd.prefix(" srch: ");
+							ncCmd.postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
+							ncCmd.foundCmd = *itr;
+							ncCmd.foundIdx = pos;
+
+							winCmd->append(ncCmd.display());
+							winCmd->refresh();
+							cmdHist.setIdx(itr);
+
+							break;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if(ncs)
+			{
+				// Not printable - but didn't get accepted by any other rules
+				// TODO, print octal (and hexadecimal version) as well
+				ncs()->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)key)));
+				ncs()->refresh();
+			}
+		}
+	});
 
 //	keyMap().set([&]()
 //			{

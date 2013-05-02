@@ -8,14 +8,18 @@
 #ifndef NCLONE_H_
 #define NCLONE_H_
 
+#include <string>
 #include <functional>
 #include <boost/date_time.hpp>
+#include <boost/signal.hpp>
 #include "NCApp.h"
 #include "NCWinScrollback.h"
 #include "NCKeyMap.h"
 #include "NCCmdHistory.h"
 #include "NCCmd.h"
 #include "NCCommandHandler.h"
+#include "NCClientIf.h"
+
 
 namespace ncpp
 {
@@ -40,7 +44,9 @@ public:
 	, nccmdhistory::NCCmdHistory &cmdHist
 	, NCCmd &ncCmd
 	, std::function<bool()> penteringPassword  // TODO, takeout penteringPassowrd and just use ncCmd
-	, NCWinCfg &cfg );
+	, NCWinCfg &cfg
+	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+	, boost::signal<void(const std::string&, const std::string&)> &msgSignal );
 
 	nckeymap::NCKeyMap& keyMap();
 	ncpp::NCCommandHandler cmdMap;
@@ -57,6 +63,9 @@ private:
 	// Timeout/idle count
 	boost::posix_time::ptime now;
 
+	std::string clientProtocol;
+	std::string clientUsername;
+	std::string clientPassword;
 
 };
 
