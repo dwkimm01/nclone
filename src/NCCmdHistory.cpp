@@ -6,6 +6,7 @@
  */
 
 #include <fstream>
+#include <vector>
 #include <boost/range/istream_range.hpp>
 #include "NCCmdHistory.h"
 #include "NCPathUtils.h"

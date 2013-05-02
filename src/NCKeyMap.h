@@ -58,6 +58,7 @@ public:
 
 	typedef int KeyType;
 	typedef std::function<void()> FuncType;
+	typedef std::function<void(KeyType)> FuncDefaultType;
 
 	typedef void PMF(int, int);
 	std::function<PMF> mfnc;
@@ -93,9 +94,15 @@ public:
 	void set(FuncType func, const std::string &name, const KeyType key);
 
 	/**
+	 * <b>Purpose:</b> Set default handler
+	 */
+	void set(FuncDefaultType func);
+
+	/**
 	 * <b>Purpose:</b> Actual mapping
 	 */
 	bool operator()(const KeyType key);
+
 
 
 	/**
@@ -144,7 +151,6 @@ private:
 
 	std::map<KeyType, EntryType> _funcTable;
 	EntryType _default;
-
 
 };
 
