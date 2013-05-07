@@ -17,6 +17,8 @@
 #include <boost/lexical_cast.hpp>
 // #include "NCExceptionOutOfRange.h"
 
+#include <iostream>
+
 // ---------------------------------------------------------------------------
 // This isn't in there already?  using namespace boost::algorithm did not help
 template<typename T>
@@ -37,83 +39,121 @@ namespace ncpp
 
 // ---------------------------------------------------------------------------
 // Functor used to split a string based on a max length
-// TODO, should be able to just replace this with one that splits the
-// string but is aware of spaces and tries to keep words together
 struct LengthFinder
 {
-	LengthFinder(const int length) : p_length(length) {}
+    LengthFinder(const int skip) : len(skip), n(0) {}
 
-	template <typename ForwardItr>
-	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
-	{
-		const ForwardItr n = Begin + p_length;
+    template<typename ForwardIteratorT>
+    boost::iterator_range<ForwardIteratorT> operator()(
+        ForwardIteratorT Begin,
+        ForwardIteratorT End )
+    {
+        ForwardIteratorT nb = Begin + n;
+        ForwardIteratorT ne = nb + len;
+        if(nb > End) nb = End;
+        if(ne > End) ne = End;
+        n = ((ne - nb) - 1);
+        return boost::iterator_range<ForwardIteratorT>(nb, ne);
+    }
 
-		// Reached the end, return (final) entire range
-		if(n >= End)
-		{
-			return boost::iterator_range<ForwardItr>(Begin, End);
-		}
-		return boost::iterator_range<ForwardItr>(Begin, n);
-	}
-
-private:
-	int p_length;
+   int len;
+   int n;
 };
+
+
+
 
 // ---------------------------------------------------------------------------
 // Functor used to split a string based on length but try to split based on
 // last found space character
 struct LengthSpaceFinder
 {
-	LengthSpaceFinder(const int length) : p_length(length), p_skipFirstSpace(false) {}
-// TODO, on scope exit set p_skipFirstSpace to true
-	template <typename ForwardItr>
-	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
-	{
-		if(p_skipFirstSpace && ' ' == *Begin) { ++Begin; p_skipFirstSpace = true; }
+    LengthSpaceFinder(const int skip) : len(skip), n(0) {}
 
-		const ForwardItr n = Begin + p_length;
+    template<typename ForwardIteratorT>
+    boost::iterator_range<ForwardIteratorT> operator()(
+        ForwardIteratorT Begin,
+        ForwardIteratorT End )
+    {
+        ForwardIteratorT nb = Begin + n;
+        ForwardIteratorT ne = nb + len;
+        if(nb > End) nb = End;
+        if(ne > End) ne = End;
 
-		// Reached the end, return (final) entire range
-		if(n > End)
-		{
-			return boost::iterator_range<ForwardItr>(Begin, End);
-		}
+        auto lastSpace = nb;
+        static const char spaceChar = ' ';
+        for(auto x = nb; x != ne; ++x)
+        {
+        	if(*x == spaceChar)
+        	{
+        		lastSpace = x;
+        	}
+        }
+        if(ne < End && lastSpace > nb)
+        {
+        	ne = lastSpace;
+        }
+        n = ((ne - nb) - 1);
 
-		// Check to see if we have ended on a space
-		const char spaceChar = ' ';
-		if(spaceChar == *n)
-		{ 
-                        p_skipFirstSpace = true;
-			return boost::iterator_range<ForwardItr>(Begin, n);
-		}
 
-		// Find last available space
-		ForwardItr lastSpace = Begin;
-		for(ForwardItr itr = Begin; itr != n; ++itr)
-		{
-			if(spaceChar == *itr)
-			{
-				lastSpace = itr;
-			}
-		}
+        return boost::iterator_range<ForwardIteratorT>(nb, ne);
+    }
 
-		// Use last space as long as it's more than the starting point
-		if(lastSpace > Begin)
-		{
-			p_skipFirstSpace = true;
-			return boost::iterator_range<ForwardItr>(Begin, lastSpace);
-		}
-
-		// Otherwise just return the entire string and while this forces the
-		// cutting of a string in half at least we've tried
-		return boost::iterator_range<ForwardItr>(Begin, n);
-	}
-
-private:
-	int p_length;
-	mutable bool p_skipFirstSpace;  // TODO, change this like the LengthMaxFinder...?
+   int len;
+   int n;
 };
+
+
+
+//		return boost::iterator_range<ForwardItr>(nb, ne);
+//
+//#if 0
+//		if(p_skipFirstSpace && ' ' == *Begin) { ++Begin; p_skipFirstSpace = true; }
+//
+//		const ForwardItr n = Begin + p_length;
+//
+//		// Reached the end, return (final) entire range
+//		if(n > End)
+//		{
+//			return boost::iterator_range<ForwardItr>(Begin, End);
+//		}
+//
+//
+//		// Check to see if we have ended on a space
+//		const char spaceChar = ' ';
+//		if(spaceChar == *n)
+//		{
+//			p_skipFirstSpace = true;
+//			return boost::iterator_range<ForwardItr>(Begin, n);
+//		}
+//
+//		// Find last available space
+//		ForwardItr lastSpace = Begin;
+//		for(ForwardItr itr = Begin; itr != n; ++itr)
+//		{
+//			if(spaceChar == *itr)
+//			{
+//				lastSpace = itr;
+//			}
+//		}
+//
+//		// Use last space as long as it's more than the starting point
+//		if(lastSpace > Begin)
+//		{
+//			p_skipFirstSpace = true;
+//			return boost::iterator_range<ForwardItr>(Begin, lastSpace);
+//		}
+//
+//		// Otherwise just return the entire string and while this forces the
+//		// cutting of a string in half at least we've tried
+//		return boost::iterator_range<ForwardItr>(Begin, n);
+//#endif
+//	}
+//
+//private:
+//	int p_length;
+//	mutable bool p_skipFirstSpace;  // TODO, change this like the LengthMaxFinder...?
+//};
 
 
 // ---------------------------------------------------------------------------
@@ -124,7 +164,7 @@ struct LengthMaxFinder
 	LengthMaxFinder(const int length) : p_length(length), p_once(false) {}
 
 	template <typename ForwardItr>
-	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End) const
+	boost::iterator_range<ForwardItr> operator()(ForwardItr Begin, ForwardItr End)
 	{
 		const ForwardItr n = Begin + p_length;
 
@@ -181,9 +221,13 @@ static void printWindow
 	typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 	unsigned int accum = 0;
 	// Start at offsMajor + offsMinor, printing at most MAXWIDTH per line and at most MAXHEIGHT lines
-	for(ForwardIterator lineItr = begin + std::min((unsigned int)(end - begin), offsMajor); lineItr != end && accum < maxHeight; ++lineItr)
+	for(ForwardIterator lineItr = begin + std::min((unsigned int)(end - begin), offsMajor);
+			lineItr != end && accum < maxHeight;
+			++lineItr)
 	{
-		for(Itr subItr = ADDSPL(boost::make_find_iterator((*lineItr)(), Splitter(maxWidth)), offsMinorInit); subItr != Itr() && accum < maxHeight; ++subItr)
+		for(Itr subItr = ADDSPL(boost::make_find_iterator((*lineItr)(), Splitter(maxWidth)), offsMinorInit);
+				subItr != Itr() && accum < maxHeight;
+				++subItr)
 		{
 			offsMinorInit = 0;
 //			print(boost::copy_range<std::string>(*subItr));

@@ -71,7 +71,7 @@ public:
 	int getTextHeight() const;
 	int getTextWidth() const;
 
-        int entryCount() const;
+	int entryCount() const;
 
 private:
 	NCWinBuffer p_buff;

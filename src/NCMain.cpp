@@ -15,6 +15,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/version.hpp>
+
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
 
@@ -38,6 +40,8 @@
 #include "NClone.h"
 #include "NCCmd.h"
 
+#include "NCTextWinFormatter.h"
+
 using namespace std;
 using namespace ncpp;
 
@@ -57,6 +61,34 @@ using namespace ncpp;
 // Main method
 int doit(int argc, char* argv[])
 {
+
+
+//    std::cout << "Boost version: " << std::hex
+//              << ((BOOST_VERSION >> 20) & 0xF)
+//              << "."
+//              << ((BOOST_VERSION >> 8) & 0xFFF)
+//              << "."
+//              << (BOOST_VERSION & 0xFF)
+//              << std::endl;
+	auto minor = BOOST_VERSION / 100 % 1000; // (BOOST_VERSION >> 8 & 0xFFF);
+	std::cout << "MINOR " << minor << std::endl;
+if( minor < 53 )
+	std::cout << "Less than 53" << std::endl;
+else
+	std::cout << "At least 53" << std::endl;
+
+//	std::vector<NCString> vec;
+//	vec.push_back(NCString("Hello", 0));
+//
+//	NCTextWinFormatter<LengthSpaceFinder> wf;
+//
+//	wf.printWindow(vec.begin(), vec.end(), 10, 10, 0, 0, [&](const NCString &xx)
+//	{
+//		std::cout << "(" << xx.getString() << ")" << std::endl;
+//	});
+//
+//	return 3;
+
 	// Scope for NCApp
 	{
 		// Parse command line options
@@ -69,6 +101,27 @@ int doit(int argc, char* argv[])
 
 		// Start up application
 		ncapp::NCApp app;
+
+#if 0
+		app << "Hello";
+		app.refresh();
+
+
+		NCWinCfg cfgx;
+		cfgx.p_h = 10;
+		cfgx.p_w = 10;
+		cfgx.p_x = 10;
+		cfgx.p_y = 10;
+		ncwin::NCWin w(&app, cfgx);
+		NCString ncstr("DoItNow", 2);
+//		w.printColor(ncstr);
+		ncstr.draw(&w);
+		w.refresh();
+
+
+		usleep(9000000);
+		return 2;
+#endif
 
 		// Resize functions
 		ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );
