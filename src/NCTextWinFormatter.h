@@ -9,10 +9,7 @@
 #define NCTEXTWINFORMATTER_H_
 
 #include <string>
-#include <vector>
-#include <utility>
 #include <boost/algorithm/string.hpp>
-#include <boost/version.hpp>
 #include "NCString.h"
 #include "NCStringFinders.h"
 

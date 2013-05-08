@@ -7,7 +7,7 @@ Text Console Chat Client
 
 **Development**
 
-![Screenshot](https://raw.github.com/dwkimm01/nclone/master/screenshots/ncloneJan22.png)
+![Screenshot](https://raw.github.com/dwkimm01/nclone/master/screenshots/ncloneMay7.png)
 
 Dependencies
 --------------
