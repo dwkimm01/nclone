@@ -5,9 +5,9 @@ env = Environment(CCFLAGS='-g')
 env.Append( CXXFLAGS='-std=c++0x' )
 
 # TODO, be able to load include paths from a config file
-INCS = ['/home/dwkimm01/Documents/Development/deps/boost_1_52_0/include', '/usr/include/glib-2.0', '/usr/lib/i386-linux-gnu/glib-2.0/include', '/usr/include/libpurple']
+INCS = ['/home/dwkimm01/Documents/Development/deps/boost_1_53_0/include', '/usr/include/glib-2.0', '/usr/lib/i386-linux-gnu/glib-2.0/include', '/usr/include/libpurple']
 # TODO, be able to load lib paths from a config file
-LIBPATHS = ['/home/dwkimm01/Documents/Development/deps/boost_1_52_0/lib']
+LIBPATHS = ['/home/dwkimm01/Documents/Development/deps/boost_1_53_0/lib']
 # TODO, depending on the system/lib versions we have to explicitly load diff libs
 #LIBS = ['boost_regex', 'boost_filesystem', 'boost_program_options', 'boost_signals', 'boost_system', 'ncurses', 'purple', 'dbus-glib-1', 'glib-2.0', 'pthread']
 LIBS = ['boost_regex', 'boost_filesystem', 'boost_program_options', 'boost_signals', 'boost_system', 'ncurses', 'pthread']
