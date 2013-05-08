@@ -8,6 +8,9 @@
 #ifndef NCSTRINGFINDERS_H_
 #define NCSTRINGFINDERS_H_
 
+#include <boost/version.hpp>
+
+
 namespace ncpp
 {
 namespace ncstringfinders
