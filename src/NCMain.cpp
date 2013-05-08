@@ -171,6 +171,11 @@ int doit(int argc, char* argv[])
 		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<std::string>(BOOST_VERSION % 100), nccolor::NCColor::CHAT_HIGHLIGHT);
 		winLog->append(boostVersion);
 
+		NCString builtOn("nclone, built on ", nccolor::NCColor::CHAT_NORMAL);
+		builtOn = builtOn + NCString(__DATE__, nccolor::NCColor::CHAT_HIGHLIGHT);
+		builtOn = builtOn + NCString(" at ", nccolor::NCColor::CHAT_NORMAL);
+		builtOn = builtOn + NCString(__TIME__, nccolor::NCColor::CHAT_HIGHLIGHT);
+		winLog->append(builtOn);
 
 		// Message received signal connect
 		msgSignal.connect
