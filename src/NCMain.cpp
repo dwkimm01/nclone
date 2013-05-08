@@ -58,25 +58,6 @@ using namespace ncpp;
 int doit(int argc, char* argv[])
 {
 
-//	auto minor = BOOST_VERSION / 100 % 1000; // (BOOST_VERSION >> 8 & 0xFFF);
-//	std::cout << "MINOR " << minor << std::endl;
-//if( minor < 53 )
-//	std::cout << "Less than 53" << std::endl;
-//else
-//	std::cout << "At least 53" << std::endl;
-
-//	std::vector<NCString> vec;
-//	vec.push_back(NCString("Hello", 0));
-//
-//	NCTextWinFormatter<LengthSpaceFinder> wf;
-//
-//	wf.printWindow(vec.begin(), vec.end(), 10, 10, 0, 0, [&](const NCString &xx)
-//	{
-//		std::cout << "(" << xx.getString() << ")" << std::endl;
-//	});
-//
-//	return 3;
-
 	// Scope for NCApp
 	{
 		// Parse command line options
@@ -89,7 +70,6 @@ int doit(int argc, char* argv[])
 
 		// Start up application
 		ncapp::NCApp app;
-
 
 		// Resize functions
 		ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );
@@ -116,7 +96,6 @@ int doit(int argc, char* argv[])
 		cfg.p_y = app.maxHeight() - cfg.p_h;
 		cfg.p_hasBorder = true;
 		cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
-//		ncwin::NCWin winCmd(&app, cfg, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 		NCWinScrollback* winCmd = new NCWinScrollback(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 		winCmd->setWrapLength();
 
@@ -129,18 +108,6 @@ int doit(int argc, char* argv[])
 		cfg.p_hasBorder = true;
 		NCWinScrollback* win3 = new NCWinScrollback(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
 
-//		{
-//			auto xxxCfg = cfg;
-//			xxxCfg.p_title = "SampleWindow";
-//			xxxCfg.p_x = 5;
-//			xxxCfg.p_y = 5;
-//			auto xxxWin = new NCWinScrollback(&app, xxxCfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
-//			xxxWin->append("Howdy");
-//			xxxWin->append("Howdy 2");
-//			xxxWin->append(NCString("Howdy 3", 2));
-//		}
-
-
 		// First chat window
 		cfg.p_title = "Console";
 		cfg.p_h -= 2;
@@ -151,10 +118,6 @@ int doit(int argc, char* argv[])
 		// TODO, forced to have one window here since there is no null check later on... fix this
 		NCWinScrollback* winLog = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
-// TODO, take this out when we can hide the window/autohide
-#define BUDDYLIST 1
-
-#if BUDDYLIST
 		// Buddy list window
 		auto blCfg = cfg;
 		blCfg.p_title = "Contacts";
@@ -169,7 +132,6 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs emptyResize;
 		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		winBl->setWrapCut();
-#endif
 
 		// Debug keystroke window
 		auto keysCfg = blCfg;
@@ -192,7 +154,6 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs timeResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 4; });
 
 		// TODO, perhaps the parent of winTime should be the parent of the chat windows
-		// ncwintime::NCWinTime* winTime = new ncwintime::NCWinTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
 		ncwin::NCWin* winTime = new ncwintime::NCWinTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
 
 		// Color printing
@@ -316,7 +277,6 @@ int doit(int argc, char* argv[])
 		while(ncCmd.stillRunning)
 		{
 
-#if BUDDYLIST
 			// Update Buddy List
 			if(winBl && app.isOnTopOf(winBl, winLog))
 			{
@@ -347,7 +307,6 @@ int doit(int argc, char* argv[])
 				winBl->end();
 				winBl->refresh();
 			}
-#endif
 
 
 			// Refresh winKeys if it is on top
