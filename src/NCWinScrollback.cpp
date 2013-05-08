@@ -206,7 +206,7 @@ void setFinder(Print &p, Bottom &b, Top &t, ScrollUp &su, ScrollDown &sd)
 
 void NCWinScrollback::setWrapLength()
 {
-	setFinder<LengthFinder>
+	setFinder<ncstringfinders::LengthFinder>
 		( p_printWindow
 		, p_getBottom
 		, p_getTop
@@ -216,7 +216,7 @@ void NCWinScrollback::setWrapLength()
 
 void NCWinScrollback::setWrapWordLength()
 {
-	setFinder<LengthSpaceFinder>
+	setFinder<ncstringfinders::LengthSpaceFinder>
 		( p_printWindow
 		, p_getBottom
 		, p_getTop
@@ -226,7 +226,7 @@ void NCWinScrollback::setWrapWordLength()
 
 void NCWinScrollback::setWrapCut()
 {
-	setFinder<LengthMaxFinder>
+	setFinder<ncstringfinders::LengthMaxFinder>
 		( p_printWindow
 		, p_getBottom
 		, p_getTop
