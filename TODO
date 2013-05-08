@@ -1,5 +1,8 @@
 TODO list
 
+ Fix CTRL-r not always putting cursor on the correct place
+especially when a line wrapped...
+
  Fix Eclipse build settings so that can be used
 should just generate makefiles automatically
 
