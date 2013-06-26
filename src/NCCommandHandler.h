@@ -55,6 +55,7 @@ private:
 	std::map<std::string, std::function<void(const std::string &cmd)>> cmdMap;
 	std::function<NCWinScrollback*()> fncs;
 	const int defaultScrollback = 500;
+	int _startTime;
 };
 } // namespace ncpp
 

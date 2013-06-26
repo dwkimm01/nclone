@@ -35,9 +35,19 @@ public:
 	static NCString getPrintableColorTimeStamp();
 
 	/**
+	 * <b>Purpose:</b> Get a time that blinks and has color
 	 */
 	static NCString getBlinkingTime(const int blankColonOn);
 
+	/**
+	 * <b>Purpose:</b> Get utc time
+	 */
+	static int getUtcTime();
+
+	/**
+	 * <b>Purpose:</b> Get the difference from now to param time as a string
+	 */
+	static NCString getTimeDiff(const int p);
 };
 
 } // namespace ncpp
