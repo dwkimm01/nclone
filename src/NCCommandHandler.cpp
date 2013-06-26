@@ -31,7 +31,11 @@ namespace ncpp
  * NCWinScrollback win3
  * NCCmd ncCmd
  */
-NCCommandHandler::NCCommandHandler() {}
+NCCommandHandler::NCCommandHandler()
+{
+	_startTime = NCTimeUtils::getUtcTime();
+}
+
 NCCommandHandler::~NCCommandHandler() {}
 
 void NCCommandHandler::Setup
@@ -75,6 +79,7 @@ void NCCommandHandler::Setup
 			ncs->append("  /info win(s)   get info about a window");
 			ncs->append("  /jump win(s)   jump to window (reorder)");
 			ncs->append("  /time     print current time");
+			ncs->append("  /uptime   print time up and running");
 			ncs->append("  /d1       print debug output to test text wrapping");
 			ncs->append("  /d2       print debug shorter string output to test page up/down");
 			ncs->append("  /lorem    print debug lorem text to test space wrapping");
@@ -359,6 +364,14 @@ void NCCommandHandler::Setup
 		}
 	};
 
+	cmdMap["/uptime"] = [&](std::string cmd)
+	{
+		if(fncs && fncs())
+		{
+			fncs()->append(NCString("Up for ", nccolor::NCColor::CHAT_NORMAL) + NCTimeUtils::getTimeDiff(_startTime));
+			fncs()->refresh();
+		}
+	};
 
 	// Add a method to parse 'jump' out of cmd
 	cmdMap["/newwin"] = [&](std::string cmd)
