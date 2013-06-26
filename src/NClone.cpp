@@ -321,11 +321,15 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			// TODO
-			if(!ncs()) return;
-			ncs()->append("CTRL-a");
-			ncs()->refresh();
+			ncCmd.cmdIdx = 0;
+			ncCmd.inputState = NCCmd::NORMAL;
 		}, "CTRL-a", 1);
+
+	keyMap().set([&]()
+		{
+			ncCmd.cmdIdx = ncCmd.cmd.size();
+			ncCmd.inputState = NCCmd::NORMAL;
+		}, "CTRL-e", 5);
 
 	keyMap().set([&]()
 		{
@@ -334,7 +338,7 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-                        // TODO, print msg to ncs if canceling ncCmd.inputState != NORMAL... 
+			// TODO, print msg to ncs if canceling ncCmd.inputState != NORMAL...
 			ncCmd.cmd.clear();
 			ncCmd.cmdIdx = 0;
 			ncCmd.inputState = NCCmd::NORMAL;
