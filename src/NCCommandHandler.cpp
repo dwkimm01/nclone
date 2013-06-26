@@ -99,6 +99,8 @@ void NCCommandHandler::Setup
 			ncs->append("  Enter      Send Message or process command");
 			ncs->append("  F3         Toggle Contact list window visibility");
 			ncs->append("  CTRL-r     Reverse search");
+			ncs->append("  CTRL-a     Move cursor to start of command");
+			ncs->append("  CTRL-e     Move cursor to end of command");
 			ncs->append("");
 			ncs->refresh();
 		}
