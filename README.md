@@ -14,123 +14,11 @@ Dependencies
 - g++ 4.7 or higher
 - BOOST 1.51 or higher (program_options, date_time, regex, system, signals)
 - libncurses
-- libpurple
+- libpurple (gloox replacing soon)
 - glib
 - pthread
 
-
-Next up (TODO list)
---------------
-- Make windows resize and refresh properly based on terminal size
-- Improvement: shorter buddy names to make reading easier
-- Improvement: push text down in window at beginning when window not full
-- Improvement: remove leading and trailing whitespace from commands
-- Upgrade: text wrapping to mind spaces
-- Wrap NCString with Msg with additional enum (INFO, MSG, WARNING, etc) to help aid color coding
-- Get color settings working for msgs, timestamps, etc
- - Char is only 8 bits we could
- - int 32/64 bit 8 chars could stuff a color attr per each char
- - would require more parsing routines
-- Window background color
-- Start command line parsing 
- - Text entry line wrapping
- - Text entry line editing with cursor/arrow keys
- - Text entry history, CTRL-r search
-- Status bar
-- Decide on license (GPL for libpurple)
-- Buddy list window
-- Drop down console window
-- Split into modules:
- - Utils
- - Ncurses
- - System
-- Cleanup
- - Add headers, footers, license
- - take out unused code
- - fix refresh vs draw vs rRefresh
- - comments and code documentation
- - Change .h to .hh
-- Fix editing lines that wrap in the command window
-- Fix keyboard layout for Mac
-- Improve build scripts, use autotools to configure build
-- Need some feature requirement type things...
- - Command completion like bash: up for last command
- - Command completion like web browser/naim: auto-completes while type and leaves the auto-completed portion to the right of the text cursor in a slightly greyed out state
-- Future functionality: string handling routines such as right justify, pad with spaces/zeroes, fill line to (with dashes)
-- Make chats full screen
-- Take away chat window border
-- Get "OK" input from user for cert problems
-- look at ncurses.h also has a "pad" full window type.
-- Configuration type system
-
-
-Research list
---------------
-- In case I want help wrapping lines: http://people.sc.fsu.edu/~jburkardt/cpp_src/wrap2/wrap2.html
-- Overview
- - Google coding standards (style guide) http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
- - Fast Streams: https://groups.google.com/forum/?fromgroups=#!topic/perfo/QmCHANgr_V8
- - More of a stream "editor" / viewer
- - Plugin for everything: like regex for reverse search through conversations and cmd hist
- - Encryption, automatic message queueing, incoming message modification (spellings mistakes, /filter)
- - can be used with screen?
- - 64 bit (or 32)
-- std::rope or some BOOST type as a string buffer replacement
-- libpurple: pidgin-sipe, gmail chat, facebook, twitter
-- BOOST
- - MPI: look into the message passing interface for "event" type programming
- - Spirit Parser
- - Cmd line arg parsing
- - Ranges (iterators)
- - Regex
- - Serialization
- - Multimap
- - Lock free (queues)
- - Sandbox: extension (plugin support)
-- C++ 11
- - lambdas
- - async, get (thread pooling - from BOOST?)
-- Design Patterns
- - "Listener"
- - Facade
- - Factory
- - (command if jeremy wants to explore)
- - Recursive Control 
-- General Comp Sci
- - Lookup tables
- - Trees, Trie (nedtrie) (map/search, see old xml file reader parser)
- - Exceptions
- - Multi-threading (see BOOST and C++11 thread "hiding" techniques)
- - Type System (config, safe assignment, output formatting, etc)
- - Scope lock (and other scope techniques)
- - Compression
- - MD5
- - Enumerating enums
-- Tools
- - Doxygen
- - wiki
- - changelog
- - git
- - scons
- - Google Protocol Buffers
- - Web Service
-- Need to be able to parse this from MS Office Communicator
-<pre>
-    │[14:56:41] (sip:jmyslinski@illumina.com) <DIV style="font-size: 9pt;font-family: MS Shell Dlg 2;color: #000000;di*│
-    │ection: ltr">balls</DIV>   
-</pre>
-- There is a PurpleConnectionFlags enum that has PURPLE_CONNECTION_HTML to not that we need to decode HTML
-- ncurses, BOOST, libpurple, pidgin-sipe, gcc 4.7 -> OSX, Windows?
-- Collection Oriented Programming??  http://c2.com/cgi/wiki?CollectionOrientedProgramming
-- Iterator Reverse: http://searchco.de/codesearch/view/16979256
-- "Iterators Must Go" Range: Chain, Zip, Stride, Radial,  
-- Allow for more generic window packing
- - 2D Bin Packing Algorithm
- - https://github.com/juj/RectangleBinPack
- - http://en.wikipedia.org/wiki/Knapsack_problem
- - http://en.wikipedia.org/wiki/Bin_packing_problem
-
-  
+ 
 Build notes
 --------------
 - Note: building BOOST on OS X with clang++
@@ -145,7 +33,7 @@ Build notes
 
 Run notes
 --------------
-- Note for sipe you still have to add this to your run command
+- Note for libpurple sipe you still have to add this to your run command
     NSS_SSL_CBC_RANDOM_IV=0 ./hw
  - Or set it in your environment export NSS_SSL_CBC_RANDOM_IV=0 for it to connect
 - Eclipse debugging
@@ -210,8 +98,8 @@ New Functionality
 - Be able to edit current command easily 
  . Left/Right arrow, delete/backspace work properly
 - CTRL-u deletes current line behind cursor to beginning
-- CTRL-a moves cursor to beginning of current line
-- CTRL-e moves cursor to end of current line
+DONE - CTRL-a moves cursor to beginning of current line
+DONE - CTRL-e moves cursor to end of current line
 - CTRL-c cancels current line (LOW priority, don't know if I like this)
 - Send a buddy queued messages (only on certain networks which don't buffer) 
  LOW priority
