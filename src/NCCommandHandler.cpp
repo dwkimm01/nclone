@@ -53,9 +53,9 @@ void NCCommandHandler::Setup
 	//Add a method that goes and gets the latest ncs window because it is not static
 	//Use getters to get anything that can change, like state, etc
 
-	cmdMap["/exit"] = [&](std::string cmd){ ncCmd.stillRunning = false; };
-	cmdMap["/quit"] = [&](std::string cmd){ ncCmd.stillRunning = false; };
-	cmdMap["/help"] = [&](std::string cmd){
+	cmdMap["/exit"] = [&](const std::string& cmd){ ncCmd.stillRunning = false; };
+	cmdMap["/quit"] = [&](const std::string& cmd){ ncCmd.stillRunning = false; };
+	cmdMap["/help"] = [&](const std::string& cmd){
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
@@ -104,7 +104,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/keys"] = [&](std::string cmd)
+	cmdMap["/keys"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs)
@@ -124,7 +124,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/key"] = [&](std::string cmd)
+	cmdMap["/key"] = [&](const std::string& cmd)
 	{
 // TODO		if(ncCmd.cmd.find("/key") == 0)
 		// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
@@ -167,7 +167,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/history"] = [&](std::string cmd)
+	cmdMap["/history"] = [&](const std::string& cmd)
 	{
 		if(fncs && fncs())
 		{
@@ -181,7 +181,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/newconn"] = [&](std::string cmd)
+	cmdMap["/newconn"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
@@ -198,7 +198,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/list"] = [&](std::string cmd)
+	cmdMap["/list"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
@@ -218,7 +218,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/refresh"] = [&](std::string cmd)
+	cmdMap["/refresh"] = [&](const std::string& cmd)
 	{
 		if(fncs && fncs())
 		{
@@ -229,7 +229,7 @@ void NCCommandHandler::Setup
 	};
 
 	//Add a method to parse 'set' out of the command string
-	cmdMap["/set"] = [&](std::string cmd)
+	cmdMap["/set"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		std::vector<std::string> cmdParam;
@@ -266,7 +266,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/clear"] = [&](std::string cmd)
+	cmdMap["/clear"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
@@ -278,7 +278,7 @@ void NCCommandHandler::Setup
 	};
 
 	// Add a method to parse 'info' out of cmd
-	cmdMap["/info"] = [&](std::string cmd){
+	cmdMap["/info"] = [&](const std::string& cmd){
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
@@ -325,13 +325,14 @@ void NCCommandHandler::Setup
 	};
 
 	// Add a method to parse 'jump' out of cmd
-	cmdMap["/jump"] = [&](std::string cmd)
+	cmdMap["/jump"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		ncs->append(NCString(ncCmd.cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
 		typedef boost::split_iterator<std::string::iterator> ItrType;
-		for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+		std::string ccmd = cmd;
+		for (ItrType i = boost::make_split_iterator(ccmd, boost::first_finder(" ", boost::is_iequal()));
 			 i != ItrType();
 			 ++i)
 		{
@@ -355,7 +356,7 @@ void NCCommandHandler::Setup
 		ncs->refresh();
 	};
 
-	cmdMap["/time"] = [&](std::string cmd)
+	cmdMap["/time"] = [&](const std::string& cmd)
 	{
 		if(fncs && fncs())
 		{
@@ -364,7 +365,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/uptime"] = [&](std::string cmd)
+	cmdMap["/uptime"] = [&](const std::string& cmd)
 	{
 		if(fncs && fncs())
 		{
@@ -374,7 +375,7 @@ void NCCommandHandler::Setup
 	};
 
 	// Add a method to parse 'jump' out of cmd
-	cmdMap["/newwin"] = [&](std::string cmd)
+	cmdMap["/newwin"] = [&](const std::string& cmd)
 	{
 		// TODO, check fncs and fcs() everywhere!!
 		NCWinScrollback* ncs = fncs();
@@ -384,7 +385,8 @@ void NCCommandHandler::Setup
 		ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 5; } );
 		ncs->append(cmd);
 		typedef boost::split_iterator<std::string::iterator> ItrType;
-        for (ItrType i = boost::make_split_iterator(cmd, boost::first_finder(" ", boost::is_iequal()));
+		std::string ccmd = cmd;
+        for (ItrType i = boost::make_split_iterator(ccmd, boost::first_finder(" ", boost::is_iequal()));
              i != ItrType();
              ++i)
         {
@@ -402,7 +404,7 @@ void NCCommandHandler::Setup
         }
 	};
 
-	cmdMap["/d1"] = [&](std::string cmd)
+	cmdMap["/d1"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
@@ -422,7 +424,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/d2"] = [&](std::string cmd)
+	cmdMap["/d2"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
@@ -436,7 +438,7 @@ void NCCommandHandler::Setup
 		}
 	};
 
-	cmdMap["/lorem"] = [&](std::string cmd)
+	cmdMap["/lorem"] = [&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
@@ -459,7 +461,9 @@ void NCCommandHandler::Setup
 			ncs->refresh();
 		}
 	};
-	cmdMap["/"] = [&](std::string cmd){
+
+	cmdMap["/"] = [&](const std::string& cmd)
+	{
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
