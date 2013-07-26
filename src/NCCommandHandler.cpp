@@ -76,6 +76,7 @@ void NCCommandHandler::Setup
 			ncs->append("      prpl-sipe	user@domain.com,domain\\user");
 			ncs->append("      prpl-jabber	user@gmail.com");
 			ncs->append("  /newwin name(s)  create a window named name");
+			ncs->append("  /delwin name(s)  delete a window named name");
 			ncs->append("  /info win(s)   get info about a window");
 			ncs->append("  /jump win(s)   jump to window (reorder)");
 			ncs->append("  /time     print current time");
@@ -399,12 +400,53 @@ void NCCommandHandler::Setup
         		cfg.p_title = winName;
         		ncs->append("Creating new window " + cfg.p_title);
         		auto myNewWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
-        		ncs->refresh();
         		myNewWin->append("Opened win " + cfg.p_title);
-        		win3->refresh();
         	}
         }
+       	//win3->refresh();
+       	fncs()->refresh();
 	};
+
+	cmdMap["/delwin"] = [&](const std::string& cmd)
+	{
+		// TODO, check fncs and fcs() everywhere!!
+		NCWinScrollback* ncs = fncs();
+		ncs->append(NCString(ncCmd.cmd + ", delete window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+
+		ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 1 - ncwin->getConfig().p_x; } );
+		ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 5; } );
+		ncs->append(cmd);
+		typedef boost::split_iterator<std::string::iterator> ItrType;
+		std::string ccmd = cmd;
+        for (ItrType i = boost::make_split_iterator(ccmd, boost::first_finder(" ", boost::is_iequal()));
+             i != ItrType();
+             ++i)
+        {
+        	// TODO, make sure there isn't a window with that name already?
+        	const std::string winName = boost::copy_range<std::string>(*i);
+        	if("/delwin" != winName)
+        	{
+        		/*cfg.p_title = winName;
+        		ncs->append("Creating new window " + cfg.p_title);
+        		auto myNewWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+        		ncs->refresh();
+        		myNewWin->append("Opened win " + cfg.p_title);
+        		win3->refresh();*/
+                        win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
+                        {
+                           auto nObjWin = dynamic_cast<ncwin::NCWin*>(nobj);
+                           if(nObjWin && nObjWin->getConfig().p_title == winName)
+                           {
+                              delete nobj;
+                              return false;
+                           }
+                           return true;
+                        });
+        	}
+        }
+        fncs()->refresh();
+	};
+
 
 	cmdMap["/d1"] = [&](const std::string& cmd)
 	{
