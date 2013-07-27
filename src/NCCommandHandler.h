@@ -52,7 +52,18 @@ public:
 	bool ProcessCommand(std::string command);
 
 private:
-	std::map<std::string, std::function<void(const std::string &cmd)>> cmdMap;
+	class Entry
+	{
+	public:
+		Entry() {}
+		Entry(std::function<void(const std::string &cmd)> fn, const std::string &help)
+			: p_fn(fn), p_help(help)
+		{
+		}
+		std::function<void(const std::string &cmd)> p_fn;
+		std::string p_help;
+	};
+	std::map<std::string, Entry> cmdMap;
 	std::function<NCWinScrollback*()> fncs;
 	const int defaultScrollback = 500;
 	int _startTime;
