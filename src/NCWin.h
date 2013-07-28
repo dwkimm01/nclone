@@ -57,12 +57,6 @@ public:
 
 	void setBackground(const short color);
 
-	/**
-	 * <b>Purpose:</b> Scroll window up one level
-	 */
-//	void scrollUp(const int n);
-//	void scrolldown(const int n);
-
 	void print(const char* str);
 	void print(const char* str, const int x, const int y);
 	void print(const NCString &ncStr);
@@ -96,7 +90,6 @@ public:
 private:
 	class NCWinData;
 	std::auto_ptr<NCWinData> p_data;
-
 };
 
 } // namespace ncwin

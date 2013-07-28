@@ -24,7 +24,6 @@ void NCWinBuffer::addRow(const ncpp::NCString &line, const bool autoScroll)
 	p_buff.push_back(line);
 }
 
-
 void NCWinBuffer::clear()
 {
 	p_buff.clear();
@@ -55,6 +54,5 @@ NCWinBuffer::ReverseIterator NCWinBuffer::rend()
 {
 	return p_buff.rend();
 }
-
 
 } // namespace ncpp

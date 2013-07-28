@@ -51,7 +51,7 @@ public:
 	// TODO, in the future maybe this should be cleaned up 
 	std::string& operator()();
 
-	//Concatenation operator
+	// Concatenation operator
 	NCString operator+(const NCString& rhs) const;
 
 	// Create an NCString based on a substring

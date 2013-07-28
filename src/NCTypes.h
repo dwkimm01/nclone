@@ -37,10 +37,6 @@ public:
 		TimeStamp p_time;
 		String p_line;
 	};
-
-
-
-
 };
 
 } // namespace nctypes

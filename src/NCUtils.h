@@ -10,7 +10,6 @@
 
 namespace ncpp
 {
-
 namespace ncutils
 {
 
@@ -22,7 +21,6 @@ namespace ncutils
 #define UNUSED(x) ((void)(x))
 
 } // namespace ncutils
-
 } // namespace ncpp
 
 #endif // NCUTILS_H_
