@@ -182,3 +182,35 @@ Random Code Sample that needs cleanup?
 Git, useful commands
 --------------
 git config --global color.ui auto
+
+
+NClone overview
+--------------
+Resize funcs for windows - could be static still need apt ptr
+
+Cmd window (user input)
+Top level chat (container) window
+Console (chat)
+Buddy List window
+Debug keystrokes
+Timestamp window
+
+Signals and Signal connections
+Connections list/vec
+Command History
+Cmd, CmdIdx, Input State
+KeyMap
+Command Map
+
+Model
+ Data Backend
+ Stl/boost containers
+
+View
+ Windows
+ ncurses
+ chat windows, buddy list, cmd win
+
+Controller
+ key map, cmd map, signals, cfg
+
