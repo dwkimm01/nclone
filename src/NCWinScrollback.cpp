@@ -42,11 +42,10 @@ void NCWinScrollback::refresh()
 	// that's where we are
 	const bool following = p_getBottom(p_buff.rbegin(), p_buff.rend(), widthOld, heightOld) == p_offs;
 
-	// TODO, need to call the base class refresh first since it will do the window resizing
+	// Need to call the base class refresh first since it will do the window resizing
 	// so that we will know what the new cfg.p_h/w/x/y are going to be
 	NCWin::updateSize();
 
-	// TODO, add back in pushing down lines for buffers that don't fill the height
 	// If there aren't enough lines, push down to start at bottom
 	// Calculate text area width and height
 	const int width = getTextWidth();
@@ -189,7 +188,6 @@ void NCWinScrollback::end()
 void NCWinScrollback::clear()
 {
 	p_buff.clear();
-//	NCWin::clear();
 	p_offs = p_getTop(p_buff.begin(), p_buff.end());
 }
 

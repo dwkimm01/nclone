@@ -13,7 +13,6 @@
 namespace ncpp
 {
 
-
 std::string NCTimeUtils::getTimeStamp()
 {
 	using namespace boost::posix_time;
@@ -24,12 +23,10 @@ std::string NCTimeUtils::getTimeStamp()
 	return to_simple_string(second_clock::local_time().time_of_day());
 }
 
-
 NCString NCTimeUtils::getColorTimeStamp()
 {
 	return NCString(NCTimeUtils::getTimeStamp(), nccolor::NCColor::CLOCK_NORMAL);
 }
-
 
 NCString NCTimeUtils::getPrintableColorTimeStamp()
 {
@@ -37,7 +34,6 @@ NCString NCTimeUtils::getPrintableColorTimeStamp()
 			getColorTimeStamp() +
 			NCString("]", nccolor::NCColor::DEFAULT);
 }
-
 
 NCString NCTimeUtils::getBlinkingTime(const int blankColonOn)
 {
@@ -61,7 +57,6 @@ NCString NCTimeUtils::getBlinkingTime(const int blankColonOn)
 		   NCString("]", nccolor::NCColor::DEFAULT);
 }
 
-
 int NCTimeUtils::getUtcTime()
 {
 	const boost::posix_time::ptime pt(boost::posix_time::second_clock::local_time());
@@ -71,7 +66,6 @@ int NCTimeUtils::getUtcTime()
 	return (diff.ticks() / diff.ticks_per_second());
 }
 
-
 NCString NCTimeUtils::getTimeDiff(const int p)
 {
 	const boost::posix_time::ptime pt(boost::posix_time::second_clock::local_time());
@@ -79,6 +73,5 @@ NCString NCTimeUtils::getTimeDiff(const int p)
 
 	return NCString(to_simple_string(pt - paramTime), nccolor::NCColor::CHAT_HIGHLIGHT); // second_clock::local_time().time_of_day());
 }
-
 
 } // namespace ncpp

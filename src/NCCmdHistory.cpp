@@ -16,7 +16,6 @@ namespace ncpp
 namespace nccmdhistory
 {
 
-
 struct line_reader: std::ctype<char>
 {
    line_reader()
@@ -58,33 +57,14 @@ NCCmdHistory::~NCCmdHistory()
 	{
 		of << x << "\n";
 	}
-
 }
 
 void NCCmdHistory::add(const std::string &cmd)
 {
-	// Make sure command is not a repeat
-//	for(const auto &e : _cmds)
-//	{
-//		if(cmd == e) return;
-//	}
-
-        // Delete older repeated command, then add to most recent (end)
-//	for(boost::circular_buffer<std::string>::iterator itr = _cmds.begin(); itr != _cmds.end(); ++itr)
-//	{
-//		if(cmd == *itr)
-//		{
-//			_cmds.erase(itr);
-//			break;
-//		}
-//	}
-
 	// I believe the correct behavior is just to keep on adding new commands regardless
 	// of whether they have been entered before or were selected from the history
 	_cmds.push_back(cmd);
 	resetIndex();
-
-	// TODO, except - if a cmdHist cmd is selected (entered) then it should prob. not be re-added?
 }
 
 unsigned int NCCmdHistory::size() const
@@ -127,8 +107,6 @@ NCCmdHistory& NCCmdHistory::operator--()
 	_cmdsIndex = (_cmdsIndex > 0) ? (_cmdsIndex - 1) : (0);
 	return *this;
 }
-
-
 
 } // namespace nccmdhistory
 } // namespace ncpp

@@ -10,13 +10,10 @@
 #include <ncurses.h>
 #include "NCColor.h"
 
-
 namespace ncpp
 {
-
 namespace nccolor
 {
-
 
 NCColor::NCColor()
 	: p_color(DEFAULT)
@@ -38,7 +35,6 @@ void NCColor::fromUnsignedChar(const unsigned char color)
 	p_color = color;
 }
 
-
 void NCColor::forEachColor(std::function<void(const short, const short, const short)> func)
 {
 	const std::vector<std::tuple<short, short, short>> colors =
@@ -53,7 +49,6 @@ void NCColor::forEachColor(std::function<void(const short, const short, const sh
 			std::make_tuple((short)BUDDYLIST_NORMAL,	(short)COLOR_WHITE, (short)COLOR_CYAN),
 			std::make_tuple((short)BUDDYLIST_HIGHLIGHT,	(short)COLOR_BLUE, (short)COLOR_BLACK),
 			std::make_tuple((short)CLOCK_NORMAL,		(short)COLOR_GREEN, (short)-1)
-
 	};
 
 	for(auto color : colors)
@@ -61,7 +56,6 @@ void NCColor::forEachColor(std::function<void(const short, const short, const sh
 		func(std::get<0>(color), std::get<1>(color), std::get<2>(color));
 	}
 }
-
 
 } // namespace nccolor
 

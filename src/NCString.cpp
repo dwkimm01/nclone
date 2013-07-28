@@ -89,7 +89,6 @@ void NCString::forEach(std::function<void(char &c, char& color)> func)
 	}
 }
 
-
 std::string::size_type NCString::size() const
 {
 	return theString.size();

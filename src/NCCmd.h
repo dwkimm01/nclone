@@ -41,7 +41,7 @@ public:
 
 	/**
 	 * <b>Purpose:</b> Get the display version of the command
-	 * @return std::string with [prefix,] cmd [, postfix] highlighting etc
+	 * @return NCString with [prefix,] cmd [, postfix] highlighting etc
 	 */
 	NCString display() const;
 	int displayIdx() const;

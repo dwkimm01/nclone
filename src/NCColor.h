@@ -48,15 +48,12 @@ public:
 	unsigned char toUnsignedChar() const;
 	void fromUnsignedChar(const unsigned char color);
 
-
 	static void forEachColor(std::function<void(const short, const short, const short)> func);
-
 
 private:
 	unsigned char p_color;
 
 };
-
 
 } // namespace nccolor
 

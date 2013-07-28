@@ -26,12 +26,6 @@ NCString NCCmd::display() const
 	return (REVERSEISEARCH == inputState)
 			? NCString(p_prefix, nccolor::NCColor::COMMAND_HIGHLIGHT) + NCString(foundCmd + p_postfix, nccolor::NCColor::COMMAND_NORMAL)
 			: NCString(cmd, nccolor::NCColor::COMMAND_NORMAL);
-
-//	if()
-//	{
-//		return ;
-//	}
-//	return cmd;
 }
 
 int NCCmd::displayIdx() const
@@ -53,7 +47,6 @@ void NCCmd::postfix(const std::string &post)
 	p_postfix = post;
 }
 
-
 int NCCmd::getScrollUp(const int windowWidth) const
 {
 	const int cmdTotal = cmd.size() / windowWidth;
@@ -68,7 +61,6 @@ int NCCmd::getScrollIdx(const int windowWidth) const
 	return 1 + (displayIdx() % windowWidth);
 }
 
-
 bool NCCmd::empty() const
 {
 	return cmd.empty();
@@ -81,7 +73,5 @@ void NCCmd::clear()
 	p_prefix.clear();
 	p_postfix.clear();
 }
-
-
 
 } // namespace ncpp

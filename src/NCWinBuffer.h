@@ -43,7 +43,6 @@ public:
 	 */
 	void clear();
 
-
 	typedef boost::circular_buffer<ncpp::NCString> Container;
 
 	/**
@@ -66,7 +65,6 @@ private:
 	// Data elements
 	Container p_buff;
 };
-
 
 } // namespace ncpp
 

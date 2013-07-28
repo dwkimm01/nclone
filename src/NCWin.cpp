@@ -95,35 +95,6 @@ public:
 			wbkgd(p_win, COLOR_PAIR(ncColor.toUnsignedChar()));
 		}
 
-
-#if 0
-// ---------------------------------------------------------------------------
-		// TODO, need to make this configurable
-		// Determine if our size needs fixing
-		int maxH = 0;
-		UNUSED(maxH);
-		int maxW = 0;
-		getmaxyx(stdscr, maxH, maxW);
-
-		if( (p_cfg.p_w + p_cfg.p_x) > maxW )
-		{
-			const int delta = ((p_cfg.p_w + p_cfg.p_x) - maxW);
-			p_cfg.p_w -= delta;
-			if(x > delta)
-			{
-				x -= delta;
-			}
-			else
-			{
-				x = 1;
-			}
-		}
-
-// ---------------------------------------------------------------------------
-#endif
-
-//		wclear(p_win);
-
 		// Draw border
 		if(p_cfg.p_hasBorder)
 		{
@@ -162,34 +133,11 @@ public:
 
 	void updateSize()
 	{
-		int widthN = p_cfg.p_w;
-		int heightN = p_cfg.p_h;
-		int xN = p_cfg.p_x;
-		int yN = p_cfg.p_y;
-
-		if(p_resizeWidth)
-		{
-			// p_cfg.p_w
-			widthN = p_resizeWidth(p_ncWin);
-		}
-
-		if(p_resizeHeight)
-		{
-			// p_cfg.p_h
-			heightN = p_resizeHeight(p_ncWin);
-		}
-
-		if(p_resizeX)
-		{
-			// p_cfg.p_x
-			xN = p_resizeX(p_ncWin);
-		}
-
-		if(p_resizeY)
-		{
-			// p_cfg.p_y
-			yN = p_resizeY(p_ncWin);
-		}
+		// Calculate width, height, x, and y
+		const int widthN = (p_resizeWidth) ? (p_resizeWidth(p_ncWin)) : (p_cfg.p_w);
+		const int heightN = (p_resizeHeight) ? (p_resizeHeight(p_ncWin)) : (p_cfg.p_h);
+		const int xN = (p_resizeX) ? (p_resizeX(p_ncWin)) : (p_cfg.p_x);
+		const int yN = (p_resizeY) ? (p_resizeY(p_ncWin)) : (p_cfg.p_y);
 
 		// Resize window if need be
 		if(widthN != p_cfg.p_w || heightN != p_cfg.p_h)
@@ -208,7 +156,6 @@ public:
 			p_cfg.p_y = yN;
 			mvwin(p_win, p_cfg.p_y, p_cfg.p_x);
 		}
-
 	}
 
 // TODO, decide if we want to use this
@@ -287,7 +234,6 @@ public:
 		wmove(p_win, cy, cx);
 	}
 
-
 	void printColor(const char* str, const char* color)
 	{
 	//    if(win == NULL)
@@ -309,19 +255,6 @@ public:
 	    		waddch(p_win, val);
 	    	}
 	    }
-
-//		wrefresh(p_win);
-
-	//    attron(COLOR_PAIR(1));
-	//    mvwprintw(win, 1, 1, "%s", "HOWDY");
-	//    attroff(COLOR_PAIR(1));
-	//
-	//    waddch(win, '\\');
-	//    waddch(win, 'F' | A_UNDERLINE | COLOR_PAIR(1));
-	//    waddch(win, 'i' | A_UNDERLINE | COLOR_PAIR(1));
-	//    waddch(win, 'l' | A_UNDERLINE | COLOR_PAIR(1));
-	//    waddch(win, 'e' | A_UNDERLINE | COLOR_PAIR(1));
-	//    waddch(win, '/');
 	}
 
 	int getChar()
@@ -355,12 +288,10 @@ NCWin::NCWin
 {
 }
 
-
 NCWin::~NCWin()
 {
 	// p_data deleted automatically by auto_ptr
 }
-
 
 void NCWin::refresh()
 {
@@ -370,24 +301,20 @@ void NCWin::refresh()
 	NCObject::refresh();
 }
 
-
 void NCWin::rRefresh()
 {
 	p_data->rRefresh();
 }
-
 
 void NCWin::clear()
 {
 	p_data->clear();
 }
 
-
 void NCWin::updateSize()
 {
 	p_data->updateSize();
 }
-
 
 const NCWinCfg& NCWin::getConfig() const
 {
@@ -399,42 +326,30 @@ void NCWin::setBackground(const short color)
 	p_data->setBackground(color);
 }
 
-
-//void NCWin::scrollUp(const int n)
-//{
-//	p_data->scrollUp(n);
-//}
-
 void NCWin::print(const char* str)
 {
 	p_data->print(str);
 }
 
-
 void NCWin::print(const ncpp::NCString &ncStr)
 {
-	//p_data->print(ncStr.getString().c_str());
 	ncStr.draw(this);
 }
-
 
 void NCWin::print(const char* str, const int x, const int y)
 {
 	p_data->print(str, x, y);
 }
 
-
 void NCWin::cursorReset()
 {
 	p_data->cursorReset();
 }
 
-
 void NCWin::cursorNextLine()
 {
 	p_data->cursorNextLine();
 }
-
 
 void NCWin::clearTillEnd()
 {
@@ -451,30 +366,21 @@ void NCWin::putChar(const char c, const int x, const int y)
 	p_data->putChar(c, x, y);
 }
 
-
 int NCWin::winId() const
 {
-//	return 1;
-//	return reinterpret_cast<int>(p_data.get());
-// TODO, this will fix it for 64-bit machines but maybe
-// we need to up the size of this return here or use a 
-// different type altogether
 	return *((int*)(p_data.get()));
 }
-
 
 void NCWin::printColor(const char* str, const char* color)
 {
 	p_data->printColor(str, color);
 }
 
-
 NCWin& NCWin::operator>>(int &c)
 {
 	c = p_data->getChar();
 	return *this;
 }
-
 
 } // namespace ncwin
 } // namespace ncpp

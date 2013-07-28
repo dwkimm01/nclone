@@ -5,7 +5,6 @@
 
 namespace ncpp
 {
-
 namespace testexampletext
 {
 
@@ -13,7 +12,6 @@ class TestExampleText
 {
 public:
    // Placeholder text: http://en.wikipedia.org/wiki/Lorem_ipsum
-
 
    static std::string get()
    {
@@ -25,7 +23,6 @@ public:
          "non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
       );
    }
-
 
    static std::string getOrig32()
    {
@@ -43,7 +40,6 @@ public:
       );
    }
 
-
    static std::string getOrig33()
    {
       return std::string(
@@ -58,7 +54,6 @@ public:
          "maiores alias consequatur aut perferendis doloribus asperiores repellat..."
       );
    }
-
 
    static std::string getOrig32English()
    {
@@ -75,7 +70,6 @@ public:
          "annoying consequences, or one who avoids a pain that produces no resultant pleasure?"
       );
    }
-
 
    static std::string getOrig33English()
    {
@@ -94,14 +88,12 @@ public:
       );
    }
 
-
    static std::string getETAIOINSHRDLU()
    {
       return std::string(
          "ETAOIN SHRDLU"
       );
    }
-
 
    static std::string rawStringLiteral()
    {
@@ -118,12 +110,9 @@ Or I will rend thee in the gobberwarts with my blurlecruncheon, see if I don't.
 
       );
    }
-
 };
 
-
 } // namespace testexampletext
-
 } // namespace ncpp
 
 #endif // TESTEXAMPLETEXT_H_
