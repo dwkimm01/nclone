@@ -18,7 +18,7 @@ TODO list
 
  Other
   - Save chat histories (append to old, have max size of txt log)
-  - OSX autotools/build scripts
+  - OSX: boost, gloox, autotools/build scripts
   - Windows build
   - General code cleanup
   - Refactor cmds and keys into generic std::function-s that can get called and mapped to whatever
