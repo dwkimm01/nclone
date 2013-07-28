@@ -1,5 +1,30 @@
 TODO list
 
+
+ GUI
+  - Command helper/guesser (e.g. /ju(mp X, to window x)
+  - Console window drops from top
+  - Buddy list window fixes and animate hiding to right
+  - CTRL-n go to next window with unseen updates
+  - Search and highlight
+
+ Network
+  - change to a more generic command string sending to client i/fs
+  - gloox i/f
+  - boost extension for plugin i/f model
+  - MS Communicator plugin creation
+  - Add commands and functions to i/f for handling conversations, new buddies, etc
+  - Handle multiple connections
+
+ Other
+  - Save chat histories (append to old, have max size of txt log)
+  - OSX autotools/build scripts
+  - Windows build
+  - General code cleanup
+  - Refactor cmds and keys into generic std::function-s that can get called and mapped to whatever
+  
+
+
  Fix CTRL-r not always putting cursor on the correct place
 especially when a line wrapped...
 
