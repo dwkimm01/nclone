@@ -225,12 +225,8 @@ void NClone::setup
 				ncCmd.prefix(" srch: ");
 //				ncCmd.postfix(" 0");
 				ncCmd.foundIdx = 0;
-				if(!winCmd) return;
-				winCmd->append(ncCmd.display());
-				winCmd->refresh();
-
 			}
-			else
+			// else
 			{
 				// Already in reverse search state, need to find next match
 				--cmdHist;
