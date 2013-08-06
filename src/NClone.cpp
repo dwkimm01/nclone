@@ -624,7 +624,7 @@ void NClone::setup
 				else if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
 				{
 					// Already in reverse search state, need to find next match
-					--cmdHist;
+					//--cmdHist;
 					for(auto itr = cmdHist.itr(); itr != cmdHist.begin(); --itr)
 					{
 						const auto pos = (*itr).find(ncCmd.cmd);
