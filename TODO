@@ -9,6 +9,7 @@ TODO list
   - Buddy list window fixes and animate hiding to right
   - CTRL-n go to next window with unseen updates
   - Search and highlight (CTRL-f starts "/find" to cmd) 
+  - Make sure boxes can be removed from window edges, make no boxes default and cfg settable
    
  Network
   - change to a more generic command string sending to client i/fs
@@ -34,7 +35,6 @@ should just generate makefiles automatically
 
 - Cleanup
  Finish cmd map
- Merge Jeremy and my views
  Auto hide buddy list (animated)
  CTRL n for next new msg
  New msg/online buddies don't put (new) window on top
@@ -353,6 +353,7 @@ Next up (TODO list)
  - Finish CTRL-r implementation
  - Fix CTRL-r not always putting cursor on the correct place
     especially when a line wrapped...
+ - Merge Jeremy and my views
 
 ----------------------------------------------------
 -- Fixed
