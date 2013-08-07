@@ -33,11 +33,11 @@ class Bot :
 {
 public:
     Bot()
-       : jid("wellsureitis@gmail.com")
+       : jid("huzzahhuzzah@gmail.com")
        , p_messageSession(0)
        , p_messageEventFilter(0)
     {
-        j = new Client( jid, "tt115938"); // , 443);
+        j = new Client( jid, "huzzah"); // , 443);
         j->logInstance().registerLogHandler(LogLevelDebug, LogAreaAll, new TestLogHandler());
 
         // j->setServer("talk.google.com");
