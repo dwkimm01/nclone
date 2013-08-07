@@ -2,11 +2,14 @@ TODO list
 
  GUI
   - Command helper/guesser (e.g. /ju(mp X, to window x)
+   . Tab does not complete command
+   . Doesn't provide hint when backspace starts deleting command
+   . Doesn't provide command specific hints (eg /jump Wina, Winb, Winc ...) 
   - Console window drops from top
   - Buddy list window fixes and animate hiding to right
   - CTRL-n go to next window with unseen updates
   - Search and highlight (CTRL-f starts "/find" to cmd) 
-
+   
  Network
   - change to a more generic command string sending to client i/fs
   - gloox i/f
