@@ -1,12 +1,11 @@
 TODO list
 
-
  GUI
   - Command helper/guesser (e.g. /ju(mp X, to window x)
   - Console window drops from top
   - Buddy list window fixes and animate hiding to right
   - CTRL-n go to next window with unseen updates
-  - Search and highlight
+  - Search and highlight (CTRL-f starts "/find" to cmd) 
 
  Network
   - change to a more generic command string sending to client i/fs
@@ -25,8 +24,6 @@ TODO list
   
 
 
- Fix CTRL-r not always putting cursor on the correct place
-especially when a line wrapped...
 
  Fix Eclipse build settings so that can be used
 should just generate makefiles automatically
@@ -350,7 +347,8 @@ Next up (TODO list)
  - Fix initial text windows when there isn't enough text to fill window
   . Right now we start from top but I want the text entered down near the cmd window
  - Finish CTRL-r implementation
-
+ - Fix CTRL-r not always putting cursor on the correct place
+    especially when a line wrapped...
 
 ----------------------------------------------------
 -- Fixed
