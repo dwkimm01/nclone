@@ -513,4 +513,21 @@ bool NCCommandHandler::ProcessCommand(std::string command)
 	return cmdProcessed;
 }
 
+std::tuple<std::string, std::string> NCCommandHandler::FindClosest(const std::string &s)
+{
+	std::tuple<std::string, std::string> ret;
+	for(const auto & cmd : cmdMap)
+	{
+		if(std::get<0>(cmd).find(s) == 0)
+		{
+			std::get<0>(ret) = std::get<0>(cmd);
+			std::get<1>(ret) = std::get<1>(cmd).p_help;
+			return ret;
+		}
+	}
+
+	return ret;
+}
+
+
 } // namespace ncpp

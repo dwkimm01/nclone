@@ -22,10 +22,9 @@ NCCmd::NCCmd()
 
 NCString NCCmd::display() const
 {
-
 	return (REVERSEISEARCH == inputState)
 			? NCString(p_prefix, nccolor::NCColor::COMMAND_HIGHLIGHT) + NCString(foundCmd + p_postfix, nccolor::NCColor::COMMAND_NORMAL)
-			: NCString(cmd, nccolor::NCColor::COMMAND_NORMAL);
+			: NCString(cmd, nccolor::NCColor::COMMAND_NORMAL) + NCString(p_postfix, nccolor::NCColor::COMMAND_NORMAL);
 }
 
 int NCCmd::displayIdx() const

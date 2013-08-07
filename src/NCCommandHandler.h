@@ -51,6 +51,11 @@ public:
 	 */
 	bool ProcessCommand(std::string command);
 
+	/**
+	 * Find Closest match
+	 */
+	std::tuple<std::string, std::string> FindClosest(const std::string &s);
+
 private:
 	class Entry
 	{

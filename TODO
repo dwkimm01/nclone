@@ -23,7 +23,8 @@ TODO list
   - Refactor cmds and keys into generic std::function-s that can get called and mapped to whatever
   
 
-
+ Refactor
+  - Maybe remove PROTOCOL from input state?
 
  Fix Eclipse build settings so that can be used
 should just generate makefiles automatically

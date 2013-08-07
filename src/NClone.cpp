@@ -33,7 +33,7 @@ void NClone::setup
 	( ncapp::NCApp &app
 	, NCWinScrollback* &winKeys
 	, NCWinScrollback* &winLog
-	, NCWinScrollback* &chats //  chats
+	, NCWinScrollback* &chats
 	, NCWinScrollback* &winBl
 	, NCWinScrollback* &winCmd
 	, ncwin::NCWin* &winTime
@@ -607,6 +607,25 @@ void NClone::setup
 			// Add characters to cmd string, refresh
 			ncCmd.cmd.insert(ncCmd.cmd.begin() + ncCmd.cmdIdx, key);
 			++ncCmd.cmdIdx;
+
+			// Figure out if we need to help out with commands
+			if(ncCmd.cmd.size() > 1 && '/' == ncCmd.cmd[0])
+			{
+				const auto &help = cmdMap.FindClosest(ncCmd.cmd);
+				const auto &helpCmd = std::get<0>(help);
+				const auto &helpNfo = std::get<1>(help);
+
+				if(helpCmd.size() > ncCmd.cmd.size())
+				{
+					const auto finish = helpCmd.substr(ncCmd.cmd.size(), helpCmd.size() - (ncCmd.cmd.size()-1));
+
+					ncCmd.postfix(finish + " - " + helpNfo);
+				}
+				else
+					ncCmd.postfix("");
+			}
+
+
 			if(NCCmd::PASSWORD == ncCmd.inputState)
 			{
 				std::string xInput;
@@ -619,7 +638,7 @@ void NClone::setup
 			{
 				if(NCCmd::NORMAL == ncCmd.inputState || NCCmd::PROTOCOL == ncCmd.inputState || NCCmd::USERNAME == ncCmd.inputState)
 				{
-					winCmd->append(ncCmd.cmd);
+					winCmd->append(ncCmd.display());
 				}
 				else if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
 				{
@@ -649,7 +668,7 @@ void NClone::setup
 		{
 			if(ncs)
 			{
-				// Not printable - but didn't get accepted by any other rules
+				// Not printable - but didn't get accepted by any other rules in the KeyMap
 				// TODO, print octal (and hexadecimal version) as well
 				ncs()->append(std::string("Unmapped keystroke " + boost::lexical_cast<std::string>((int)key)));
 				ncs()->refresh();

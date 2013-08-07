@@ -49,7 +49,7 @@ public:
 	, boost::signal<void(const std::string&, const std::string&)> &msgSignal );
 
 	nckeymap::NCKeyMap& keyMap();
-	ncpp::NCCommandHandler cmdMap;
+	ncpp::NCCommandHandler cmdMap; // TODO, move to private
 
 private:
 
