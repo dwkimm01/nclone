@@ -304,7 +304,7 @@ void NClone::setup
 		{
 			if(!chats) return;
 			chats->rotate();
-			chats->refresh();
+			ncs()->refresh();
 		}, "Buddy Next", '\t'); // 9
 
 
@@ -312,7 +312,7 @@ void NClone::setup
 		{
 			if(!chats) return;
 			chats->rotateBack();
-			chats->refresh();
+			ncs()->refresh();
 		}, "Buddy Previous", KEY_BTAB);
 
 	keyMap().set([&]()
@@ -483,6 +483,8 @@ void NClone::setup
 
 		if(NCCmd::NORMAL == ncCmd.inputState)
 		{
+                    if(ncCmd.cmd.size() > 0)
+                    {
 			cmdHist.add(ncCmd.cmd);
 
 			if(!cmdMap.ProcessCommand(ncCmd.cmd))
@@ -511,6 +513,7 @@ void NClone::setup
 			ncs()->refresh();
 
 			}
+                    }
 		}
 		else if(NCCmd::PROTOCOL == ncCmd.inputState)
 		{
