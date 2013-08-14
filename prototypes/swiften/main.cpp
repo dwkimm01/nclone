@@ -3,6 +3,8 @@
 
 #include <Swiften/Swiften.h>
 
+// http://swift.im/swiften/guide/
+
 using namespace Swift;
 using namespace boost;
 
