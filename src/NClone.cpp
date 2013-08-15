@@ -10,7 +10,8 @@
 #include "NCStringUtils.h"
 #include "NCTimeUtils.h"
 #include "NCColor.h"
-#include "NCClientPurple.h"
+//#include "NCClientPurple.h"
+#include "NCClientSwiften.h"
 
 using namespace boost::gregorian;
 using namespace boost::posix_time;
@@ -537,10 +538,10 @@ void NClone::setup
 			ncCmd.inputState = NCCmd::NORMAL;
 			clientPassword = ncCmd.cmd;
 			ncs()->append("   creating new connection..");
-			typedef ncclientpurple::NCClientPurple::String String;
+			typedef ncclientswiften::NCClientSwiften::String String;
 
 			connections.push_back
-				( new ncclientpurple::NCClientPurple
+				( new ncclientswiften::NCClientSwiften
 					( clientUsername
 					, clientPassword
 					, clientProtocol
@@ -549,6 +550,8 @@ void NClone::setup
 					, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
 					, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
 					) );
+
+			connections[0]->connect();
 
 			// TODO, no indication if connection failed or for what reason
 			// TODO, do not add password to cmdHist!!!
