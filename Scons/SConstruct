@@ -8,14 +8,10 @@ env.Append( CXXFLAGS='-std=c++0x' )
 #INCS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/include']
 INCS = ['/home/dwkimm01/Documents/Development/deps']
 # TODO, be able to load lib paths from a config file
-#LIBPATHS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/lib']
-LIBPATHS = ['/home/dwkimm01/Documents/Development/deps']
+LIBPATHS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/lib']
 # TODO, depending on the system/lib versions we have to explicitly load diff libs
-#LIBS = ['Swiften', 'boost_regex', 'boost_filesystem', 'boost_program_options', 'boost_signals', 'boost_date_time', 'boost_system', 'boost_thread', 'ncurses', 'z', 'pthread']
 LIBS = ['Swiften', 'boost_regex', 'boost_filesystem', 'boost_program_options', 'boost_signals', 'boost_date_time', 'boost_system', 'boost_thread', 'ncurses', 'z', 'pthread']
 SRCS = Glob('build/*.cpp')
-
-#SRCS = SRCS + ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/lib/libSwiften.a']
 
 # TODO, try out ncursesw at some point
 

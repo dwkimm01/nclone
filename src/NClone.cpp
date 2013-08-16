@@ -551,7 +551,7 @@ void NClone::setup
 					, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
 					) );
 
-			connections[0]->connect();
+//			connections[0]->connect();
 
 			// TODO, no indication if connection failed or for what reason
 			// TODO, do not add password to cmdHist!!!

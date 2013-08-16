@@ -55,6 +55,18 @@ public:
 
 };
 
+
+using namespace Swift;
+using namespace boost;
+
+static Client* client;
+
+void handleConnected();
+void handleMessageReceived(Message::ref message);
+void handlePresenceReceived(Presence::ref presence);
+void handleRosterReceived(ErrorPayload::ref error);
+
+
 NCClientSwiften::NCClientSwiften
    ( const NCClientSwiften::String &name
    , const NCClientSwiften::String &password
@@ -64,14 +76,33 @@ NCClientSwiften::NCClientSwiften
    , std::function<void(const String&, const String&)> debugLogCB
    , std::function<void(const String&)> buddySignedOnCB
    )
-   : p_data(new NCClientSwiften::Data(name, password, protocol, p_debugLogCB))
+   : p_data(0) // p_data(new NCClientSwiften::Data(name, password, protocol, p_debugLogCB))
    , p_connectionStepCB(connectionStepCB)
    , p_msgReceivedCB(msgReceivedCB)
    , p_debugLogCB(debugLogCB)
    , p_buddySignedOnCB(buddySignedOnCB)
 {
 
+	  SimpleEventLoop eventLoop;
+	  BoostNetworkFactories networkFactories(&eventLoop);
 
+	  client = new Client("fun@server.com", "p/w", &networkFactories);
+	  client->setAlwaysTrustCertificates();
+	  client->onConnected.connect(&handleConnected);
+	  client->onMessageReceived.connect(bind(&handleMessageReceived, _1));
+	  // client->onPresenceReceived.connect(bind(&EchoBot::handlePresenceReceived, this, _1));
+	  client->onPresenceReceived.connect(bind(&handlePresenceReceived, _1));
+
+	  client->connect();
+	//client->sendPresence(Presence::create("Send me a message"));
+	  std::cout << "Running event loop" << std::endl;
+	  eventLoop.run();
+
+	  delete client;
+
+
+
+#if 0
 	p_data->client->onConnected.connect([&]()
 	{
 //		std::cout << "Connected" << std::endl;
@@ -115,8 +146,47 @@ NCClientSwiften::NCClientSwiften
 	        p_data->client->sendPresence(response);
 	      }
 	});
-
+#endif
 }
+
+
+// scons swiften_dll=yes SWIFTEN_INSTALLDIR=/home/dwkimm01/Documents/Development/deps/swiften-2.0.0 /home/dwkimm01/Documents/Development/deps/swiften-2.0.0
+
+void handleConnected() {
+  std::cout << "Connected" << std::endl;
+  // Request the roster
+      GetRosterRequest::ref rosterRequest =
+          GetRosterRequest::create(client->getIQRouter());
+      rosterRequest->onResponse.connect(
+          bind(&handleRosterReceived, _2));
+      rosterRequest->send();
+}
+
+void handleMessageReceived(Message::ref message) {
+  // Echo back the incoming message
+  message->setTo(message->getFrom());
+  message->setFrom(JID());
+  client->sendMessage(message);
+}
+
+void handlePresenceReceived(Presence::ref presence) {
+      // Automatically approve subscription requests
+      if (presence->getType() == Presence::Subscribe) {
+        Presence::ref response = Presence::create();
+        response->setTo(presence->getFrom());
+        response->setType(Presence::Subscribed);
+        client->sendPresence(response);
+      }
+    }
+
+void handleRosterReceived(ErrorPayload::ref error) {
+      if (error) {
+        std::cerr << "Error receiving roster. Continuing anyway.";
+      }
+      // Send initial available presence
+      client->sendPresence(Presence::create("Send me a message"));
+    }
+
 
 NCClientSwiften::~NCClientSwiften()
 {
@@ -128,16 +198,16 @@ NCClientSwiften::String NCClientSwiften::getName() { return "NCClientSwiften"; }
 
 void NCClientSwiften::connect()
 {
-	p_data->client->connect();
-
-	p_data->loopThread.reset( new std::thread([&]()
-	{
-		p_debugLogCB("DEBUG", "Running event loop begin");
-		p_data->eventLoop.run();
-		p_debugLogCB("DEBUG", "Running event loop done");
-
-	}));
-//	std::cout << "Running event loop" << std::endl;
+//	p_data->client->connect();
+//
+//	p_data->loopThread.reset( new std::thread([&]()
+//	{
+//		p_debugLogCB("DEBUG", "Running event loop begin");
+//		p_data->eventLoop.run();
+//		p_debugLogCB("DEBUG", "Running event loop done");
+//
+//	}));
+////	std::cout << "Running event loop" << std::endl;
 
 }
 
