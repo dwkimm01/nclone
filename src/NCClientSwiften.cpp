@@ -82,20 +82,44 @@ NCClientSwiften::NCClientSwiften
    , p_debugLogCB(debugLogCB)
    , p_buddySignedOnCB(buddySignedOnCB)
 {
+	SimpleEventLoop eventLoop;
+	BoostNetworkFactories networkFactories(&eventLoop);
 
-	  SimpleEventLoop eventLoop;
-	  BoostNetworkFactories networkFactories(&eventLoop);
+	client = new Client(name, password, &networkFactories);
+	client->setAlwaysTrustCertificates();
+//	client->onConnected.connect(&handleConnected);
+	client->onConnected.connect([&]()
+	{
+		p_debugLogCB("DEBUG", "Connected");
+		// Request the roster
+		GetRosterRequest::ref rosterRequest = GetRosterRequest::create(client->getIQRouter());
+		rosterRequest->onResponse.connect(
+				bind(&handleRosterReceived, _2));
+		rosterRequest->send();
+	});
 
-	  client = new Client(name, password, &networkFactories);
-	  client->setAlwaysTrustCertificates();
-	  client->onConnected.connect(&handleConnected);
-	  client->onMessageReceived.connect(bind(&handleMessageReceived, _1));
-	  // client->onPresenceReceived.connect(bind(&EchoBot::handlePresenceReceived, this, _1));
-	  client->onPresenceReceived.connect(bind(&handlePresenceReceived, _1));
 
-	  client->connect();
+	client->onMessageReceived.connect(bind(&handleMessageReceived, _1));
+
+
+	// client->onPresenceReceived.connect(bind(&EchoBot::handlePresenceReceived, this, _1));
+//	  client->onPresenceReceived.connect(bind(&handlePresenceReceived, _1));
+	client->onPresenceReceived.connect([&](Presence::ref presence)
+	{
+		// Automatically approve subscription requests
+		if (presence->getType() == Presence::Subscribe)
+		{
+			Presence::ref response = Presence::create();
+			response->setTo(presence->getFrom());
+			response->setType(Presence::Subscribed);
+			p_data->client->sendPresence(response);
+		}
+	});
+
+	client->connect();
 	//client->sendPresence(Presence::create("Send me a message"));
-	  std::cout << "Running event loop" << std::endl;
+//	  std::cout << "Running event loop" << std::endl;
+	p_debugLogCB("DEBUG", "Running event loop");
 	  eventLoop.run();
 	  delete client;
 
