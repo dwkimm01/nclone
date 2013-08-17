@@ -27,9 +27,8 @@ public:
 	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const String&)> debugLogCB)
 		: networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
-		, p_debugLogCB(p_debugLogCB)
+//		, p_debugLogCB(p_debugLogCB)
 	{
-//		client->setAlwaysTrustCertificates();
 	}
 
 	~Data()
@@ -67,21 +66,12 @@ public:
 	Swift::Client* client;
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
-	std::function<void(const String&, const String&)> p_debugLogCB;
+//	std::function<void(const String&, const String&)> p_debugLogCB;
 
 };
 
 
-//static Client* client;
 
-void handleConnected();
-void handleMessageReceived(Message::ref message);
-void handlePresenceReceived(Presence::ref presence);
-void handleRosterReceived(ErrorPayload::ref error);
-
-
-static SimpleEventLoop eventLoop;
-static BoostNetworkFactories networkFactories(&eventLoop);
 
 
 NCClientSwiften::NCClientSwiften
@@ -93,14 +83,16 @@ NCClientSwiften::NCClientSwiften
    , std::function<void(const String&, const String&)> debugLogCB
    , std::function<void(const String&)> buddySignedOnCB
    )
-   : p_data(new NCClientSwiften::Data(name, password, protocol, p_debugLogCB))
+   : p_data(new NCClientSwiften::Data(name, password, protocol, debugLogCB))
    , p_connectionStepCB(connectionStepCB)
    , p_msgReceivedCB(msgReceivedCB)
    , p_debugLogCB(debugLogCB)
    , p_buddySignedOnCB(buddySignedOnCB)
 {
 
-	p_data->client = new Client(name, password, &networkFactories);
+//	p_debugLogCB = [&](const String &a, const String &b){};
+
+	p_data->client = new Client(name, password, &p_data->networkFactories);
 	p_data->client->setAlwaysTrustCertificates();
 
 	// Connected
@@ -150,8 +142,7 @@ NCClientSwiften::NCClientSwiften
 	auto xx = new std::thread([&]()
 	{
 //		p_debugLogCB("DEBUG", "Running event loop begin");
-		//p_data->
-		eventLoop.run();
+		p_data->eventLoop.run();
 //		p_debugLogCB("DEBUG", "Running event loop done");
 
 	});

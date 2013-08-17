@@ -15,6 +15,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
@@ -57,6 +59,9 @@ using namespace ncpp;
 // Main method
 int doit(int argc, char* argv[])
 {
+	// Thread
+	boost::mutex msgLock;
+
 
 	// Scope for NCApp
 	{
@@ -184,6 +189,7 @@ int doit(int argc, char* argv[])
 					(
 						[&](const std::string &s, const std::string &t)
 						{
+			boost::mutex::scoped_lock lock(msgLock);
 							// Prefix message with timestamp
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
 							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", nccolor::NCColor::CHATBUDDY_NORMAL);
@@ -192,6 +198,7 @@ int doit(int argc, char* argv[])
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
+
 							win3->forEachChild([&](ncobject::NCObject* o)
 							{
 								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
