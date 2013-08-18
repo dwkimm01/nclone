@@ -107,13 +107,11 @@ NCClientSwiften::NCClientSwiften
 
 
 	// Message Incoming
-//	client->onMessageReceived.connect(bind(&handleMessageReceived, _1));
-	p_data->client->onMessageReceived.connect([&](Message::ref message)
+	p_data->client->onMessageReceived.connect([&](Message::ref message) // bind(&handleMessageReceived, _1)
 	{
 		if(message && message->getBody().size() > 0)
 			p_debugLogCB(message->getFrom(), message->getBody());
 
-//		handleMessageReceived(message);
 		//   testing purposes, echo back
 		message->setTo(message->getFrom());
 		message->setFrom(JID());
@@ -138,14 +136,17 @@ NCClientSwiften::NCClientSwiften
 	//client->sendPresence(Presence::create("Send me a message"));
 	p_debugLogCB("DEBUG", "Running event loop");
 //	  eventLoop.run();
-//	p_data->loopThread.reset( new std::thread([&]()
-	auto xx = new std::thread([&]()
+	p_data->loopThread.reset( new std::thread([&]()
 	{
-//		p_debugLogCB("DEBUG", "Running event loop begin");
 		p_data->eventLoop.run();
-//		p_debugLogCB("DEBUG", "Running event loop done");
-
-	});
+	}) );
+//	auto xx = new std::thread([&]()
+//	{
+////		p_debugLogCB("DEBUG", "Running event loop begin");
+//		p_data->eventLoop.run();
+////		p_debugLogCB("DEBUG", "Running event loop done");
+//
+//	});
 //	  delete client;
 
 
@@ -247,15 +248,21 @@ void handlePresenceReceived(Presence::ref presence) {
 
 NCClientSwiften::~NCClientSwiften()
 {
-	delete p_data;
-	p_data = 0;
+	if(p_data)
+	{
+		p_debugLogCB("DEBUG", "Disconnecting");
+		p_data->client->disconnect();
+		p_data->loopThread->join();
+
+		delete p_data;
+		p_data = 0;
+	}
 }
 
 NCClientSwiften::String NCClientSwiften::getName() { return "NCClientSwiften"; }
 
 void NCClientSwiften::connect()
 {
-
 }
 
 void NCClientSwiften::disconnect()
@@ -269,6 +276,24 @@ void NCClientSwiften::sendTyping(const NCClientSwiften::String &who, const NCCli
 
 void NCClientSwiften::msgSend(const NCClientSwiften::String &who, const NCClientSwiften::String &msg)
 {
+	boost::shared_ptr<Swift::Message> msgOut(new Swift::Message());
+	msgOut->setFrom(JID());
+	msgOut->setTo(who);
+
+	msgOut->setBody(msg);
+	p_data->client->sendMessage(msgOut);
+
+//	p_data->client->onMessageReceived.connect([&](Message::ref message) // bind(&handleMessageReceived, _1)
+//	{
+//		if(message && message->getBody().size() > 0)
+//			p_debugLogCB(message->getFrom(), message->getBody());
+//
+//		//   testing purposes, echo back
+//		message->setTo(message->getFrom());
+//		message->setFrom(JID());
+//		p_data->client->sendMessage(message);
+
+
 }
 
 void NCClientSwiften::questionAnswerBool(const int id, const bool response)
