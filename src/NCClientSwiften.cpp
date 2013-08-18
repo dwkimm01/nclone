@@ -62,15 +62,31 @@ public:
 	}
 
 
+	static std::string GetString(const Presence::Type &t)
+	{
+		// enum Type { Available, Error, Probe, Subscribe, Subscribed, Unavailable, Unsubscribe, Unsubscribed };
+
+		switch(t)
+		{
+		case Presence::Available:
+			return "Available";
+			break;
+		case Presence::Unavailable:
+			return "Unavailable";
+			break;
+		default:
+			return "Unknown";
+		}
+		return "Unknown";
+	};
+
+
 	Swift::BoostNetworkFactories networkFactories;
 	Swift::Client* client;
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
-//	std::function<void(const String&, const String&)> p_debugLogCB;
 
 };
-
-
 
 
 
@@ -112,16 +128,26 @@ NCClientSwiften::NCClientSwiften
 		if(message && message->getBody().size() > 0)
 			p_debugLogCB(message->getFrom(), message->getBody());
 
-		//   testing purposes, echo back
-		message->setTo(message->getFrom());
-		message->setFrom(JID());
-		p_data->client->sendMessage(message);
+		// Testing purposes, echo back
+		// message->setTo(message->getFrom());
+		// message->setFrom(JID());
+		// p_data->client->sendMessage(message);
 	});
+
+
+
 
 	// client->onPresenceReceived.connect(bind(&EchoBot::handlePresenceReceived, this, _1));
 //	  client->onPresenceReceived.connect(bind(&handlePresenceReceived, _1));
 	p_data->client->onPresenceReceived.connect([&](Presence::ref presence)
 	{
+//		p_debugLogCB("DEBUG", "OPR");
+		const std::string statusString = NCClientSwiften::Data::GetString(presence->getType());
+//		p_debugLogCB("DEBUG", std::string(" OPR ") + presence->getFrom().toString() + " " + statusString);
+		p_msgReceivedCB(presence->getFrom().toString(), presence->getFrom().toString() + " " + statusString);
+
+//		p_msgReceivedCB(presence->getFrom().toString(), "Online");
+
 		// Automatically approve subscription requests
 		if (presence->getType() == Presence::Subscribe)
 		{
@@ -224,14 +250,6 @@ void handleConnected()
 }
 */
 
-/*
-void handleMessageReceived(Message::ref message) {
-  // Echo back the incoming message
-  message->setTo(message->getFrom());
-  message->setFrom(JID());
-  client->sendMessage(message);
-}
-*/
 
 /*
 void handlePresenceReceived(Presence::ref presence) {
@@ -254,6 +272,7 @@ NCClientSwiften::~NCClientSwiften()
 		p_data->client->disconnect();
 		p_data->loopThread->join();
 
+		delete p_data->client;
 		delete p_data;
 		p_data = 0;
 	}
@@ -267,7 +286,7 @@ void NCClientSwiften::connect()
 
 void NCClientSwiften::disconnect()
 {
-	p_data->client->disconnect();
+//	p_data->client->disconnect();
 }
 
 void NCClientSwiften::sendTyping(const NCClientSwiften::String &who, const NCClientSwiften::String &msg, bool done)
@@ -282,18 +301,6 @@ void NCClientSwiften::msgSend(const NCClientSwiften::String &who, const NCClient
 
 	msgOut->setBody(msg);
 	p_data->client->sendMessage(msgOut);
-
-//	p_data->client->onMessageReceived.connect([&](Message::ref message) // bind(&handleMessageReceived, _1)
-//	{
-//		if(message && message->getBody().size() > 0)
-//			p_debugLogCB(message->getFrom(), message->getBody());
-//
-//		//   testing purposes, echo back
-//		message->setTo(message->getFrom());
-//		message->setFrom(JID());
-//		p_data->client->sendMessage(message);
-
-
 }
 
 void NCClientSwiften::questionAnswerBool(const int id, const bool response)
