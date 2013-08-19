@@ -1,6 +1,8 @@
 TODO list
 
  GUI
+  - Fix but where "console" gets added as a window
+    connect to chat client, CTRL-r for hello "yeah hello!!!" and hit enter seems to do it
   - Command helper/guesser (e.g. /ju(mp X, to window x)
    . Tab does not complete command
    . Doesn't provide hint when backspace starts deleting command
