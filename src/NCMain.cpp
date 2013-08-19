@@ -60,7 +60,7 @@ using namespace ncpp;
 int doit(int argc, char* argv[])
 {
 	// Thread
-	boost::mutex msgLock;
+	boost::recursive_mutex msgLock;
 
 
 	// Scope for NCApp
@@ -189,7 +189,9 @@ int doit(int argc, char* argv[])
 					(
 						[&](const std::string &s, const std::string &t)
 						{
-			boost::mutex::scoped_lock lock(msgLock);
+//			boost::mutex::scoped_lock lock(msgLock);
+			boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
+
 							// Prefix message with timestamp
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
 							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", nccolor::NCColor::CHATBUDDY_NORMAL);
@@ -288,6 +290,10 @@ int doit(int argc, char* argv[])
 		// Loop forever until input tells us to return
 		while(ncCmd.stillRunning)
 		{
+			{
+			boost::unique_lock<boost::recursive_mutex> scoped_lockA(msgLock);
+
+
 
 			// Update Buddy List
 			if(winBl && app.isOnTopOf(winBl, winLog))
@@ -334,10 +340,14 @@ int doit(int argc, char* argv[])
 			winCmd->scrollUp(ncCmd.getScrollUp(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))));
 			winCmd->refresh();
 			winCmd->cursorSet(ncCmd.getScrollIdx(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))), 1);
+			}
 
 			// Get user input
 			int c = 0;
 			(*winCmd) >> c;  // app >> c;
+
+			boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
+
 
 			// Show keystroke in keystroke debug window
 			if(KEY_TIMEOUT != c)

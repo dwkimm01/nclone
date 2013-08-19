@@ -537,7 +537,7 @@ void NClone::setup
 		{
 			ncCmd.inputState = NCCmd::NORMAL;
 			clientPassword = ncCmd.cmd;
-			ncs()->append("   creating new connection..");
+//			ncs()->append("   creating new connection..");
 			typedef ncclientswiften::NCClientSwiften::String String;
 
 			connections.push_back

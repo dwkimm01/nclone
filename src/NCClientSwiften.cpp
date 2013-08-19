@@ -14,6 +14,8 @@
 using namespace Swift;
 using namespace boost;
 
+// Here's how to build the swiften library and install it to a prefix
+// scons swiften_dll=yes SWIFTEN_INSTALLDIR=/home/dwkimm01/Documents/Development/deps/swiften-2.0.0 /home/dwkimm01/Documents/Development/deps/swiften-2.0.0
 
 namespace ncpp
 {
@@ -27,38 +29,29 @@ public:
 	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const String&)> debugLogCB)
 		: networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
-//		, p_debugLogCB(p_debugLogCB)
+//		, p_debugLogCB(debugLogCB)
 	{
 	}
 
 	~Data()
 	{
-//		delete client;
-//		client = 0;
+		if(client)
+		{
+			delete client;
+			client = 0;
+		}
 	}
 
-//	void handleRosterReceived(Swift::ErrorPayload::ref error)
-//	{
-//		if (error)
-//		{
-//			// std::cerr << "Error receiving roster. Continuing anyway.";
-//			p_debugLogCB("ERROR", "Error receiving roster. Continuing anyway.");
-//		}
-//		// Send initial available presence
-//		p_debugLogCB("DEBUG", "Send initial available presense");
-//		client->sendPresence(Swift::Presence::create("Send me a message"));
-//	}
 
 
 	void handleRosterReceived(ErrorPayload::ref error)
 	{
 		if (error)
 		{
-	//		std::cerr << "Error receiving roster. Continuing anyway.";
-			throw int(2);
+//			p_debugLogCB("DEBUG", "Error receiving roster.  Continuing.");
 		}
 		// Send initial available presence
-		client->sendPresence(Presence::create("Send me a message"));
+		client->sendPresence(Presence::create("Online"));
 	}
 
 
@@ -85,6 +78,7 @@ public:
 	Swift::Client* client;
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
+//	std::function<void(const String&, const String&)> p_debugLogCB;
 
 };
 
@@ -106,8 +100,6 @@ NCClientSwiften::NCClientSwiften
    , p_buddySignedOnCB(buddySignedOnCB)
 {
 
-//	p_debugLogCB = [&](const String &a, const String &b){};
-
 	p_data->client = new Client(name, password, &p_data->networkFactories);
 	p_data->client->setAlwaysTrustCertificates();
 
@@ -126,14 +118,14 @@ NCClientSwiften::NCClientSwiften
 	p_data->client->onMessageReceived.connect([&](Message::ref message) // bind(&handleMessageReceived, _1)
 	{
 		if(message && message->getBody().size() > 0)
-			p_debugLogCB(message->getFrom(), message->getBody());
+			p_msgReceivedCB(message->getFrom(), message->getBody());
+//			p_debugLogCB(message->getFrom(), message->getBody());
 
 		// Testing purposes, echo back
 		// message->setTo(message->getFrom());
 		// message->setFrom(JID());
 		// p_data->client->sendMessage(message);
 	});
-
 
 
 
@@ -145,8 +137,6 @@ NCClientSwiften::NCClientSwiften
 		const std::string statusString = NCClientSwiften::Data::GetString(presence->getType());
 //		p_debugLogCB("DEBUG", std::string(" OPR ") + presence->getFrom().toString() + " " + statusString);
 		p_msgReceivedCB(presence->getFrom().toString(), presence->getFrom().toString() + " " + statusString);
-
-//		p_msgReceivedCB(presence->getFrom().toString(), "Online");
 
 		// Automatically approve subscription requests
 		if (presence->getType() == Presence::Subscribe)
@@ -164,7 +154,10 @@ NCClientSwiften::NCClientSwiften
 //	  eventLoop.run();
 	p_data->loopThread.reset( new std::thread([&]()
 	{
+		p_debugLogCB("DEBUG", "Running event loop begin");
 		p_data->eventLoop.run();
+		p_debugLogCB("DEBUG", "Running event loop done");
+
 	}) );
 //	auto xx = new std::thread([&]()
 //	{
@@ -235,33 +228,8 @@ NCClientSwiften::NCClientSwiften
 }
 
 
-// scons swiften_dll=yes SWIFTEN_INSTALLDIR=/home/dwkimm01/Documents/Development/deps/swiften-2.0.0 /home/dwkimm01/Documents/Development/deps/swiften-2.0.0
-
-/*
-void handleConnected()
-{
-//  std::cout << "Connected" << std::endl;
-  // Request the roster
-      GetRosterRequest::ref rosterRequest =
-          GetRosterRequest::create(client->getIQRouter());
-      rosterRequest->onResponse.connect(
-          bind(&handleRosterReceived, _2));
-      rosterRequest->send();
-}
-*/
 
 
-/*
-void handlePresenceReceived(Presence::ref presence) {
-      // Automatically approve subscription requests
-      if (presence->getType() == Presence::Subscribe) {
-        Presence::ref response = Presence::create();
-        response->setTo(presence->getFrom());
-        response->setType(Presence::Subscribed);
-        client->sendPresence(response);
-      }
-    }
-*/
 
 
 NCClientSwiften::~NCClientSwiften()
@@ -272,7 +240,6 @@ NCClientSwiften::~NCClientSwiften()
 		p_data->client->disconnect();
 		p_data->loopThread->join();
 
-		delete p_data->client;
 		delete p_data;
 		p_data = 0;
 	}
