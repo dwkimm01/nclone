@@ -170,7 +170,7 @@ void NCCommandHandler::Setup
 		}
 		fncs()->append("");
 		fncs()->refresh();
-	}, "Print command history");
+	}, "Print command history (clear empties history)");
 
 	cmdMap["/newconn"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
