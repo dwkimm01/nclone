@@ -467,8 +467,13 @@ void NClone::setup
 
 				if(!cmdMap.ProcessCommand(ncCmd.cmd))
 				{
-//					if(ncs())
+					if("Console" == ncs()->getConfig().p_title)
+					{
+						ncs()->append("Hey, I don't know what you mean by \"" + ncCmd.cmd + "\"");
+					}
 // TODO, "console" gets added as a window with this bad code
+					else
+					{
 					ncclientif::NCClientIf* client = 0;
 
 					// TODO, need to fix the way this connection is picked
@@ -490,6 +495,8 @@ void NClone::setup
 					// Add msg to top (front) buffer
 					const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
 					ncs()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
+					}
+
 					ncs()->refresh();
 
 				}
