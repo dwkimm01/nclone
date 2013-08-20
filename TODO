@@ -1,11 +1,8 @@
-TODO list
 
  GUI
   - Add text notification on CTRL-c when entering newconn info
-  - Fix but where "console" gets added as a window
-    connect to chat client, CTRL-r for hello "yeah hello!!!" and hit enter seems to do it
   - Command helper/guesser (e.g. /ju(mp X, to window x)
-   . Tab does not complete command
+   . Tab does not complete command (maybe enter should complete a guessed command)
    . Doesn't provide hint when backspace starts deleting command
    . Doesn't provide command specific hints (eg /jump Wina, Winb, Winc ...) 
   - Console window drops from top
@@ -15,8 +12,9 @@ TODO list
   - Make sure boxes can be removed from window edges, make no boxes default and cfg settable
    
  Network
-  - change to a more generic command string sending to client i/fs
-  - gloox i/f
+  - change to a more generic command string sending to client i/fs (instead of connect, disconnect, etc?)
+  - Add data model for handling sending msgs to specific user on specific connection
+DONE  - gloox i/f
   - boost extension for plugin i/f model
   - MS Communicator plugin creation
   - Add commands and functions to i/f for handling conversations, new buddies, etc

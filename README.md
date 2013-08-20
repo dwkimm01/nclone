@@ -103,7 +103,8 @@ DONE - CTRL-e moves cursor to end of current line
 - CTRL-c cancels current line (LOW priority, don't know if I like this)
 - Send a buddy queued messages (only on certain networks which don't buffer) 
  LOW priority
-
+DONE - Fix but where "console" gets added as a window
+- connect to chat client, CTRL-r for hello "yeah hello!!!" and hit enter seems to do it
 
 Use Cases
 --------------
