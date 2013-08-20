@@ -60,6 +60,9 @@ public:
 	// Decrement index to older command
 	NCCmdHistory& operator--();
 
+	// Clear history out
+	void clear();
+
 	// -----------------------------------------------------------------------
 	// Iterator
     class iterator: public boost::iterator_facade

@@ -108,5 +108,12 @@ NCCmdHistory& NCCmdHistory::operator--()
 	return *this;
 }
 
+void NCCmdHistory::clear()
+{
+	_cmds.clear();
+	resetIndex();
+}
+
+
 } // namespace nccmdhistory
 } // namespace ncpp

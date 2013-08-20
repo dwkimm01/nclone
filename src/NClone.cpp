@@ -10,7 +10,6 @@
 #include "NCStringUtils.h"
 #include "NCTimeUtils.h"
 #include "NCColor.h"
-//#include "NCClientPurple.h"
 #include "NCClientSwiften.h"
 
 using namespace boost::gregorian;
@@ -72,19 +71,19 @@ void NClone::setup
 
 	keyMap().set([&]()
 		{
-			if(!chats || !winBl) return;
+			if(!chats || !winBl || !winLog) return;
 			// Bring buddy list to top if it's not on top, if it is push it to the back
 			if(app.isOnTopOf(winBl, winLog))
 			{
 				app.bringToBack(winBl);
 				chats->refresh();
-//				app.refresh();
+				if(winTime)
+					winTime->refresh();
 			}
 			else
 			{
 				app.bringToFront(winBl);
 				winBl->refresh();
-//				app.refresh();
 			}
 		}
 		, "Buddy List Toggle", KEY_F(3));
@@ -450,28 +449,6 @@ void NClone::setup
 
 	keyMap().set([&]()
 	{
-#if 0
-		// Reset command window and assume it needs updating
-		cmdHist.add(ncCmd.cmd);
-		const bool success = cmdMap.ProcessCommand(ncCmd.cmd);
-		if (!success)
-		{
-			// TODO, either do this here or in the NCCommandHandler::ProcessCommand
-//			ncs()->append(ncCmd.cmd);
-//			ncs()->refresh();
-		}
-		// TODO, probably don't want/need to add standard cmds w/o params like help
-		ncCmd.cmd.clear();
-		ncCmd.cmdIdx = 0;
-		winCmd->clear();
-		winCmd->refresh();
-#endif
-
-//		if(cmdMap.ProcessCommand(ncCmd.cmd))
-//		{
-//			ncCmd.clear();
-//			return;
-//		}
 
 		// First check to see if we're in the REVERSEISEARCH state
 		if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
@@ -484,37 +461,39 @@ void NClone::setup
 
 		if(NCCmd::NORMAL == ncCmd.inputState)
 		{
-                    if(ncCmd.cmd.size() > 0)
-                    {
-			cmdHist.add(ncCmd.cmd);
-
-			if(!cmdMap.ProcessCommand(ncCmd.cmd))
+			if(ncCmd.cmd.size() > 0)
 			{
+				cmdHist.add(ncCmd.cmd);
 
-			ncclientif::NCClientIf* client = 0;
+				if(!cmdMap.ProcessCommand(ncCmd.cmd))
+				{
+//					if(ncs())
+// TODO, "console" gets added as a window with this bad code
+					ncclientif::NCClientIf* client = 0;
 
-			// TODO, need to fix the way this connection is picked
-			if(connections.size() > 0)
-			{
-				client = connections[0];
-			}
+					// TODO, need to fix the way this connection is picked
+					if(connections.size() > 0)
+					{
+						client = connections[0];
+					}
 
-			// Pick buddy
-			const std::string buddyName = ncs()->getConfig().p_title;
+					// Pick buddy
+					const std::string buddyName = ncs()->getConfig().p_title;
 
-			if(client)
-			{
-				client->msgSend(buddyName, ncCmd.cmd);
-			}
+					if(client)
+					{
+						ncs()->append(" sending to (" + buddyName + ") msg(" + ncCmd.cmd + ")");
+						client->msgSend(buddyName, ncCmd.cmd);
+					}
 
-			const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
-			// Add msg to top (front) buffer
-			const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
-			ncs()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
-			ncs()->refresh();
+					const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
+					// Add msg to top (front) buffer
+					const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
+					ncs()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
+					ncs()->refresh();
 
-			}
-                    }
+				}
+            }
 		}
 		else if(NCCmd::PROTOCOL == ncCmd.inputState)
 		{
@@ -537,7 +516,6 @@ void NClone::setup
 		{
 			ncCmd.inputState = NCCmd::NORMAL;
 			clientPassword = ncCmd.cmd;
-//			ncs()->append("   creating new connection..");
 			typedef ncclientswiften::NCClientSwiften::String String;
 
 			connections.push_back
@@ -551,22 +529,15 @@ void NClone::setup
 					, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
 					) );
 
-//			connections[0]->connect();
-
 			// TODO, no indication if connection failed or for what reason
 			// TODO, do not add password to cmdHist!!!
 		}
-//			}
-//}
-//}
 
-			// Reset command window and assume it needs updating
-			// TODO, probably don't want/need to add standard cmds w/o params like help
-//					ncCmd.cmd.clear();
-//					ncCmd.cmdIdx = 0;
-			ncCmd.clear();
-			winCmd->clear();
-			winCmd->refresh();
+		// Reset command window and assume it needs updating
+		// TODO, probably don't want/need to add standard cmds w/o params like help
+		ncCmd.clear();
+		winCmd->clear();
+		winCmd->refresh();
 
 	}, "Enter", '\n');
 
@@ -686,14 +657,7 @@ void NClone::setup
 //			{
 //				ncs()->append("JEremy wuz here.  Lol");
 //				ncs()->refresh();
-//			}, "Enter", KEY_ENTER);
-//
-//	keyMap().set([&]()
-//			{
-//				ncs()->append("JEremy wuz here.  Lol");
-//				ncs()->refresh();
-//			}, "Enter", '\n'); // 10);
-
+//			}, "Enter", KEY_ENTER); // '\n', 10
 
 }
 
@@ -701,8 +665,6 @@ nckeymap::NCKeyMap& NClone::keyMap()
 {
 	return p_keyMap;
 }
-
-
 
 } // namespace nclone
 } // namespace ncpp

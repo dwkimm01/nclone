@@ -152,16 +152,24 @@ void NCCommandHandler::Setup
 
 	cmdMap["/history"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		if(fncs && fncs())
+		if(!fncs || !fncs()) return;
+
+		const boost::regex re("/history[[:space:]]+clear[[:space:]]*");
+		if(boost::regex_match(cmd, re))
+		{
+			fncs()->append("Clearing history");
+			cmdHist.clear();
+		}
+		else
 		{
 			fncs()->append(NCString(ncCmd.cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
 			for(auto x : cmdHist)
 			{
 				fncs()->append(" " + x);
 			}
-			fncs()->append("");
-			fncs()->refresh();
 		}
+		fncs()->append("");
+		fncs()->refresh();
 	}, "Print command history");
 
 	cmdMap["/newconn"] = NCCommandHandler::Entry([&](const std::string& cmd)
@@ -251,12 +259,11 @@ void NCCommandHandler::Setup
 
 	cmdMap["/clear"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
+		if(fncs && fncs())
 		{
 			// Clear top buffer
-			ncs->clear();
-			ncs->refresh();
+			fncs()->clear();
+			fncs()->refresh();
 		}
 	}, "Empty current window");
 
@@ -279,32 +286,31 @@ void NCCommandHandler::Setup
 			typedef boost::split_iterator<std::string::iterator> ItrType;
 			for (ItrType i = boost::make_split_iterator(winList, boost::first_finder(" ", boost::is_iequal()));
 					i != ItrType(); ++i)
-		{
-			const std::string winName = boost::copy_range<std::string>(*i);
-			if(winName != "/info")
 			{
-				app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				const std::string winName = boost::copy_range<std::string>(*i);
+//				if(winName != "/info")
 				{
-					auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
-					if(nobjwin && nobjwin->getConfig().p_title == winName)
+					app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
 					{
-						ncs->append("  Window " + winName);
-						ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
-						ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
-						ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
-						ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
-						const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
-						ncs->append(std::string("     border: ") + borderVal);
-    			        NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
-    			        if(nwstmp)
-    			        	ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) );
-
-					}
-					return true;
-				});
+						auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
+						if(nobjwin && nobjwin->getConfig().p_title == winName)
+						{
+							ncs->append("  Window " + winName);
+							ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
+							ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
+							ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
+							ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
+							const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
+							ncs->append(std::string("     border: ") + borderVal);
+							NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
+							if(nwstmp)
+								ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) );
+						}
+						return true;
+					});
+				}
 			}
-		}
-		ncs->refresh();
+			ncs->refresh();
 		}
 	}, "Win(s) get info about a window");
 

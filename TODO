@@ -1,6 +1,7 @@
 TODO list
 
  GUI
+  - Add text notification on CTRL-c when entering newconn info
   - Fix but where "console" gets added as a window
     connect to chat client, CTRL-r for hello "yeah hello!!!" and hit enter seems to do it
   - Command helper/guesser (e.g. /ju(mp X, to window x)
