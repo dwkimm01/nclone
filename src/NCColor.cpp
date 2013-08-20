@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <tuple>
-#include <ncurses.h>
+#include "NCCurses.h"
 #include "NCColor.h"
 
 namespace ncpp

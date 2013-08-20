@@ -18,7 +18,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <ncurses.h> // TODO, move out of here when the keystroke reading gets moved
+#include "NCCurses.h" // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>
 
 #include "NCApp.h"
@@ -189,8 +189,7 @@ int doit(int argc, char* argv[])
 					(
 						[&](const std::string &s, const std::string &t)
 						{
-//			boost::mutex::scoped_lock lock(msgLock);
-			boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
+							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
 							// Prefix message with timestamp
 							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();

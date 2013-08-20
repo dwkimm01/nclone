@@ -4,7 +4,7 @@
  *  Created on: Oct 23, 2012
  *      Author: dkimmel
  */
-#include <ncurses.h>
+#include "NCCurses.h"
 #include "NCApp.h"
 #include "NCUtils.h"
 #include "NCExceptionCurses.h"

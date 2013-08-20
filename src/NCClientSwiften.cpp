@@ -29,7 +29,7 @@ public:
 	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const String&)> debugLogCB)
 		: networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
-//		, p_debugLogCB(debugLogCB)
+		, p_debugLogCB(debugLogCB)
 	{
 	}
 
@@ -42,18 +42,15 @@ public:
 		}
 	}
 
-
-
 	void handleRosterReceived(ErrorPayload::ref error)
 	{
 		if (error)
 		{
-//			p_debugLogCB("DEBUG", "Error receiving roster.  Continuing.");
+			p_debugLogCB("DEBUG", "Error receiving roster.  Continuing.");
 		}
 		// Send initial available presence
 		client->sendPresence(Presence::create("Online"));
 	}
-
 
 	static std::string GetString(const Presence::Type &t)
 	{
@@ -73,13 +70,11 @@ public:
 		return "Unknown";
 	};
 
-
 	Swift::BoostNetworkFactories networkFactories;
 	Swift::Client* client;
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
-//	std::function<void(const String&, const String&)> p_debugLogCB;
-
+	std::function<void(const String&, const String&)> p_debugLogCB;
 };
 
 
@@ -119,7 +114,6 @@ NCClientSwiften::NCClientSwiften
 	{
 		if(message && message->getBody().size() > 0)
 			p_msgReceivedCB(message->getFrom(), message->getBody());
-//			p_debugLogCB(message->getFrom(), message->getBody());
 
 		// Testing purposes, echo back
 		// message->setTo(message->getFrom());
@@ -127,10 +121,7 @@ NCClientSwiften::NCClientSwiften
 		// p_data->client->sendMessage(message);
 	});
 
-
-
-	// client->onPresenceReceived.connect(bind(&EchoBot::handlePresenceReceived, this, _1));
-//	  client->onPresenceReceived.connect(bind(&handlePresenceReceived, _1));
+	// Handle presence
 	p_data->client->onPresenceReceived.connect([&](Presence::ref presence)
 	{
 //		p_debugLogCB("DEBUG", "OPR");
@@ -149,88 +140,16 @@ NCClientSwiften::NCClientSwiften
 	});
 
 	p_data->client->connect();
-	//client->sendPresence(Presence::create("Send me a message"));
 	p_debugLogCB("DEBUG", "Running event loop");
-//	  eventLoop.run();
-	p_data->loopThread.reset( new std::thread([&]()
-	{
-		p_debugLogCB("DEBUG", "Running event loop begin");
-		p_data->eventLoop.run();
-		p_debugLogCB("DEBUG", "Running event loop done");
 
-	}) );
-//	auto xx = new std::thread([&]()
-//	{
-////		p_debugLogCB("DEBUG", "Running event loop begin");
-//		p_data->eventLoop.run();
-////		p_debugLogCB("DEBUG", "Running event loop done");
-//
-//	});
-//	  delete client;
-
-
-#if 0
-	p_data->client->onConnected.connect([&]()
-	{
-		p_debugLogCB("DEBUG", "Connected");
-		// Request roster
-		Swift::GetRosterRequest::ref rosterRequest
-			= Swift::GetRosterRequest::create(p_data->client->getIQRouter());
-
-		rosterRequest->onResponse.connect(bind(&NCClientSwiften::Data::handleRosterReceived, p_data, _2));
-		rosterRequest->send();
-	});
-
-
-//	client->onMessageReceived.connect(bind(&handleMessageReceived, _1));
-
-	p_data->client->onMessageReceived.connect([&](Swift::Message::ref message)
-	{
-		p_debugLogCB("DEBUG", "Got a message");
-
-		// Echo back the incoming message
-		message->setTo(message->getFrom());
-		message->setFrom(Swift::JID());
-		p_data->client->sendMessage(message);
-	});
-
-
-
-
-	// client->onPresenceReceived.connect(bind(&EchoBot::handlePresenceReceived, this, _1));
-	p_data->client->onPresenceReceived.connect([&](Swift::Presence::ref presence)
-	{
-		p_debugLogCB("DEBUG", "Presence recvd");
-		// Automatically approve subscription requests
-		if (presence->getType() == Swift::Presence::Subscribe)
-		{
-			Swift::Presence::ref response = Swift::Presence::create();
-	        response->setTo(presence->getFrom());
-	        response->setType(Swift::Presence::Subscribed);
-	        p_data->client->sendPresence(response);
-	      }
-	});
-
-
-	p_debugLogCB("DEBUG", "Calling connect for " + name);
-
-	p_data->client->connect();
-	p_debugLogCB("DEBUG", "Calling connect for " + name + " returned");
-
-	p_data->loopThread.reset( new std::thread([&]()
+	p_data->loopThread.reset(new std::thread([&]()
 	{
 		p_debugLogCB("DEBUG", "Running event loop begin");
 		p_data->eventLoop.run();
 		p_debugLogCB("DEBUG", "Running event loop done");
 
 	}));
-#endif
 }
-
-
-
-
-
 
 NCClientSwiften::~NCClientSwiften()
 {

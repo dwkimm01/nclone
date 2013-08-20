@@ -5,7 +5,7 @@
  *      Author: dwkimm01
  */
 
-#include <ncurses.h>
+#include "NCCurses.h"
 #include "NClone.h"
 #include "NCStringUtils.h"
 #include "NCTimeUtils.h"

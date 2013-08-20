@@ -4,16 +4,14 @@
  *  Created on: Oct 23, 2012
  *      Author: dkimmel
  */
-#include <ncurses.h>
 #include <string>
 #include <iostream>
 #include <stdlib.h>
-
+#include "NCCurses.h"
 #include "NCWin.h"
 #include "NCUtils.h"
 #include "NCString.h"
 #include "NCColor.h"
-
 
 namespace ncpp
 {
