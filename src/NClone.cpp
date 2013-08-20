@@ -487,7 +487,7 @@ void NClone::setup
 
 					if(client)
 					{
-						ncs()->append(" sending to (" + buddyName + ") msg(" + ncCmd.cmd + ")");
+// TODO, upgrade this logic ncs()->append(" sending to (" + buddyName + ") msg(" + ncCmd.cmd + ")");
 						client->msgSend(buddyName, ncCmd.cmd);
 					}
 
