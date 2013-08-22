@@ -126,9 +126,8 @@ NCClientSwiften::NCClientSwiften
 	// Handle presence
 	p_data->client->onPresenceReceived.connect([&](Presence::ref presence)
 	{
-//		p_debugLogCB("DEBUG", "OPR");
 		const std::string statusString = NCClientSwiften::Data::GetString(presence->getType());
-//		p_debugLogCB("DEBUG", std::string(" OPR ") + presence->getFrom().toString() + " " + statusString);
+		p_debugLogCB("DEBUG", std::string(" ") + statusString + " " + presence->getFrom().toString());
 		p_msgReceivedCB(presence->getFrom().toString(), presence->getFrom().toString() + " " + statusString);
 
 		// Automatically approve subscription requests
