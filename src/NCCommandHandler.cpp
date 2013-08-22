@@ -45,9 +45,11 @@ void NCCommandHandler::Setup
 	, nckeymap::NCKeyMap &ncKeyMap
 	, NCCmd& ncCmd
 	, nccmdhistory::NCCmdHistory& cmdHist
+	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
 	, NCWinCfg& cfg )
 {
 	fncs = pncs;
+	p_connections = &connections;
 
 	// Use getters to get anything that can change, like state, etc
 
@@ -188,6 +190,20 @@ void NCCommandHandler::Setup
 			ncs->refresh();
 		}
 	}, "Create new connection");
+
+	cmdMap["/connections"] = NCCommandHandler::Entry([&](const std::string& cmd)
+	{
+		if(fncs && fncs() && p_connections)
+		{
+			fncs()->append(" Connections " + boost::lexical_cast<std::string>(p_connections->size()));
+
+			for(const auto & cn : *p_connections)
+			{
+				fncs()->append("  " + cn->getName());
+			}
+			fncs()->refresh();
+		}
+	}, "List connections");
 
 	cmdMap["/list"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{

@@ -27,7 +27,8 @@ class NCClientSwiften::Data
 {
 public:
 	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const String&)> debugLogCB)
-		: networkFactories(&eventLoop)
+		: p_name(name)
+		, networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
 		, p_debugLogCB(debugLogCB)
 	{
@@ -70,6 +71,7 @@ public:
 		return "Unknown";
 	};
 
+	std::string p_name;
 	Swift::BoostNetworkFactories networkFactories;
 	Swift::Client* client;
 	Swift::SimpleEventLoop eventLoop;
@@ -164,7 +166,10 @@ NCClientSwiften::~NCClientSwiften()
 	}
 }
 
-NCClientSwiften::String NCClientSwiften::getName() { return "NCClientSwiften"; }
+NCClientSwiften::String NCClientSwiften::getName()
+{
+	return p_data->p_name;
+}
 
 void NCClientSwiften::connect()
 {

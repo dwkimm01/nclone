@@ -50,7 +50,7 @@ void NClone::setup
 	enteringPassword = penteringPassword;
 
 	cmdMap.Setup(ncs, app, chats, p_keyMap,
-			ncCmd, cmdHist, cfg);
+			ncCmd, cmdHist, connections, cfg);
 
 	keyMap().set([&]()
 		{

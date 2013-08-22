@@ -9,6 +9,7 @@
 #define NCCOMMANDHANDLER_H_
 
 #include <string>
+#include <vector>
 #include <map>
 #include <functional>
 #include "NCCmd.h"
@@ -17,6 +18,7 @@
 #include "NCWinCfg.h"
 #include "NCApp.h"
 #include "NCKeyMap.h"
+#include "NCClientIf.h"
 
 namespace ncpp
 {
@@ -44,7 +46,8 @@ public:
 		, nckeymap::NCKeyMap &ncKeyMap
 		, NCCmd& ncCmd
 		, nccmdhistory::NCCmdHistory& cmdHist
-		, NCWinCfg& cfg);
+		, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+		, NCWinCfg& cfg );
 
 	/**
 	 * Process Commands
@@ -72,6 +75,7 @@ private:
 	std::function<NCWinScrollback*()> fncs;
 	const int defaultScrollback = 500;
 	int _startTime;
+	std::vector<ncpp::ncclientif::NCClientIf*>* p_connections;
 };
 } // namespace ncpp
 
