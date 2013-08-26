@@ -157,7 +157,13 @@ NCClientSwiften::~NCClientSwiften()
 	if(p_data)
 	{
 		p_debugLogCB("DEBUG", "Disconnecting");
+
+//		p_data->client->onConnected.disconnect();
+//		p_data->client->onMessageReceived.disconnect();
+//		p_data->client->onPresenceReceived.disconnect();
 		p_data->client->disconnect();
+		p_data->eventLoop.stop();
+
 		p_data->loopThread->join();
 
 		delete p_data;

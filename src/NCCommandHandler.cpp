@@ -232,13 +232,14 @@ void NCCommandHandler::Setup
 				{
 					if((*citr)->getName() == cnxName)
 					{
+						fncs()->append("Deleting " + cnxName);
 						auto connectionToDelete = *citr;
 						citr = p_connections->erase(citr);
 						delete connectionToDelete;
+						break;
 					}
 				}
 			}
-
 
 			fncs()->refresh();
 		}

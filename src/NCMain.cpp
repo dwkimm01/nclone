@@ -345,7 +345,7 @@ int doit(int argc, char* argv[])
 			int c = 0;
 			(*winCmd) >> c;  // app >> c;
 
-			boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
+//			boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
 
 			// Show keystroke in keystroke debug window

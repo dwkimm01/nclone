@@ -11,6 +11,7 @@
 #include "NCTimeUtils.h"
 #include "NCColor.h"
 #include "NCClientSwiften.h"
+#include "NCClientDummy.h"
 
 using namespace boost::gregorian;
 using namespace boost::posix_time;
@@ -525,7 +526,10 @@ void NClone::setup
 			clientPassword = ncCmd.cmd;
 			typedef ncclientswiften::NCClientSwiften::String String;
 
-			connections.push_back
+			if("XMPP" == clientProtocol)
+			{
+				ncs()->append("Creating XMPP connection");
+				connections.push_back
 				( new ncclientswiften::NCClientSwiften
 					( clientUsername
 					, clientPassword
@@ -535,6 +539,17 @@ void NClone::setup
 					, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
 					, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
 					) );
+			}
+			else if("DUMMY" == clientProtocol)
+			{
+				ncs()->append("Creating DUMMY connection");
+				connections.push_back(new ncclientdummy::NCClientDummy(clientUsername + ":Dummy"));
+			}
+			else
+			{
+				ncs()->append("Unknown protocol type " + clientProtocol);
+			}
+
 
 			// TODO, no indication if connection failed or for what reason
 			// TODO, do not add password to cmdHist!!!

@@ -1,5 +1,5 @@
 /*
- * ncclientif.h
+ * NCClientIf.h
  *
  *  Created on: Nov 10, 2012
  *      Author: dwkimm01
