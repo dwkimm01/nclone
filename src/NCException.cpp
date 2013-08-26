@@ -18,7 +18,6 @@ namespace ncpp
 namespace ncexception
 {
 
-
 NCException::NCException(const std::string &msg, const char* file, const int line)
    : p_msg(msg)
    , p_file( NCStringUtils::nullIsEmpty(file) )

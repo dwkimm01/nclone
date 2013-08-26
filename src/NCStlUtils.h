@@ -15,7 +15,6 @@
 
 namespace ncpp
 {
-
 namespace ncstlutils
 {
 
@@ -47,7 +46,6 @@ template<typename T, typename Function>
   }
 
 } // namespace ncstlutils
-
 } // namespace ncpp
 
 #endif // NCSTLUTILS_H_

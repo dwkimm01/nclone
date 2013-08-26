@@ -9,59 +9,56 @@
 
 namespace ncpp
 {
-
 namespace ncclientpurple
 {
-   NCClientPurple::NCClientPurple
-   	   ( const NCClientPurple::String &name
-   	   , const NCClientPurple::String &password
-   	   , const String &protocol
-   	   , std::function<void(const String&, const int, const int)> connectionStepCB
-   	   , std::function<void(const String&, const String&)> msgReceivedCB
-   	   , std::function<void(const String&, const String&)> debugLogCB
-   	   , std::function<void(const String&)> buddySignedOnCB 
-   	   )
-	{}
+
+NCClientPurple::NCClientPurple
+	( const NCClientPurple::String &name
+	, const NCClientPurple::String &password
+	, const String &protocol
+	, std::function<void(const String&, const int, const int)> connectionStepCB
+	, std::function<void(const String&, const String&)> msgReceivedCB
+	, std::function<void(const String&, const String&)> debugLogCB
+	, std::function<void(const String&)> buddySignedOnCB
+	)
+{}
 
 
-   NCClientPurple::~NCClientPurple() {}
+NCClientPurple::~NCClientPurple() {}
 
 
-   NCClientPurple::String NCClientPurple::getName() {}
+NCClientPurple::String NCClientPurple::getName() {}
 
-   // --------------------------------------------------------------
-   // State change
-   void NCClientPurple::connect() {}
-   void NCClientPurple::disconnect() {}
+// --------------------------------------------------------------
+// State change
+void NCClientPurple::connect() {}
+void NCClientPurple::disconnect() {}
 
-   // --------------------------------------------------------------
-   // Commands
-   void NCClientPurple::sendTyping(const String &who, const String &msg, bool done) {}
-   void NCClientPurple::msgSend(const String &who, const String &msg) {}
-   void NCClientPurple::questionAnswerBool(const int id, const bool response) {}
-   void NCClientPurple::addBuddy(const NCClientPurple::String &who, const NCClientPurple::String &group) {}
-   void NCClientPurple::removeBuddy(const NCClientPurple::String &who, const NCClientPurple::String &group) {}
-   void NCClientPurple::setAway(const NCClientPurple::String &state, const NCClientPurple::String &msg) {}
-
-
-   // --------------------------------------------------------------
-   // Callbacks
-   // Connection status
-   void NCClientPurple::connectionProgress(const String &text, const int step, const int count) {}
-   void NCClientPurple::connected() {}
-   void NCClientPurple::disconnected() {}
-   void NCClientPurple::connectionNotice(const String &text) {}
-   void NCClientPurple::disconnectNotice(const String &text, const int reason) {}
-   void NCClientPurple::contactTyping() {}
-
-   void NCClientPurple::msgReceived(const String &who, const String &msg) {}
-
-   void NCClientPurple::questionAskedBool(const int id, const String &question) {}
-
-   void NCClientPurple::debugLog(const String &level, const String &logLine) {}
+// --------------------------------------------------------------
+// Commands
+void NCClientPurple::sendTyping(const String &who, const String &msg, bool done) {}
+void NCClientPurple::msgSend(const String &who, const String &msg) {}
+void NCClientPurple::questionAnswerBool(const int id, const bool response) {}
+void NCClientPurple::addBuddy(const NCClientPurple::String &who, const NCClientPurple::String &group) {}
+void NCClientPurple::removeBuddy(const NCClientPurple::String &who, const NCClientPurple::String &group) {}
+void NCClientPurple::setAway(const NCClientPurple::String &state, const NCClientPurple::String &msg) {}
 
 
+// --------------------------------------------------------------
+// Callbacks
+// Connection status
+void NCClientPurple::connectionProgress(const String &text, const int step, const int count) {}
+void NCClientPurple::connected() {}
+void NCClientPurple::disconnected() {}
+void NCClientPurple::connectionNotice(const String &text) {}
+void NCClientPurple::disconnectNotice(const String &text, const int reason) {}
+void NCClientPurple::contactTyping() {}
 
+void NCClientPurple::msgReceived(const String &who, const String &msg) {}
+
+void NCClientPurple::questionAskedBool(const int id, const String &question) {}
+
+void NCClientPurple::debugLog(const String &level, const String &logLine) {}
 
 
 }} 
@@ -79,7 +76,6 @@ namespace ncclientpurple
 
 namespace ncpp
 {
-
 namespace ncclientpurple
 {
 
@@ -650,9 +646,7 @@ void NCClientPurple::debugLog(const String &level, const String &logLine)
 	p_debugLogCB(level, logLine);
 }
 
-
 } // namespace ncclientpurple
-
 } // namespace ncpp
 
 #endif

@@ -19,7 +19,6 @@ using namespace boost;
 
 namespace ncpp
 {
-
 namespace ncclientswiften
 {
 
@@ -157,13 +156,8 @@ NCClientSwiften::~NCClientSwiften()
 	if(p_data)
 	{
 		p_debugLogCB("DEBUG", "Disconnecting");
-
-//		p_data->client->onConnected.disconnect();
-//		p_data->client->onMessageReceived.disconnect();
-//		p_data->client->onPresenceReceived.disconnect();
 		p_data->client->disconnect();
 		p_data->eventLoop.stop();
-
 		p_data->loopThread->join();
 
 		delete p_data;
@@ -176,18 +170,9 @@ NCClientSwiften::String NCClientSwiften::getName()
 	return p_data->p_name;
 }
 
-void NCClientSwiften::connect()
-{
-}
-
-void NCClientSwiften::disconnect()
-{
-//	p_data->client->disconnect();
-}
-
-void NCClientSwiften::sendTyping(const NCClientSwiften::String &who, const NCClientSwiften::String &msg, bool done)
-{
-}
+void NCClientSwiften::connect() {}
+void NCClientSwiften::disconnect() {}
+void NCClientSwiften::sendTyping(const NCClientSwiften::String &who, const NCClientSwiften::String &msg, bool done) {}
 
 void NCClientSwiften::msgSend(const NCClientSwiften::String &who, const NCClientSwiften::String &msg)
 {
@@ -197,10 +182,6 @@ void NCClientSwiften::msgSend(const NCClientSwiften::String &who, const NCClient
 
 	msgOut->setBody(msg);
 	p_data->client->sendMessage(msgOut);
-}
-
-void NCClientSwiften::questionAnswerBool(const int id, const bool response)
-{
 }
 
 void NCClientSwiften::addBuddy(const NCClientSwiften::String &who, const NCClientSwiften::String &group)
@@ -243,14 +224,9 @@ void NCClientSwiften::msgReceived(const NCClientSwiften::String &who, const NCCl
 {
 }
 
-void NCClientSwiften::questionAskedBool(const int id, const NCClientSwiften::String &question)
-{
-}
-
 void NCClientSwiften::debugLog(const NCClientSwiften::String &level, const NCClientSwiften::String &logLine)
 {
 }
 
 } // namespace ncclientif
-
 } // namespace ncpp

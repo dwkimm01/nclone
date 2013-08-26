@@ -13,7 +13,6 @@
 
 namespace ncpp
 {
-
 namespace nccolor
 {
 
@@ -56,7 +55,6 @@ private:
 };
 
 } // namespace nccolor
-
 } // namespace ncpp
 
 #endif // NCCOLOR_H_

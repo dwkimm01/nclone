@@ -181,12 +181,12 @@ void NCCommandHandler::Setup
 		{
 			ncs->append(cmd);
 			// Collect up user information:
-			//  protocol: prpl-jabber
+			//  protocol: XMPP
 			//  login: user@gmail.com
 			//  password: xxxx
 			ncCmd.inputState = NCCmd::PROTOCOL;
 			ncs->append(NCString(ncCmd.cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
-			ncs->append("   Enter protocol (e.g. prpl-jabber)");
+			ncs->append("   Enter protocol (e.g. XMPP, DUMMY)");
 			ncs->refresh();
 		}
 	}, "Create new connection");
@@ -604,6 +604,5 @@ std::tuple<std::string, std::string> NCCommandHandler::FindClosest(const std::st
 
 	return ret;
 }
-
 
 } // namespace ncpp

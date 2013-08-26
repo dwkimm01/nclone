@@ -114,6 +114,5 @@ void NCCmdHistory::clear()
 	resetIndex();
 }
 
-
 } // namespace nccmdhistory
 } // namespace ncpp

@@ -5,29 +5,26 @@
 #include <iostream>
 #include <iterator>
 #include <string>
-#include <map>
 
 using boost::multi_index_container;
 using namespace boost::multi_index;
 using namespace std;
 
 
-typedef std::map<std::string, void*> ConnectionMap;
-
 class Chat
 {
 public:
    std::string buddyName;
+   std::string buddyNick;
    std::string buddyId;
    std::string connectionId;
 
-   std::string buddyNick;
-
    void* textBuffer;
+   void* connection;
 
-   Chat() : textBuffer(0) {}
+   Chat() : textBuffer(0), connection(0) {}
    Chat(const std::string &pBuddyName, const std::string &pBuddyNick, const std::string &pBuddyId, const std::string &pConnectionId, void* pTextBuffer, void* pConnection)
-      : buddyName(pBuddyName), buddyNick(pBuddyNick), buddyId(pBuddyId), connectionId(pConnectionId), textBuffer(pTextBuffer) {}
+      : buddyName(pBuddyName), buddyNick(pBuddyNick), buddyId(pBuddyId), connectionId(pConnectionId), textBuffer(pTextBuffer), connection(pConnection) {}
 
 
 };

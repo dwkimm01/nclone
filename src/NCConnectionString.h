@@ -13,7 +13,6 @@
 
 namespace ncpp
 {
-
 namespace ncconnectionstring
 {
 
@@ -54,19 +53,18 @@ public:
 		}
 	}
 
-
 	const std::string username() const { return p_username; }
 
 	const std::string hostname() const 
 	{
 		if("prpl-sipe" == protocol())
-                {
-                   // Some crazy here, return right of @: user@domain.com,domain\\user
-                   std::string domain = p_hostname;
-                   domain = domain.substr( 0, domain.find(".") );
-		   return  p_hostname + std::string(",") + domain + std::string("\\") + p_username;
-                }
-                // else
+		{
+			// Some crazy here, return right of @: user@domain.com,domain\\user
+			std::string domain = p_hostname;
+			domain = domain.substr( 0, domain.find(".") );
+			return  p_hostname + std::string(",") + domain + std::string("\\") + p_username;
+		}
+		// else
 		return p_hostname; 
 	}
 
@@ -76,7 +74,7 @@ public:
 		// just being able to force it
 		if(p_hostname.find("gmail.com") != std::string::npos)
 		{
-			return "prpl-jabber";
+			return "XMPP";
 		}
                 // else default to sipe right now
 		return "prpl-sipe";
@@ -90,7 +88,6 @@ private:
 };
 
 } // ncconnectionstring
-
 } // namespace ncpp
 
 #endif // NCCONNECTIONSTRING_H_

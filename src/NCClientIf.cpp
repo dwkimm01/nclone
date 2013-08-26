@@ -9,7 +9,6 @@
 
 namespace ncpp
 {
-
 namespace ncclientif
 {
 
@@ -24,11 +23,8 @@ void NCClientIf::disconnectNotice(const String &text, const int reason) {}
 void NCClientIf::contactTyping() {}
 
 void NCClientIf::msgReceived(const String &who, const String &msg) {}
-void NCClientIf::questionAskedBool(const int id, const String &question) {}
 void NCClientIf::debugLog(const String &level, const String &logLine) {}
 
 
 } // namespace ncclientif
-
 } // namespace ncpp
-

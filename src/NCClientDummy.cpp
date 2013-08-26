@@ -26,7 +26,6 @@ void NCClientDummy::disconnect() {}
 
 void NCClientDummy::sendTyping(const String &who, const String &msg, bool done) {}
 void NCClientDummy::msgSend(const String &who, const String &msg) {}
-void NCClientDummy::questionAnswerBool(const int id, const bool response) {}
 void NCClientDummy::addBuddy(const String &who, const String &group) {}
 void NCClientDummy::removeBuddy(const String &who, const String &group) {}
 void NCClientDummy::setAway(const String &state, const String &msg) {}
@@ -40,8 +39,6 @@ void NCClientDummy::disconnectNotice(const String &text, const int reason) {}
 void NCClientDummy::contactTyping() {}
 
 void NCClientDummy::msgReceived(const String &who, const String &msg) {}
-
-void NCClientDummy::questionAskedBool(const int id, const String &question) {}
 
 void NCClientDummy::debugLog(const String &level, const String &logLine) {}
 

@@ -13,7 +13,6 @@
 namespace ncpp
 {
 
-
 // TODO, merge this class with NCKeyProcessor
 class NCInput
 {
@@ -38,7 +37,6 @@ public:
 
 	};
 
-
 	/**
 	 * <b>Purpose:</b> CTOR
 	 */
@@ -49,14 +47,8 @@ public:
 	 */
 	~NCInput();
 
-	/**
-	 * <b>Purpose:</b> Try to get input
-	 */
-//	int
-
 };
 
 } // namespace ncpp
-
 
 #endif // NCINPUT_H_

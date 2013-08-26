@@ -12,20 +12,8 @@ namespace ncpp
 namespace nckeymap
 {
 
-NCKeyMap::NCKeyMap()
-{
-	/*const std::vector<std::tuple<int, KeyType>> defaultKeys =
-	{
-			{1, NCKeyMap::PAGE_DOWN }
-	};
-
-	setKeyMap(defaultKeys, false);*/
-
-}
-
-NCKeyMap::~NCKeyMap()
-{
-}
+NCKeyMap::NCKeyMap() {}
+NCKeyMap::~NCKeyMap() {}
 
 bool NCKeyMap::exists(const KeyType key)
 {
@@ -62,25 +50,10 @@ bool NCKeyMap::operator()(const KeyType key)
 	return false;
 }
 
-/*void NCKeyMap::setKeyMap(const std::vector<std::tuple<int, KeyType>> &m, const bool clearFirst)
-{
-	if(clearFirst)
-	{
-		_keyMap.clear();
-	}
-
-	for(auto e : m)
-	{
-		_keyMap[std::get<0>(e)] = std::get<1>(e);
-	}
-}*/
-
 NCKeyMap::MapType& NCKeyMap::getMap()
 {
 	return _funcTable;
 }
-
-
 
 } // namespace nckeymap
 } // namespace ncpp

@@ -25,7 +25,6 @@
 
 namespace ncpp
 {
-
 namespace ncapp
 {
 
@@ -109,5 +108,4 @@ int NCApp::maxWidth() const
 }
 
 } // namespace ncapp
-
 } // namespace ncpp

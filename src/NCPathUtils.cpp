@@ -5,7 +5,6 @@
  *      Author: dwkimm01
  */
 
-//#include <boost/filesystem/path.hpp>
 #include <boost/filesystem.hpp>
 #include "NCPathUtils.h"
 #include "NCEnvironmentVariables.h"
@@ -44,8 +43,6 @@ void NCPathUtils::createPath(const std::string &path)
 {
 	boost::filesystem::create_directory(path);
 }
-
-
 
 } // namespace ncpathutils
 } // namespace ncpp

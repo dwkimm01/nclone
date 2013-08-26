@@ -239,7 +239,6 @@ private:
 
 #endif
 
-
 } // namespace ncstringfinders
 } // namespace ncpp
 

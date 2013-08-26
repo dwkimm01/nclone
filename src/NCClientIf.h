@@ -12,7 +12,6 @@
 
 namespace ncpp
 {
-
 namespace ncclientif
 {
 
@@ -52,7 +51,6 @@ public:
    // Commands
    virtual void sendTyping(const String &who, const String &msg, bool done) = 0;
    virtual void msgSend(const String &who, const String &msg) = 0;
-   virtual void questionAnswerBool(const int id, const bool response) = 0;
    virtual void addBuddy(const String &who, const String &group) = 0;
    virtual void removeBuddy(const String &who, const String &group) = 0;
    virtual void setAway(const String &state, const String &msg) = 0;
@@ -70,8 +68,6 @@ public:
 
    virtual void msgReceived(const String &who, const String &msg);
 
-   virtual void questionAskedBool(const int id, const String &question);
-
    virtual void debugLog(const String &level, const String &logLine);
 
    // TODO,
@@ -86,9 +82,7 @@ public:
    //  - Other aggregation like news (rss) readers
 };
 
-
 } // namespace ncclientif
-
 } // namespace ncpp
 
 #endif // NCCLIENTIF_H_

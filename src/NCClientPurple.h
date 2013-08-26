@@ -14,7 +14,6 @@
 
 namespace ncpp
 {
-
 namespace ncclientpurple
 {
 
@@ -116,9 +115,7 @@ private:
 
 };
 
-
 } // namespace ncclientpurple
-
 } // namespace ncpp
 
 #endif // NCCLIENTPURPLE_H_

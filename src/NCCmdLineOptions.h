@@ -16,7 +16,6 @@
 
 namespace ncpp
 {
-
 namespace nccmdlineoptions
 {
 
@@ -142,7 +141,6 @@ private:
 }; // class NCCmdLineOptions
 
 } // namespace nccmdlineoptions
-
 } // namespace ncpp
 
 #endif // NCCMDLINEOPTIONS_H_

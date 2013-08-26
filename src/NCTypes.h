@@ -13,7 +13,6 @@
 
 namespace ncpp
 {
-
 namespace nctypes
 {
 
@@ -40,7 +39,6 @@ public:
 };
 
 } // namespace nctypes
-
 } // namespace ncpp
 
 #endif // NCTYPES_H_

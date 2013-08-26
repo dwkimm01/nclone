@@ -11,7 +11,6 @@
 
 namespace ncpp
 {
-
 namespace ncenvironmentvariables
 {
 
@@ -32,5 +31,4 @@ bool NCEnvironmentVariables::isSet(const std::string &var)
 }
 
 } // namespace ncenvironmentvariables
-
 } // namespace ncpp

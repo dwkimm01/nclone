@@ -12,7 +12,6 @@
 
 namespace ncpp
 {
-
 namespace ncapp
 {
 
@@ -62,7 +61,6 @@ public:
 };
 
 } // namespace ncapp
-
 } // namespace ncpp
 
 #endif // NCAPP_H_

@@ -58,5 +58,4 @@ void NCColor::forEachColor(std::function<void(const short, const short, const sh
 }
 
 } // namespace nccolor
-
 } // namespace ncpp

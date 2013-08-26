@@ -63,7 +63,6 @@ public:
 private:
 	std::string theString;
 	std::string colorString;
-
 };
 
 }  // namespace ncpp

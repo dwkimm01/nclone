@@ -12,7 +12,6 @@
 
 namespace ncpp
 {
-
 namespace ncenvironmentvariables
 {
 
@@ -51,7 +50,6 @@ public:
 };
 
 } // namespace ncenvironmentvariables
-
 } // namespace ncpp
 
 #endif // NCENVIRONMENTVARIABLES_H_

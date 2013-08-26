@@ -9,12 +9,10 @@
 #define NCCLIENTSWIFTEN_H_
 
 #include <functional>
-//#include <memory>
 #include "NCClientIf.h"
 
 namespace ncpp
 {
-
 namespace ncclientswiften
 {
 
@@ -65,7 +63,6 @@ public:
    // Commands
    virtual void sendTyping(const String &who, const String &msg, bool done);
    virtual void msgSend(const String &who, const String &msg);
-   virtual void questionAnswerBool(const int id, const bool response);
    virtual void addBuddy(const String &who, const String &group);
    virtual void removeBuddy(const String &who, const String &group);
    virtual void setAway(const String &state, const String &msg);
@@ -83,8 +80,6 @@ public:
 
    virtual void msgReceived(const String &who, const String &msg);
 
-   virtual void questionAskedBool(const int id, const String &question);
-
    virtual void debugLog(const String &level, const String &logLine);
 
 private:
@@ -97,9 +92,7 @@ private:
    std::function<void(const String&)> p_buddySignedOnCB;
 };
 
-
 } // namespace ncclientswiften
-
 } // namespace ncpp
 
 #endif // NCCLIENTSWIFTEN_H_
