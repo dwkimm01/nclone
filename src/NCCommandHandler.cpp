@@ -191,6 +191,59 @@ void NCCommandHandler::Setup
 		}
 	}, "Create new connection");
 
+	cmdMap["/delconn"] = NCCommandHandler::Entry([&](const std::string& cmd)
+	{
+		if(fncs && fncs() && p_connections)
+		{
+			std::string cnxList = cmd;
+			boost::replace_all(cnxList, "/delconn", "");
+			if(cnxList.size() == 0)
+			{
+				fncs()->append(" Specify connection to delete");
+			}
+
+			typedef boost::split_iterator<std::string::iterator> ItrType;
+			for (ItrType i = boost::make_split_iterator(cnxList, boost::first_finder(" ", boost::is_iequal()));
+					i != ItrType(); ++i)
+			{
+				const std::string cnxName = boost::copy_range<std::string>(*i);
+				if(cnxName.empty()) continue;
+				fncs()->append(" Looking to delete " + cnxName);
+
+				int count = 0;
+				for(const auto & cn : *p_connections)
+				{
+					if(cn->getName() == cnxName)
+					{
+						++count;
+					}
+				}
+				if(1 < count)
+				{
+					fncs()->append("Cannot delete " + cnxName + " by name, specify connection ID");
+					continue;
+				}
+				if(0 == count)
+				{
+					fncs()->append("Cannot delete " + cnxName + ", no connection by that name");
+					continue;
+				}
+				for(auto citr = p_connections->begin(); citr != p_connections->end(); ++citr)
+				{
+					if((*citr)->getName() == cnxName)
+					{
+						auto connectionToDelete = *citr;
+						citr = p_connections->erase(citr);
+						delete connectionToDelete;
+					}
+				}
+			}
+
+
+			fncs()->refresh();
+		}
+	}, "Delete connection");
+
 	cmdMap["/connections"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
 		if(fncs && fncs() && p_connections)
@@ -235,7 +288,7 @@ void NCCommandHandler::Setup
 		app.refresh();
 	}, "Refresh all windows");
 
-	//Add a method to parse 'set' out of the command string
+	// Add a method to parse 'set' out of the command string
 	cmdMap["/set"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
 		NCWinScrollback* ncs = fncs();
