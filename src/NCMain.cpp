@@ -71,7 +71,7 @@ int doit(int argc, char* argv[])
 		progArgs.print();
 
 		// Signals connects client APIs to windows/backend
-		boost::signal<void(const std::string&, const std::string&)> msgSignal;
+		boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> msgSignal;
 
 		// Start up application
 		ncapp::NCApp app;
@@ -185,9 +185,9 @@ int doit(int argc, char* argv[])
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
-				( std::function<void(const std::string &, const std::string &)>
+				( std::function<void(ncclientif::NCClientIf*, const std::string &, const std::string &)>
 					(
-						[&](const std::string &s, const std::string &t)
+						[&](ncclientif::NCClientIf* client, const std::string &s, const std::string &t)
 						{
 							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
@@ -232,6 +232,7 @@ int doit(int argc, char* argv[])
 					)
 				, _1
 				, _2
+				, _3
 				)
 			);
 

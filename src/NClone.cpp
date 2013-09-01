@@ -44,7 +44,7 @@ void NClone::setup
 	, std::function<bool()> penteringPassword
 	, NCWinCfg &cfg
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-	, boost::signal<void(const std::string&, const std::string&)> &msgSignal )
+	, boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> &msgSignal )
 {
 	// Save function for later use
 	ncs = pncs;
@@ -535,9 +535,9 @@ void NClone::setup
 					, clientPassword
 					, clientProtocol
 					, [&](const String &s, const int, const int) { }  // connectionStepCB
-					, [&](const String &s, const String &t) { msgSignal(s, t); }  // msgReceivedCB
-					, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
-					, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
+					, [&](ncclientif::NCClientIf* client, const String &s, const String &t) { msgSignal(client, s, t); }  // msgReceivedCB
+					, [&](const String &s, const String &t) { msgSignal(0, s, t); } // debugLogCB
+					, [&](const String &t) { msgSignal(0, t, "logged on"); } // buddySignedOnCB
 					) );
 			}
 			else if("DUMMY" == clientProtocol)

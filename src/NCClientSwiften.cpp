@@ -85,7 +85,7 @@ NCClientSwiften::NCClientSwiften
    , const NCClientSwiften::String &password
    , const NCClientSwiften::String &protocol
    , std::function<void(const String&, const int, const int)> connectionStepCB
-   , std::function<void(const String&, const String&)> msgReceivedCB
+   , std::function<void(ncclientif::NCClientIf*, const String&, const String&)> msgReceivedCB
    , std::function<void(const String&, const String&)> debugLogCB
    , std::function<void(const String&)> buddySignedOnCB
    )
@@ -114,7 +114,7 @@ NCClientSwiften::NCClientSwiften
 	p_data->client->onMessageReceived.connect([&](Message::ref message) // bind(&handleMessageReceived, _1)
 	{
 		if(message && message->getBody().size() > 0)
-			p_msgReceivedCB(message->getFrom(), message->getBody());
+			p_msgReceivedCB(this, message->getFrom(), message->getBody());
 
 		// Testing purposes, echo back
 		// message->setTo(message->getFrom());
@@ -127,7 +127,7 @@ NCClientSwiften::NCClientSwiften
 	{
 		const std::string statusString = NCClientSwiften::Data::GetString(presence->getType());
 		p_debugLogCB("DEBUG", std::string(" ") + statusString + " " + presence->getFrom().toString());
-		p_msgReceivedCB(presence->getFrom().toString(), presence->getFrom().toString() + " " + statusString);
+		p_msgReceivedCB(this, presence->getFrom().toString(), presence->getFrom().toString() + " " + statusString);
 
 		// Automatically approve subscription requests
 		if (presence->getType() == Presence::Subscribe)

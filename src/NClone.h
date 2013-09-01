@@ -46,7 +46,7 @@ public:
 	, std::function<bool()> penteringPassword  // TODO, takeout penteringPassowrd and just use ncCmd
 	, NCWinCfg &cfg
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-	, boost::signal<void(const std::string&, const std::string&)> &msgSignal );
+	, boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> &msgSignal );
 
 	nckeymap::NCKeyMap& keyMap();
 	ncpp::NCCommandHandler cmdMap; // TODO, move to private
