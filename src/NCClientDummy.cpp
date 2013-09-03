@@ -12,9 +12,14 @@ namespace ncpp
 namespace ncclientdummy
 {
 
-NCClientDummy::NCClientDummy(const std::string &name)
+NCClientDummy::NCClientDummy
+	( const std::string &name
+	, std::function<void(ncclientif::NCClientIf*, const String&, const String&)> msgReceivedCB
+	)
 	: p_name(name)
+	, p_msgReceivedCB(msgReceivedCB)
 {
+	p_msgReceivedCB(this, "Dummy", "Initialized");
 }
 
 NCClientDummy::~NCClientDummy() {}
@@ -25,7 +30,11 @@ void NCClientDummy::connect() {}
 void NCClientDummy::disconnect() {}
 
 void NCClientDummy::sendTyping(const String &who, const String &msg, bool done) {}
-void NCClientDummy::msgSend(const String &who, const String &msg) {}
+void NCClientDummy::msgSend(const String &who, const String &msg)
+{
+	p_msgReceivedCB(this, "Dummy", std::string("Echo: ") + msg);
+}
+
 void NCClientDummy::addBuddy(const String &who, const String &group) {}
 void NCClientDummy::removeBuddy(const String &who, const String &group) {}
 void NCClientDummy::setAway(const String &state, const String &msg) {}

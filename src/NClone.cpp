@@ -543,7 +543,10 @@ void NClone::setup
 			else if("DUMMY" == clientProtocol)
 			{
 				ncs()->append("Creating DUMMY connection");
-				connections.push_back(new ncclientdummy::NCClientDummy(clientUsername + ":Dummy"));
+				connections.push_back(new ncclientdummy::NCClientDummy
+					( clientUsername + ":Dummy"
+					, [&](ncclientif::NCClientIf* client, const String &s, const String &t) { msgSignal(client, s, t); }  // msgReceivedCB
+					));
 			}
 			else
 			{

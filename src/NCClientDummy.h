@@ -8,6 +8,7 @@
 #ifndef NCCLIENTDUMMY_H_
 #define NCCLIENTDUMMY_H_
 
+#include <functional>
 #include "NCClientIf.h"
 
 namespace ncpp
@@ -20,11 +21,13 @@ namespace ncclientdummy
  */
 class NCClientDummy : public ncclientif::NCClientIf
 {
-	std::string p_name;
-
 public:
 
-	NCClientDummy(const std::string &name);
+	NCClientDummy
+		( const std::string &name
+		, std::function<void(ncclientif::NCClientIf*, const String&, const String&)> msgReceivedCB
+		);
+
 	virtual ~NCClientDummy();
 
    // --------------------------------------------------------------
@@ -59,8 +62,11 @@ public:
 
    virtual void debugLog(const String &level, const String &logLine);
 
-};
+private:
+   std::string p_name;
+   std::function<void(ncclientif::NCClientIf*, const String&, const String&)> p_msgReceivedCB;
 
+};
 
 } // namespace ncclientdummy
 } // namespace ncpp

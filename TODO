@@ -10,6 +10,7 @@
   - CTRL-n go to next window with unseen updates
   - Search and highlight (CTRL-f starts "/find" to cmd) 
   - Make sure boxes can be removed from window edges, make no boxes default and cfg settable
+  - /newconn should take args: /newconn XMPP user@host.orgi
    
  Network
   - change to a more generic command string sending to client i/fs (instead of connect, disconnect, etc?)
