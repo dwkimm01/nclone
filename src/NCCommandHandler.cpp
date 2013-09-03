@@ -235,7 +235,8 @@ void NCCommandHandler::Setup
 						fncs()->append("Deleting " + cnxName);
 						auto connectionToDelete = *citr;
 						citr = p_connections->erase(citr);
-remove entry from chatsToConnection
+TODO remove entry from chatsToConnection
+
 						delete connectionToDelete;
 						break;
 					}

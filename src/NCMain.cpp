@@ -230,7 +230,7 @@ int doit(int argc, char* argv[])
 							}
 
 							// Add to connectionToChats
-							if(chatToConnections.find(s) == chatToConnections.end())
+							if(client && chatToConnections.find(s) == chatToConnections.end())
 							{
 								chatToConnections[s].insert(client->getName());
 							}
