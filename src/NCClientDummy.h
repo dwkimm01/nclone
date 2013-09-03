@@ -64,6 +64,7 @@ public:
 
 private:
    std::string p_name;
+   std::string p_buddyAtHost;
    std::function<void(ncclientif::NCClientIf*, const String&, const String&)> p_msgReceivedCB;
 
 };

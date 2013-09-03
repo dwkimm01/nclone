@@ -10,6 +10,7 @@
 
 #include <string>
 #include <functional>
+#include <set>
 #include <boost/date_time.hpp>
 #include <boost/signal.hpp>
 #include "NCApp.h"
@@ -46,6 +47,7 @@ public:
 	, std::function<bool()> penteringPassword  // TODO, takeout penteringPassowrd and just use ncCmd
 	, NCWinCfg &cfg
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+	, std::map<std::string, std::set<std::string> > &chatToConnections
 	, boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> &msgSignal );
 
 	nckeymap::NCKeyMap& keyMap();

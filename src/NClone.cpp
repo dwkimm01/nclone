@@ -44,6 +44,7 @@ void NClone::setup
 	, std::function<bool()> penteringPassword
 	, NCWinCfg &cfg
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+	, std::map<std::string, std::set<std::string> > &chatToConnections
 	, boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> &msgSignal )
 {
 	// Save function for later use
@@ -477,14 +478,30 @@ void NClone::setup
 					{
 					ncclientif::NCClientIf* client = 0;
 
-					// TODO, need to fix the way this connection is picked
-					if(connections.size() > 0)
-					{
-						client = connections[0];
-					}
-
 					// Pick buddy
 					const std::string buddyName = ncs()->getConfig().p_title;
+
+					// Find connection associated with this user
+					auto cnxItr = chatToConnections.find(buddyName);
+					if(chatToConnections.end() != cnxItr)
+					{
+						if(cnxItr->second.size() > 0)
+						{
+							// client
+							std::string clientName = *(cnxItr->second.begin());
+
+							for(auto connection : connections)
+							{
+								if(connection->getName() == clientName)
+								{
+									// TODO, fix to a more proper matching up of chat to connection
+									client = connection;
+									break;
+								}
+							}
+						}
+					}
+
 
 					if(client)
 					{

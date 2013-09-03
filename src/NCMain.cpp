@@ -7,6 +7,7 @@
 //============================================================================
 
 #include <iostream>
+#include <set>
 #include <thread>
 #include <boost/lexical_cast.hpp>
 #include <boost/signal.hpp>
@@ -19,7 +20,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "NCCurses.h" // TODO, move out of here when the keystroke reading gets moved
-#include <stdio.h>
+#include <stdio.h>  // TODO, why is this here?
 
 #include "NCApp.h"
 #include "NCWin.h"
@@ -182,6 +183,14 @@ int doit(int argc, char* argv[])
 		builtOn = builtOn + NCString(__TIME__, nccolor::NCColor::CHAT_HIGHLIGHT);
 		winLog->append(builtOn);
 
+
+		// Client vector
+		std::vector<ncpp::ncclientif::NCClientIf*> connections;
+		std::map<std::string, std::set<std::string> > chatToConnections;
+		// TODO, if username, password, protocol are filled out jump start with a
+		// new connection here?
+
+
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
@@ -220,6 +229,12 @@ int doit(int argc, char* argv[])
 								addedWin->append(line);
 							}
 
+							// Add to connectionToChats
+							if(chatToConnections.find(s) == chatToConnections.end())
+							{
+								chatToConnections[s].insert(client->getName());
+							}
+
 							// Refresh the top window to see newly added text ... if we are the top window yaay
 							// TODO, do we want to just skip this if we're not on top?
 							// Only issue is that sometimes windows underneath seemed to show through - maybe
@@ -237,10 +252,6 @@ int doit(int argc, char* argv[])
 			);
 
 
-		// Client map: string name of connection
-		std::vector<ncpp::ncclientif::NCClientIf*> connections;
-		// TODO, if username, password, protocol are filled out jump start with a
-		// new connection here?
 
 		// Command history
 		nccmdhistory::NCCmdHistory cmdHist;
@@ -285,6 +296,7 @@ int doit(int argc, char* argv[])
 			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
 			, cfg
 			, connections
+			, chatToConnections
 			, msgSignal);
 
 		// Loop forever until input tells us to return
