@@ -24,7 +24,7 @@
 
 #include "NCApp.h"
 #include "NCWin.h"
-#include "NCWinBuffer.h"
+// #include "NCWinBuffer.h"
 #include "NCWinScrollback.h"
 #include "NCWinTime.h"
 #include "NCTimeUtils.h"
@@ -72,7 +72,7 @@ int doit(int argc, char* argv[])
 		progArgs.print();
 
 		// Signals connects client APIs to windows/backend
-		boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> msgSignal;
+		boost::signal<void(ncclientif::NCClientIf*, const string&, const string&)> msgSignal;
 
 		// Start up application
 		ncapp::NCApp app;
@@ -166,15 +166,15 @@ int doit(int argc, char* argv[])
 		NCString allColorsString("Colors ", nccolor::NCColor::CHAT_NORMAL);
 		nccolor::NCColor::forEachColor([&](const short colorNum, const short foreground, const short background)
 		{
-			allColorsString = allColorsString + NCString(boost::lexical_cast<std::string>(colorNum), colorNum);
+			allColorsString = allColorsString + NCString(boost::lexical_cast<string>(colorNum), colorNum);
 		});
 		winLog->append(allColorsString);
 
 		// Dependency versions
 		NCString boostVersion("BOOST ", nccolor::NCColor::CHAT_NORMAL);
-		boostVersion = boostVersion + NCString(boost::lexical_cast<std::string>(BOOST_VERSION / 100000), nccolor::NCColor::CHAT_HIGHLIGHT);
-		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<std::string>(BOOST_VERSION / 100 % 1000), nccolor::NCColor::CHAT_HIGHLIGHT);
-		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<std::string>(BOOST_VERSION % 100), nccolor::NCColor::CHAT_HIGHLIGHT);
+		boostVersion = boostVersion + NCString(boost::lexical_cast<string>(BOOST_VERSION / 100000), nccolor::NCColor::CHAT_HIGHLIGHT);
+		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<string>(BOOST_VERSION / 100 % 1000), nccolor::NCColor::CHAT_HIGHLIGHT);
+		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<string>(BOOST_VERSION % 100), nccolor::NCColor::CHAT_HIGHLIGHT);
 		winLog->append(boostVersion);
 
 		NCString builtOn("nclone, built on ", nccolor::NCColor::CHAT_NORMAL);
@@ -185,8 +185,8 @@ int doit(int argc, char* argv[])
 
 
 		// Client vector
-		std::vector<ncpp::ncclientif::NCClientIf*> connections;
-		std::map<std::string, std::set<std::string> > chatToConnections;
+		vector<ncpp::ncclientif::NCClientIf*> connections;
+		map<string, set<string> > chatToConnections;
 		// TODO, if username, password, protocol are filled out jump start with a
 		// new connection here?
 
@@ -194,24 +194,24 @@ int doit(int argc, char* argv[])
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
-				( std::function<void(ncclientif::NCClientIf*, const std::string &, const std::string &)>
+				( function<void(ncclientif::NCClientIf*, const string &, const string &)>
 					(
-						[&](ncclientif::NCClientIf* client, const std::string &s, const std::string &t)
+						[&](ncclientif::NCClientIf* client, const string &s, const string &t)
 						{
 							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
 							// Prefix message with timestamp
-							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp();
-							const NCString line = nMsg + NCString(" " + t + " (from " + s + ")", nccolor::NCColor::CHATBUDDY_NORMAL);
+							const auto nMsg = NCTimeUtils::getPrintableColorTimeStamp();
+							const auto line = nMsg + NCString(" " + t + " (from " + s + ")", nccolor::NCColor::CHATBUDDY_NORMAL);
 							// Determine which window message will go to
-							const std::string titleToFind = (s == "DEBUG" || s == "INFO")?("Console"):(s);
+							const auto titleToFind = (s == "DEBUG" || s == "INFO")?("Console"):(s);
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
 
 							win3->forEachChild([&](ncobject::NCObject* o)
 							{
-								NCWinScrollback* winMsg = dynamic_cast<NCWinScrollback*>(o);
+								auto const winMsg = dynamic_cast<NCWinScrollback*>(o);
 								if(winMsg && titleToFind == winMsg->getConfig().p_title)
 								{
 									winMsg->append(line);
@@ -256,14 +256,13 @@ int doit(int argc, char* argv[])
 		// Command history
 		nccmdhistory::NCCmdHistory cmdHist;
 
-
 		// Draw/show entire app by refreshing
 		app.refresh();
 
 		// New Connection information
-		std::string clientProtocol;
-		std::string clientUsername;
-		std::string clientPassword;
+		string clientProtocol;
+		string clientUsername;
+		string clientPassword;
 
 		// Input collector
 		NCCmd ncCmd;
@@ -274,7 +273,7 @@ int doit(int argc, char* argv[])
 		// If there are cmd args use them to (jump) start/create a connection
 		if(!progArgs.connection().empty())
 		{
-			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
+			auto const ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
 			ncs->append(" Using cmd line account");
 			ncs->refresh();
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
@@ -310,15 +309,15 @@ int doit(int argc, char* argv[])
 			// Update Buddy List
 			if(winBl && app.isOnTopOf(winBl, winLog))
 			{
-				auto topChatWin = dynamic_cast<ncwin::NCWin*>(win3->getTop());
-				const std::string topChatName = (topChatWin)
+				auto const topChatWin = dynamic_cast<ncwin::NCWin*>(win3->getTop());
+				const auto topChatName = (topChatWin)
 						? (topChatWin->getConfig().p_title)
 						: ("");
 
 				winBl->clear();
 				win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
 				{
-					ncwin::NCWin* ncw = dynamic_cast<ncwin::NCWin*>(nobj);
+					auto const ncw = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(ncw)
 					{
 						auto currentColor = (topChatName == ncw->getConfig().p_title)
@@ -358,143 +357,32 @@ int doit(int argc, char* argv[])
 			int c = 0;
 			(*winCmd) >> c;  // app >> c;
 
-//			boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
+//	TODO		boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
 
 			// Show keystroke in keystroke debug window
 			if(KEY_TIMEOUT != c)
 			{
 				const char ks[] = {(char)c, 0};
-				const std::string keyStroke = (ncstringutils::NCStringUtils::isPrint(c))
-					? (std::string("Key ") + std::string(ks))
-					: (std::string("Key ") + boost::lexical_cast<std::string>(c));
+				const string keyStroke = (ncstringutils::NCStringUtils::isPrint(c))
+					? (string("Key ") + string(ks))
+					: (string("Key ") + boost::lexical_cast<string>(c));
 				winKeys->append(keyStroke);
 			}
 
-			NCWinScrollback* ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
+			auto const ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
 
 			if(ncs)
 			{
 				// Use Keymap
 				nclone.keyMap()(c);
 
-#if OLDKEYPROCESSING
-				if(! nclone.keyMap()(c) )
-				switch(c)
-				{
-
-
-#if STATUSTWIRL
-				winCmd.print(status[statusIndex++].c_str(), winCmd.getConfig().p_w-3, 1);
-				if(statusIndex >= status.size())
-				{
-					statusIndex = 0;
-				}
-#endif
-
-			case 10:
-			case KEY_ENTER:
-				if(!ncCmd.empty())
-				{
-					else
-					{
-						// First check to see if we're in the REVERSEISEARCH state
-						if(NCCmd::REVERSEISEARCH == ncCmd.inputState)
-						{
-							ncCmd.cmd = cmdHist.getCommand();
-							cmdHist.resetIndex();
-							ncCmd.inputState = NCCmd::NORMAL;
-						}
-						// TODO, what about the PASSWORD state?
-
-
-						if(NCCmd::NORMAL == ncCmd.inputState)
-						{
-							ncclientif::NCClientIf* client = 0;
-
-							// TODO, need to fix the way this connection is picked
-							if(connections.size() > 0)
-							{
-								client = connections[0];
-							}
-
-							// Pick buddy
-							const string buddyName = ncs->getConfig().p_title;
-
-							if(client)
-							{
-								client->msgSend(buddyName, ncCmd.cmd);
-							}
-
-							const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
-							// Add msg to top (front) buffer
-							const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
-							ncs->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
-							ncs->refresh();
-						}
-						else if(NCCmd::PROTOCOL == ncCmd.inputState)
-						{
-							ncCmd.inputState = NCCmd::USERNAME;
-							clientProtocol = ncCmd.cmd;
-							ncs->append("    protocol: " + ncCmd.cmd);
-							ncs->append("   Enter user login");
-							ncs->refresh();
-						}
-						else if(NCCmd::USERNAME == ncCmd.inputState)
-						{
-							// TODO, need to turn off the echo to the screen
-							ncCmd.inputState = NCCmd::PASSWORD;
-							clientUsername = ncCmd.cmd;
-							ncs->append("    username: " + ncCmd.cmd);
-							ncs->append("   Enter password");
-							ncs->refresh();
-						}
-						else if(NCCmd::PASSWORD == ncCmd.inputState)
-						{
-							ncCmd.inputState = NCCmd::NORMAL;
-							clientPassword = ncCmd.cmd;
-							ncs->append("   creating new connection..");
-							typedef ncclientpurple::NCClientPurple::String String;
-
-							connections.push_back
-								( new ncclientpurple::NCClientPurple
-								( clientUsername 
-								, clientPassword
-								, clientProtocol
-								, [&](const String &s, const int, const int) { }  // connectionStepCB
-								, [&](const String &s, const String &t) { msgSignal(s, t); }  // msgReceivedCB
-								, [&](const String &s, const String &t) { msgSignal(s, t); } // debugLogCB
-								, [&](const String &t) { msgSignal(t, "logged on"); } // buddySignedOnCB
-								) );
-
-							// TODO, no indication if connection failed or for what reason
-							// TODO, do not add password to cmdHist!!! 
-						}
-					}
-
-
-					// Reset command window and assume it needs updating
-					cmdHist.add(ncCmd.cmd);
-					// TODO, probably don't want/need to add standard cmds w/o params like help
-//					ncCmd.cmd.clear();
-//					ncCmd.cmdIdx = 0;
-					ncCmd.clear();
-					winCmd->clear();
-					winCmd->refresh();
-				}
-				break;
-			default:
-				break;
-				// nothing
-			}
-#endif
-
 		} // if ncs
 
 		}
 	} // end NCApp scope
 
-	std::cout << "nclone exiting successfully" << std::endl;
+	cout << "nclone exiting successfully" << endl;
 	return 0;
 }
 

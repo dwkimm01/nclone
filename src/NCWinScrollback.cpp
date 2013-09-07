@@ -195,11 +195,11 @@ void NCWinScrollback::clear()
 template <typename FindType, typename Print, typename Bottom, typename Top, typename ScrollUp, typename ScrollDown>
 void setFinder(Print &p, Bottom &b, Top &t, ScrollUp &su, ScrollDown &sd)
 {
-	p = &NCTextWinFormatter<FindType>::template printWindow<ncpp::NCWinBuffer::Iterator>;
-	b = &NCTextWinFormatter<FindType>::template getBottom<NCWinBuffer::ReverseIterator>;
-	t = &NCTextWinFormatter<FindType>::template getTop<NCWinBuffer::Iterator>;
-	su = &NCTextWinFormatter<FindType>::template getScrollUp<NCWinBuffer::ReverseIterator>;
-	sd = &NCTextWinFormatter<FindType>::template getScrollDown<NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator>;
+	p = &NCTextWinFormatter<FindType>::template printWindow<ncpp::NCTextBuffer::Iterator>;
+	b = &NCTextWinFormatter<FindType>::template getBottom<NCTextBuffer::ReverseIterator>;
+	t = &NCTextWinFormatter<FindType>::template getTop<NCTextBuffer::Iterator>;
+	su = &NCTextWinFormatter<FindType>::template getScrollUp<NCTextBuffer::ReverseIterator>;
+	sd = &NCTextWinFormatter<FindType>::template getScrollDown<NCTextBuffer::Iterator, NCTextBuffer::ReverseIterator>;
 }
 
 void NCWinScrollback::setWrapLength()

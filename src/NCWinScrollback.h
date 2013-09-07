@@ -9,7 +9,7 @@
 #define NCWINSCROLLBACK_H_
 
 #include "NCWin.h"
-#include "NCWinBuffer.h"
+#include "NCTextBuffer.h"
 #include "NCString.h"
 
 namespace ncpp
@@ -74,7 +74,7 @@ public:
 	int entryCount() const;
 
 private:
-	NCWinBuffer p_buff;
+	NCTextBuffer p_buff;
 	// Note, the second value will definitely be
 	// dependent on the width and height of the
 	// window
@@ -82,12 +82,12 @@ private:
 
 	// Functions for wrapping
 	typedef std::pair<unsigned int, unsigned int> OffsPair;
-	std::function<void(NCWinBuffer::Iterator, NCWinBuffer::Iterator, const unsigned int, const unsigned int, const unsigned int, const unsigned int, std::function<void(const NCString&)> )> p_printWindow;
-	std::function<OffsPair(NCWinBuffer::ReverseIterator, NCWinBuffer::ReverseIterator, const unsigned int, const unsigned int)> p_getBottom;
-	std::function<OffsPair(NCWinBuffer::Iterator, NCWinBuffer::Iterator)> p_getTop;
+	std::function<void(NCTextBuffer::Iterator, NCTextBuffer::Iterator, const unsigned int, const unsigned int, const unsigned int, const unsigned int, std::function<void(const NCString&)> )> p_printWindow;
+	std::function<OffsPair(NCTextBuffer::ReverseIterator, NCTextBuffer::ReverseIterator, const unsigned int, const unsigned int)> p_getBottom;
+	std::function<OffsPair(NCTextBuffer::Iterator, NCTextBuffer::Iterator)> p_getTop;
 
-	std::function<OffsPair(NCWinBuffer::ReverseIterator, NCWinBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollUp;
-	std::function<OffsPair(NCWinBuffer::Iterator, NCWinBuffer::Iterator, NCWinBuffer::ReverseIterator, NCWinBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollDown;
+	std::function<OffsPair(NCTextBuffer::ReverseIterator, NCTextBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollUp;
+	std::function<OffsPair(NCTextBuffer::Iterator, NCTextBuffer::Iterator, NCTextBuffer::ReverseIterator, NCTextBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollDown;
 };
 
 } // namespace ncpp

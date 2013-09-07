@@ -1,12 +1,12 @@
 /*
- * NCWinBuffer.h
+ * NCTextBuffer.h
  *
  *  Created on: Oct 25, 2012
  *      Author: dkimmel
  */
 
-#ifndef NCWINBUFFER_H_
-#define NCWINBUFFER_H_
+#ifndef NCTEXTBUFFER_H_
+#define NCTEXTBUFFER_H_
 
 #include <string>
 #include <functional>
@@ -20,18 +20,18 @@ namespace ncpp
  * <b>Purpose:</b> String buffer that keeps track of which elements
  * are displayed depending on viewport/screen size
  */
-class NCWinBuffer
+class NCTextBuffer
 {
 public:
 	/**
 	 * <b>Purpose:</b> CTOR
 	 */
-	NCWinBuffer(const int scrollBack);
+	NCTextBuffer(const int scrollBack);
 
 	/**
 	 * <b>Purpose:</b> DTOR
 	 */
-	~NCWinBuffer();
+	~NCTextBuffer();
 
 	/**
 	 * <b>Purpose:</b> Append a row to the buffer
@@ -68,4 +68,4 @@ private:
 
 } // namespace ncpp
 
-#endif // NCWINBUFFER_H_
+#endif // NCTEXTBUFFER_H_

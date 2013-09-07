@@ -72,11 +72,11 @@ void NCCommandHandler::Setup
 			// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
 			ncs->append("  Escape     quit");
 			ncs->append("  CTRL-c     cancel current input");
-			ncs->append("  TAB        go to next window");
-			ncs->append("  SHIFT-TAB  go to previous window");
+			ncs->append("  Tab        go to next window");
+			ncs->append("  Shift-Tab  go to previous window");
 			ncs->append("  CTRL-u     clear input window");
-			ncs->append("  PAGE-Up    Scroll up a window length");
-			ncs->append("  PAGE-Down  Scroll down a window length");
+			ncs->append("  Page-Up    Scroll up a window length");
+			ncs->append("  Page-Down  Scroll down a window length");
 			ncs->append("  Home       Scroll to top of scrollback");
 			ncs->append("  End        Scroll to bottom of scrollback");
 			ncs->append("  Enter      Send Message or process command");
@@ -235,7 +235,7 @@ void NCCommandHandler::Setup
 						fncs()->append("Deleting " + cnxName);
 						auto connectionToDelete = *citr;
 						citr = p_connections->erase(citr);
-TODO remove entry from chatsToConnection
+//TODO remove entry from chatsToConnection
 
 						delete connectionToDelete;
 						break;
