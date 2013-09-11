@@ -32,6 +32,7 @@ namespace ncpp
  * NCCmd ncCmd
  */
 NCCommandHandler::NCCommandHandler()
+	: p_connections(0)
 {
 	_startTime = NCTimeUtils::getUtcTime();
 }
@@ -54,12 +55,10 @@ void NCCommandHandler::Setup
 
 	// Use getters to get anything that can change, like state, etc
 
-	cmdMap["/exit"] = NCCommandHandler::Entry([&](const std::string& cmd){ ncCmd.stillRunning = false; }, "Quit application");
-	cmdMap["/quit"] = NCCommandHandler::Entry([&](const std::string& cmd){ ncCmd.stillRunning = false; }, "Quit application");
+	cmdMap["/exit"] = NCCommandHandler::Entry([&](const std::string& cmd) { ncCmd.stillRunning = false; }, "Quit application");
+	cmdMap["/quit"] = NCCommandHandler::Entry([&](const std::string& cmd) { ncCmd.stillRunning = false; }, "Quit application");
 	cmdMap["/help"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-//		msgSignal(0, "", "HELP ENTERED");
-
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
