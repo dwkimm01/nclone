@@ -9,7 +9,6 @@
 #define NCTYPES_H_
 
 #include <string>
-#include <vector>
 
 namespace ncpp
 {

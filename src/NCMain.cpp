@@ -10,7 +10,6 @@
 #include <set>
 #include <thread>
 #include <boost/lexical_cast.hpp>
-#include <boost/signal.hpp>
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
@@ -24,7 +23,6 @@
 
 #include "NCApp.h"
 #include "NCWin.h"
-// #include "NCWinBuffer.h"
 #include "NCWinScrollback.h"
 #include "NCWinTime.h"
 #include "NCTimeUtils.h"
@@ -41,6 +39,8 @@
 #include "NCKeyMap.h"
 #include "NClone.h"
 #include "NCCmd.h"
+#include "NCChats.h"
+#include "NCTypes.h"
 
 using namespace std;
 using namespace ncpp;
@@ -54,7 +54,7 @@ using namespace ncpp;
 //        shift keycode 15 = F26
 //        string F26 ="\033[Z"
 //
-//INSERT, DELETE: switch between connections
+// INSERT, DELETE: switch between connections
 
 
 // Main method
@@ -62,7 +62,6 @@ int doit(int argc, char* argv[])
 {
 	// Thread
 	boost::recursive_mutex msgLock;
-
 
 	// Scope for NCApp
 	{
@@ -72,7 +71,11 @@ int doit(int argc, char* argv[])
 		progArgs.print();
 
 		// Signals connects client APIs to windows/backend
-		boost::signal<void(ncclientif::NCClientIf*, const string&, const string&)> msgSignal;
+		ncclientif::NCClientIf::MsgSignal msgSignal;
+		std::function<void()> refreshBuddyList;
+
+		// Chats, data model
+		ncchats::NCChats chats;
 
 		// Start up application
 		ncapp::NCApp app;
@@ -194,17 +197,17 @@ int doit(int argc, char* argv[])
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
-				( function<void(ncclientif::NCClientIf*, const string &, const string &)>
+				( function<void(ncclientif::NCClientIf*, const string &, const string &, bool)>
 					(
-						[&](ncclientif::NCClientIf* client, const string &s, const string &t)
+						[&](ncclientif::NCClientIf* client, const string &s, const string &t, bool refresh)
 						{
 							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
 							// Prefix message with timestamp
-							const auto nMsg = NCTimeUtils::getPrintableColorTimeStamp();
-							const auto line = nMsg + NCString(" " + t + " (from " + s + ")", nccolor::NCColor::CHATBUDDY_NORMAL);
+							const auto nMsg = (!s.empty())?(NCTimeUtils::getPrintableColorTimeStamp()):(NCString("", nccolor::NCColor::CHATBUDDY_NORMAL));
+							const auto line = nMsg + NCString(" " + t /*+ " (from " + s + ")"*/, nccolor::NCColor::CHATBUDDY_NORMAL);
 							// Determine which window message will go to
-							const auto titleToFind = (s == "DEBUG" || s == "INFO")?("Console"):(s);
+							const auto titleToFind = (s == "DEBUG" || s == "INFO" || s == "")?("Console"):(s);
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;
@@ -235,22 +238,24 @@ int doit(int argc, char* argv[])
 								chatToConnections[s].insert(client->getName());
 							}
 
-							// Refresh the top window to see newly added text ... if we are the top window yaay
-							// TODO, do we want to just skip this if we're not on top?
-							// Only issue is that sometimes windows underneath seemed to show through - maybe
-							// it's an NCURSES prob though.
-							win3->refresh();
-
-							// Put cursor back to cmd window
-							winCmd->refresh();
+							// Refresh the top window to see newly added text ... if we are the top window
+							if(refresh)
+							{
+								if(win3 && win3->getTop())
+									win3->getTop()->refresh();
+								if(refreshBuddyList)
+									refreshBuddyList();
+								if(winCmd)
+									winCmd->refresh();
+							}
 						}
 					)
 				, _1
 				, _2
 				, _3
+				, _4
 				)
 			);
-
 
 
 		// Command history
@@ -286,7 +291,6 @@ int doit(int argc, char* argv[])
 		}
 
 
-
 		// Processing keys (and command) setup
 		nclone::NClone nclone;
 		nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
@@ -298,15 +302,9 @@ int doit(int argc, char* argv[])
 			, chatToConnections
 			, msgSignal);
 
-		// Loop forever until input tells us to return
-		while(ncCmd.stillRunning)
+		// Buddy list window
+		refreshBuddyList = [&]()
 		{
-			{
-			boost::unique_lock<boost::recursive_mutex> scoped_lockA(msgLock);
-
-
-
-			// Update Buddy List
 			if(winBl && app.isOnTopOf(winBl, winLog))
 			{
 				auto const topChatWin = dynamic_cast<ncwin::NCWin*>(win3->getTop());
@@ -337,6 +335,19 @@ int doit(int argc, char* argv[])
 				winBl->refresh();
 			}
 
+		};
+
+
+		// Loop forever until input tells us to return
+		while(ncCmd.stillRunning)
+		{
+			{
+			boost::unique_lock<boost::recursive_mutex> scoped_lockA(msgLock);
+
+
+			// Update Buddy List
+			if(refreshBuddyList) refreshBuddyList();
+
 
 			// Refresh winKeys if it is on top
 			if(winKeys && app.isOnTopOf(winKeys, winLog))
@@ -359,7 +370,6 @@ int doit(int argc, char* argv[])
 
 //	TODO		boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
-
 			// Show keystroke in keystroke debug window
 			if(KEY_TIMEOUT != c)
 			{
@@ -376,8 +386,8 @@ int doit(int argc, char* argv[])
 			{
 				// Use Keymap
 				nclone.keyMap()(c);
-
-		} // if ncs
+			} // if ncs
+			// TODO, why do we check ncs???
 
 		}
 	} // end NCApp scope

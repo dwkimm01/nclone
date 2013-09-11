@@ -47,7 +47,8 @@ public:
 		, NCCmd& ncCmd
 		, nccmdhistory::NCCmdHistory& cmdHist
 		, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-		, NCWinCfg& cfg );
+		, NCWinCfg& cfg
+		, ncclientif::NCClientIf::MsgSignal &msgSignal );
 
 	/**
 	 * Process Commands

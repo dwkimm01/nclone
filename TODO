@@ -1,5 +1,9 @@
 
+ TODO**
+  upgrade to BOOST's signal2
+
  GUI
+  - Change buddy up/down use CTRL-up/down (use TAB/shifttab for change buddy)
   - Add text notification on CTRL-c when entering newconn info
   - Command helper/guesser (e.g. /ju(mp X, to window x)
    . Tab does not complete command (maybe enter should complete a guessed command)

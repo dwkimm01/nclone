@@ -45,14 +45,14 @@ void NClone::setup
 	, NCWinCfg &cfg
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
 	, std::map<std::string, std::set<std::string> > &chatToConnections
-	, boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> &msgSignal )
+	, ncclientif::NCClientIf::MsgSignal &msgSignal )
 {
 	// Save function for later use
 	ncs = pncs;
 	enteringPassword = penteringPassword;
 
 	cmdMap.Setup(ncs, app, chats, p_keyMap,
-			ncCmd, cmdHist, connections, cfg);
+			ncCmd, cmdHist, connections, cfg, msgSignal);
 
 	keyMap().set([&]()
 		{
@@ -552,9 +552,9 @@ void NClone::setup
 					, clientPassword
 					, clientProtocol
 					, [&](const String &s, const int, const int) { }  // connectionStepCB
-					, [&](ncclientif::NCClientIf* client, const String &s, const String &t) { msgSignal(client, s, t); }  // msgReceivedCB
-					, [&](const String &s, const String &t) { msgSignal(0, s, t); } // debugLogCB
-					, [&](const String &t) { msgSignal(0, t, "logged on"); } // buddySignedOnCB
+					, [&](ncclientif::NCClientIf* client, const String &s, const String &t, bool r) { msgSignal(client, s, t, r); }  // msgReceivedCB
+					, [&](const String &s, const String &t) { msgSignal(0, s, t, true); } // debugLogCB
+					, [&](const String &t) { msgSignal(0, t, "logged on", true); } // buddySignedOnCB
 					) );
 			}
 			else if("DUMMY" == clientProtocol)
@@ -562,7 +562,7 @@ void NClone::setup
 				ncs()->append("Creating DUMMY connection");
 				connections.push_back(new ncclientdummy::NCClientDummy
 					( clientUsername + ":Dummy"
-					, [&](ncclientif::NCClientIf* client, const String &s, const String &t) { msgSignal(client, s, t); }  // msgReceivedCB
+					, [&](ncclientif::NCClientIf* client, const String &s, const String &t) { msgSignal(client, s, t, false); }  // msgReceivedCB
 					));
 			}
 			else

@@ -9,6 +9,8 @@
 #define NCCLIENTIF_H_
 
 #include <string>
+#include "boost/signal.hpp"
+
 
 namespace ncpp
 {
@@ -25,11 +27,15 @@ namespace ncclientif
 class NCClientIf
 {
 public:
-   // --------------------------------------------------------------
-   // Types
-   typedef std::string String;
+	// --------------------------------------------------------------
+	// Types
+	typedef std::string String;
 
-   virtual ~NCClientIf();
+	// Params: client*, buddyname/DEBUG level, message, refresh true/false
+	typedef boost::signal<void(ncclientif::NCClientIf*, const String&, const String&, bool)> MsgSignal;
+
+
+	virtual ~NCClientIf();
 
    // TODO, need a way to get configuration or user enterable information
    // dynamically into subclasses.  Meaning a virtual method that maybe

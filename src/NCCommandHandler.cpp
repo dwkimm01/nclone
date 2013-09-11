@@ -46,7 +46,8 @@ void NCCommandHandler::Setup
 	, NCCmd& ncCmd
 	, nccmdhistory::NCCmdHistory& cmdHist
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-	, NCWinCfg& cfg )
+	, NCWinCfg& cfg
+	, ncclientif::NCClientIf::MsgSignal &msgSignal )
 {
 	fncs = pncs;
 	p_connections = &connections;
@@ -57,14 +58,19 @@ void NCCommandHandler::Setup
 	cmdMap["/quit"] = NCCommandHandler::Entry([&](const std::string& cmd){ ncCmd.stillRunning = false; }, "Quit application");
 	cmdMap["/help"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
+//		msgSignal(0, "", "HELP ENTERED");
+
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-			ncs->append(NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
-			ncs->append(" Commands");
+//			ncs->append(NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+			msgSignal(0, "", ncCmd.cmd + ", help menu:", false);
+//			ncs->append(" Commands");
+			msgSignal(0, "" , "Commands", false);
 			for(auto e : cmdMap)
 			{
-				ncs->append("  " + std::get<0>(e) + " " + std::get<1>(e).p_help);
+//				ncs->append("  " + std::get<0>(e) + " " + std::get<1>(e).p_help);
+				msgSignal(0, "", "  " + std::get<0>(e) + " " + std::get<1>(e).p_help, false);
 			}
 			ncs->append(" ");
 			ncs->append(" Shortcuts");

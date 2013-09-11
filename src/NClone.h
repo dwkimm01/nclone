@@ -48,7 +48,7 @@ public:
 	, NCWinCfg &cfg
 	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
 	, std::map<std::string, std::set<std::string> > &chatToConnections
-	, boost::signal<void(ncclientif::NCClientIf*, const std::string&, const std::string&)> &msgSignal );
+	, ncclientif::NCClientIf::MsgSignal &msgSignal );
 
 	nckeymap::NCKeyMap& keyMap();
 	ncpp::NCCommandHandler cmdMap; // TODO, move to private
