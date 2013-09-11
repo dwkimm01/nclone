@@ -25,7 +25,7 @@ public:
 
 	NCClientDummy
 		( const std::string &name
-		, std::function<void(ncclientif::NCClientIf*, const String&, const String&)> msgReceivedCB
+		, std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> msgReceivedCB
 		);
 
 	virtual ~NCClientDummy();
@@ -65,7 +65,7 @@ public:
 private:
    std::string p_name;
    std::string p_buddyAtHost;
-   std::function<void(ncclientif::NCClientIf*, const String&, const String&)> p_msgReceivedCB;
+   std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> p_msgReceivedCB;
 
 };
 

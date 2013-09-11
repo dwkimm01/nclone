@@ -35,9 +35,9 @@ public:
    	   , const String &password
    	   , const String &protocol
    	   , std::function<void(const String&, const int, const int)> connectionStepCB
-   	   , std::function<void(ncclientif::NCClientIf*, const String&, const String&, bool)> msgReceivedCB
-   	   , std::function<void(const String&, const String&)> debugLogCB
-   	   , std::function<void(const String&)> buddySignedOnCB
+   	   , std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> msgReceivedCB
+   	   , std::function<void(const String&, const NCString&)> debugLogCB
+   	   , std::function<void(const NCString&)> buddySignedOnCB
    	   );
 
    virtual ~NCClientSwiften();
@@ -87,9 +87,9 @@ private:
    Data* p_data;
 
    std::function<void(const String&, const int, const int)> p_connectionStepCB;
-   std::function<void(ncclientif::NCClientIf*, const String&, const String&, bool)> p_msgReceivedCB;
-   std::function<void(const String&, const String&)> p_debugLogCB;
-   std::function<void(const String&)> p_buddySignedOnCB;
+   std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> p_msgReceivedCB;
+   std::function<void(const String&, const NCString&)> p_debugLogCB;
+   std::function<void(const NCString&)> p_buddySignedOnCB;
 };
 
 } // namespace ncclientswiften

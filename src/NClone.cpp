@@ -552,9 +552,9 @@ void NClone::setup
 					, clientPassword
 					, clientProtocol
 					, [&](const String &s, const int, const int) { }  // connectionStepCB
-					, [&](ncclientif::NCClientIf* client, const String &s, const String &t, bool r) { msgSignal(client, s, t, r); }  // msgReceivedCB
-					, [&](const String &s, const String &t) { msgSignal(0, s, t, true); } // debugLogCB
-					, [&](const String &t) { msgSignal(0, t, "logged on", true); } // buddySignedOnCB
+					, [&](ncclientif::NCClientIf* client, const String &s, const NCString &t, bool r) { msgSignal(client, s, t, r); }
+					, [&](const String &s, const NCString &t) { msgSignal(0, s, t, true); } // debugLogCB
+					, [&](const NCString &t) { msgSignal(0, "", t, true); } // buddySignedOnCB
 					) );
 			}
 			else if("DUMMY" == clientProtocol)
@@ -562,7 +562,7 @@ void NClone::setup
 				ncs()->append("Creating DUMMY connection");
 				connections.push_back(new ncclientdummy::NCClientDummy
 					( clientUsername + ":Dummy"
-					, [&](ncclientif::NCClientIf* client, const String &s, const String &t) { msgSignal(client, s, t, false); }  // msgReceivedCB
+					, [&](ncclientif::NCClientIf* client, const String &s, const NCString &t, bool refresh) { msgSignal(client, s, t, refresh); }
 					));
 			}
 			else

@@ -10,6 +10,7 @@
 
 #include <string>
 #include "boost/signal.hpp"
+#include "NCString.h"
 
 
 namespace ncpp
@@ -31,8 +32,8 @@ public:
 	// Types
 	typedef std::string String;
 
-	// Params: client*, buddyname/DEBUG level, message, refresh true/false
-	typedef boost::signal<void(ncclientif::NCClientIf*, const String&, const String&, bool)> MsgSignal;
+	// Params: client*, buddyname/DEBUG level, NCString message, refresh true/false
+	typedef boost::signal<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> MsgSignal;
 
 
 	virtual ~NCClientIf();

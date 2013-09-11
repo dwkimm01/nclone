@@ -15,6 +15,7 @@ namespace ncpp
 {
 
 // Forward declarations
+// TODO, remove NCWin from NCString and just iterate over color and string chars at the same time
 namespace ncwin
 {
 class NCWin;

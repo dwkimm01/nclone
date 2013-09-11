@@ -62,14 +62,11 @@ void NCCommandHandler::Setup
 		NCWinScrollback* ncs = fncs();
 		if(ncs != NULL)
 		{
-//			ncs->append(NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT));
-			msgSignal(0, "", ncCmd.cmd + ", help menu:", false);
-//			ncs->append(" Commands");
-			msgSignal(0, "" , "Commands", false);
+			msgSignal(0, "", NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+			msgSignal(0, "" , NCString("Commands", nccolor::NCColor::COMMAND_NORMAL), false);
 			for(auto e : cmdMap)
 			{
-//				ncs->append("  " + std::get<0>(e) + " " + std::get<1>(e).p_help);
-				msgSignal(0, "", "  " + std::get<0>(e) + " " + std::get<1>(e).p_help, false);
+				msgSignal(0, "", NCString("  " + std::get<0>(e) + " " + std::get<1>(e).p_help, nccolor::NCColor::COMMAND_NORMAL), false);
 			}
 			ncs->append(" ");
 			ncs->append(" Shortcuts");

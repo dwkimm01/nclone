@@ -10,6 +10,7 @@
 #include <boost/bind.hpp>
 #include "Swiften/Swiften.h"
 #include "NCClientSwiften.h"
+#include "NCColor.h"
 
 using namespace Swift;
 using namespace boost;
@@ -25,7 +26,7 @@ namespace ncclientswiften
 class NCClientSwiften::Data
 {
 public:
-	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const String&)> debugLogCB)
+	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const NCString&)> debugLogCB)
 		: p_name(name)
 		, networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
@@ -46,7 +47,7 @@ public:
 	{
 		if (error)
 		{
-			p_debugLogCB("DEBUG", "Error receiving roster.  Continuing.");
+			p_debugLogCB("DEBUG", NCString("Error receiving roster.  Continuing.", nccolor::NCColor::CHAT_HIGHLIGHT));
 		}
 		// Send initial available presence
 		client->sendPresence(Presence::create("Online"));
@@ -75,7 +76,7 @@ public:
 	Swift::Client* client;
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
-	std::function<void(const String&, const String&)> p_debugLogCB;
+	std::function<void(const String&, const NCString&)> p_debugLogCB;
 };
 
 
@@ -85,9 +86,9 @@ NCClientSwiften::NCClientSwiften
    , const NCClientSwiften::String &password
    , const NCClientSwiften::String &protocol
    , std::function<void(const String&, const int, const int)> connectionStepCB
-   , std::function<void(ncclientif::NCClientIf*, const String&, const String&, bool)> msgReceivedCB
-   , std::function<void(const String&, const String&)> debugLogCB
-   , std::function<void(const String&)> buddySignedOnCB
+   , std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> msgReceivedCB
+   , std::function<void(const String&, const NCString&)> debugLogCB
+   , std::function<void(const NCString&)> buddySignedOnCB
    )
    : p_data(new NCClientSwiften::Data(name, password, protocol, debugLogCB))
    , p_connectionStepCB(connectionStepCB)
@@ -102,7 +103,7 @@ NCClientSwiften::NCClientSwiften
 	// Connected
 	p_data->client->onConnected.connect([&]()
 	{
-		p_debugLogCB("DEBUG", "Connected");
+		p_debugLogCB("DEBUG", NCString("Connected", nccolor::NCColor::CHAT_NORMAL));
 		// Request the roster
 		GetRosterRequest::ref rosterRequest = GetRosterRequest::create(p_data->client->getIQRouter());
 		rosterRequest->onResponse.connect(bind(&NCClientSwiften::Data::handleRosterReceived, p_data, _2));
@@ -114,7 +115,7 @@ NCClientSwiften::NCClientSwiften
 	p_data->client->onMessageReceived.connect([&](Message::ref message) // bind(&handleMessageReceived, _1)
 	{
 		if(message && message->getBody().size() > 0)
-			p_msgReceivedCB(this, message->getFrom(), message->getBody(), true);
+			p_msgReceivedCB(this, message->getFrom(), NCString(message->getBody(), nccolor::NCColor::CHATBUDDY_NORMAL), true);
 
 		// Testing purposes, echo back
 		// message->setTo(message->getFrom());
@@ -126,8 +127,8 @@ NCClientSwiften::NCClientSwiften
 	p_data->client->onPresenceReceived.connect([&](Presence::ref presence)
 	{
 		const std::string statusString = NCClientSwiften::Data::GetString(presence->getType());
-		p_debugLogCB("DEBUG", std::string(" ") + statusString + " " + presence->getFrom().toString());
-		p_msgReceivedCB(this, presence->getFrom().toString(), presence->getFrom().toString() + " " + statusString, true);
+		p_debugLogCB("DEBUG", NCString(std::string(" ") + statusString + " " + presence->getFrom().toString(), nccolor::NCColor::CHAT_NORMAL));
+		p_msgReceivedCB(this, presence->getFrom().toString(), NCString(presence->getFrom().toString() + " " + statusString, nccolor::NCColor::CHAT_NORMAL), true);
 
 		// Automatically approve subscription requests
 		if (presence->getType() == Presence::Subscribe)
@@ -140,13 +141,13 @@ NCClientSwiften::NCClientSwiften
 	});
 
 	p_data->client->connect();
-	p_debugLogCB("DEBUG", "Running event loop");
+	p_debugLogCB("DEBUG", NCString("Running event loop", nccolor::NCColor::CHAT_HIGHLIGHT));
 
 	p_data->loopThread.reset(new std::thread([&]()
 	{
-		p_debugLogCB("DEBUG", "Running event loop begin");
+		p_debugLogCB("DEBUG", NCString("Running event loop begin", nccolor::NCColor::CHAT_HIGHLIGHT));
 		p_data->eventLoop.run();
-		p_debugLogCB("DEBUG", "Running event loop done");
+		p_debugLogCB("DEBUG", NCString("Running event loop done", nccolor::NCColor::CHAT_HIGHLIGHT));
 
 	}));
 }
@@ -155,7 +156,7 @@ NCClientSwiften::~NCClientSwiften()
 {
 	if(p_data)
 	{
-		p_debugLogCB("DEBUG", "Disconnecting");
+		p_debugLogCB("DEBUG", NCString("Disconnecting", nccolor::NCColor::CHAT_HIGHLIGHT));
 		p_data->client->disconnect();
 		p_data->eventLoop.stop();
 		p_data->loopThread->join();

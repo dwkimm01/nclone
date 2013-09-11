@@ -197,15 +197,17 @@ int doit(int argc, char* argv[])
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
-				( function<void(ncclientif::NCClientIf*, const string &, const string &, bool)>
+				( function<void(ncclientif::NCClientIf*, const string &, const NCString &, bool)>
 					(
-						[&](ncclientif::NCClientIf* client, const string &s, const string &t, bool refresh)
+						[&](ncclientif::NCClientIf* client, const string &s, const NCString &t, bool refresh)
 						{
 							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
 
 							// Prefix message with timestamp
 							const auto nMsg = (!s.empty())?(NCTimeUtils::getPrintableColorTimeStamp()):(NCString("", nccolor::NCColor::CHATBUDDY_NORMAL));
-							const auto line = nMsg + NCString(" " + t /*+ " (from " + s + ")"*/, nccolor::NCColor::CHATBUDDY_NORMAL);
+							const auto line = nMsg
+									+ NCString( " ", nccolor::NCColor::CHATBUDDY_NORMAL)
+									+ t;
 							// Determine which window message will go to
 							const auto titleToFind = (s == "DEBUG" || s == "INFO" || s == "")?("Console"):(s);
 
