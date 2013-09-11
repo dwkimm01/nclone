@@ -209,7 +209,10 @@ int doit(int argc, char* argv[])
 									+ NCString( " ", nccolor::NCColor::CHATBUDDY_NORMAL)
 									+ t;
 							// Determine which window message will go to
-							const auto titleToFind = (s == "DEBUG" || s == "INFO" || s == "")?("Console"):(s);
+							const auto titleToFind
+								= (s == "DEBUG" || s == "INFO")?("Console"):
+								  (s == "" && win3 && dynamic_cast<NCWinScrollback*>(win3->getTop()))?
+										  (dynamic_cast<NCWinScrollback*>(win3->getTop())->getConfig().p_title):(s);
 
 							// Find window named "buddy name" and add text
 							bool msgAdded = false;

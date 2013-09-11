@@ -59,36 +59,31 @@ void NCCommandHandler::Setup
 	cmdMap["/quit"] = NCCommandHandler::Entry([&](const std::string& cmd) { ncCmd.stillRunning = false; }, "Quit application");
 	cmdMap["/help"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
+		msgSignal(0, "", NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+		msgSignal(0, "" , NCString("Commands", nccolor::NCColor::COMMAND_NORMAL), false);
+		for(auto e : cmdMap)
 		{
-			msgSignal(0, "", NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
-			msgSignal(0, "" , NCString("Commands", nccolor::NCColor::COMMAND_NORMAL), false);
-			for(auto e : cmdMap)
-			{
-				msgSignal(0, "", NCString("  " + std::get<0>(e) + " " + std::get<1>(e).p_help, nccolor::NCColor::COMMAND_NORMAL), false);
-			}
-			ncs->append(" ");
-			ncs->append(" Shortcuts");
-			// TODO, would be cool if dynamically mapping keystrokes would show up here in the
-			// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
-			ncs->append("  Escape     quit");
-			ncs->append("  CTRL-c     cancel current input");
-			ncs->append("  Tab        go to next window");
-			ncs->append("  Shift-Tab  go to previous window");
-			ncs->append("  CTRL-u     clear input window");
-			ncs->append("  Page-Up    Scroll up a window length");
-			ncs->append("  Page-Down  Scroll down a window length");
-			ncs->append("  Home       Scroll to top of scrollback");
-			ncs->append("  End        Scroll to bottom of scrollback");
-			ncs->append("  Enter      Send Message or process command");
-			ncs->append("  F3         Toggle Contact list window visibility");
-			ncs->append("  CTRL-r     Reverse search");
-			ncs->append("  CTRL-a     Move cursor to start of command");
-			ncs->append("  CTRL-e     Move cursor to end of command");
-			ncs->append("");
-			ncs->refresh();
+			msgSignal(0, "", NCString("  " + std::get<0>(e) + " " + std::get<1>(e).p_help, nccolor::NCColor::COMMAND_NORMAL), false);
 		}
+		msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString(" Shortcuts", nccolor::NCColor::CHAT_NORMAL), false);
+		// TODO, would be cool if dynamically mapping keystrokes would show up here in the
+		// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
+		msgSignal(0, "", NCString("  Escape     quit", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  CTRL-c     cancel current input", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  Tab        go to next window", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  Shift-Tab  go to previous window", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  CTRL-u     clear input window", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  Page-Up    Scroll up a window length", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  Page-Down  Scroll down a window length", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  Home       Scroll to top of scrollback", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  End        Scroll to bottom of scrollback", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  Enter      Send Message or process command", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  F3         Toggle Contact list window visibility", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  CTRL-r     Reverse search", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  CTRL-a     Move cursor to start of command", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("  CTRL-e     Move cursor to end of command", nccolor::NCColor::CHAT_NORMAL), false);
+		msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_NORMAL), true);
 	}, "Print help information");
 
 	cmdMap["/keys"] = NCCommandHandler::Entry([&](const std::string& cmd)
