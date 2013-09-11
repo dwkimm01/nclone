@@ -512,7 +512,8 @@ void NClone::setup
 					const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
 					// Add msg to top (front) buffer
 					const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + ncCmd.cmd, outgoingMsgColor);
-					ncs()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
+//					ncs()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
+					ncs()->append(nMsg);
 					}
 
 					ncs()->refresh();
