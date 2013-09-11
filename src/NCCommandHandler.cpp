@@ -88,28 +88,25 @@ void NCCommandHandler::Setup
 
 	cmdMap["/keys"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		NCWinScrollback* ncs = fncs();
-		if(ncs)
+		for(auto k : ncKeyMap.getMap())
 		{
-			for(auto k : ncKeyMap.getMap())
-			{
-				NCString space(" ", nccolor::NCColor::CHAT_NORMAL);
+			const NCString space(" ", nccolor::NCColor::CHAT_NORMAL);
 
-				ncs->append
-					( space
-					+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL)
-					+ space
-					+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
-					);
-			}
-			ncs->refresh();
+			msgSignal(0, "", space
+				+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL)
+				+ space
+				+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
+				, false);
 		}
+		msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_NORMAL), true);
+
 	}, "Print list of assigned keys");
 
 	cmdMap["/key"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
 // TODO		if(ncCmd.cmd.find("/key") == 0)
 		// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
+		int counter = 0;
 		const std::string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
 		const boost::regex re(binStr);
 		const std::string text = ncCmd.cmd;  // TODO, refactor and take out this var
@@ -119,56 +116,48 @@ void NCCommandHandler::Setup
 			{
 				if(what.size() == 3)
 				{
-					if(fncs && fncs())
-					{
-						fncs()->append(" Remap: " + what[1].str() + " to " + what[2].str());
-						fncs()->refresh();
+					msgSignal(0, "", NCString(" Remap: " + what[1].str() + " to " + what[2].str(), nccolor::NCColor::CHAT_HIGHLIGHT), false);
 
-						for(auto km : ncKeyMap.getMap())
+					for(auto km : ncKeyMap.getMap())
+					{
+						if(km.second.name == what[1].str())
 						{
-							if(km.second.name == what[1].str())
-							{
-								auto kv = km.second.func;
-								ncKeyMap.getMap().erase(km.first);
-								ncKeyMap.set(kv, what[1], boost::lexical_cast<int>(what[2].str()));
-								break;
-							}
+							++counter;
+							auto kv = km.second.func;
+							ncKeyMap.getMap().erase(km.first);
+							ncKeyMap.set(kv, what[1], boost::lexical_cast<int>(what[2].str()));
+							break;
 						}
 					}
 				}
 			}
+			msgSignal(0, "", NCString(" Remapped " + boost::lexical_cast<std::string>(counter) + " keys", nccolor::NCColor::CHAT_HIGHLIGHT), false);
+			msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_HIGHLIGHT), true);
 		}
 		else
 		{
-			if(fncs && fncs())
-			{
-				fncs()->append(" " + ncCmd.cmd);
-				fncs()->append(" Does not match " + binStr);
-				fncs()->refresh();
-			}
+			msgSignal(0, "", NCString(" " + ncCmd.cmd, nccolor::NCColor::CHAT_HIGHLIGHT), false);
+			msgSignal(0, "", NCString(" Does not match " + binStr, nccolor::NCColor::CHAT_HIGHLIGHT), true);
 		}
 	}, "\"Command\" xxx remap number xxx to Command");
 
 	cmdMap["/history"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		if(!fncs || !fncs()) return;
-
 		const boost::regex re("/history[[:space:]]+clear[[:space:]]*");
 		if(boost::regex_match(cmd, re))
 		{
-			fncs()->append("Clearing history");
+			msgSignal(0, "", NCString("Clearing history", nccolor::NCColor::CHAT_HIGHLIGHT), false);
 			cmdHist.clear();
 		}
 		else
 		{
-			fncs()->append(NCString(ncCmd.cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT));
+			msgSignal(0, "", NCString(ncCmd.cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 			for(auto x : cmdHist)
 			{
-				fncs()->append(" " + x);
+				msgSignal(0, "", NCString(" " + x, nccolor::NCColor::DEFAULT), false);
 			}
 		}
-		fncs()->append("");
-		fncs()->refresh();
+		msgSignal(0, "", NCString(" ", nccolor::NCColor::DEFAULT), true);
 	}, "Print command history (clear empties history)");
 
 	cmdMap["/newconn"] = NCCommandHandler::Entry([&](const std::string& cmd)
