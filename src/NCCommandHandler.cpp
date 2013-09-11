@@ -162,30 +162,25 @@ void NCCommandHandler::Setup
 
 	cmdMap["/newconn"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
-		{
-			ncs->append(cmd);
-			// Collect up user information:
-			//  protocol: XMPP
-			//  login: user@gmail.com
-			//  password: xxxx
-			ncCmd.inputState = NCCmd::PROTOCOL;
-			ncs->append(NCString(ncCmd.cmd + " Creating new connection", nccolor::NCColor::COMMAND_HIGHLIGHT));
-			ncs->append("   Enter protocol (e.g. XMPP, DUMMY)");
-			ncs->refresh();
-		}
+		msgSignal(0, "", NCString(cmd, nccolor::NCColor::DEFAULT), false);
+		// Collect up user information:
+		//  protocol: XMPP
+		//  login: user@gmail.com
+		//  password: xxxx
+		ncCmd.inputState = NCCmd::PROTOCOL;
+		msgSignal(0, "", NCString(ncCmd.cmd + " Creating new connection", nccolor::NCColor::DEFAULT), false);
+		msgSignal(0, "", NCString("   Enter protocol (e.g. XMPP, DUMMY)", nccolor::NCColor::DEFAULT), true);
 	}, "Create new connection");
 
 	cmdMap["/delconn"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		if(fncs && fncs() && p_connections)
+		if(p_connections)
 		{
 			std::string cnxList = cmd;
 			boost::replace_all(cnxList, "/delconn", "");
 			if(cnxList.size() == 0)
 			{
-				fncs()->append(" Specify connection to delete");
+				msgSignal(0, "", NCString(" Specify connection to delete", nccolor::NCColor::DEFAULT), false);
 			}
 
 			typedef boost::split_iterator<std::string::iterator> ItrType;
@@ -194,7 +189,7 @@ void NCCommandHandler::Setup
 			{
 				const std::string cnxName = boost::copy_range<std::string>(*i);
 				if(cnxName.empty()) continue;
-				fncs()->append(" Looking to delete " + cnxName);
+				msgSignal(0, "", NCString(" Looking to delete " + cnxName, nccolor::NCColor::DEFAULT), false);
 
 				int count = 0;
 				for(const auto & cn : *p_connections)
@@ -206,19 +201,19 @@ void NCCommandHandler::Setup
 				}
 				if(1 < count)
 				{
-					fncs()->append("Cannot delete " + cnxName + " by name, specify connection ID");
+					msgSignal(0, "", NCString("Cannot delete " + cnxName + " by name, specify connection ID", nccolor::NCColor::DEFAULT), false);
 					continue;
 				}
 				if(0 == count)
 				{
-					fncs()->append("Cannot delete " + cnxName + ", no connection by that name");
+					msgSignal(0, "", NCString("Cannot delete " + cnxName + ", no connection by that name", nccolor::NCColor::DEFAULT), false);
 					continue;
 				}
 				for(auto citr = p_connections->begin(); citr != p_connections->end(); ++citr)
 				{
 					if((*citr)->getName() == cnxName)
 					{
-						fncs()->append("Deleting " + cnxName);
+						msgSignal(0, "", NCString("Deleting " + cnxName, nccolor::NCColor::DEFAULT), false);
 						auto connectionToDelete = *citr;
 						citr = p_connections->erase(citr);
 //TODO remove entry from chatsToConnection
@@ -229,51 +224,42 @@ void NCCommandHandler::Setup
 				}
 			}
 
-			fncs()->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "Delete connection");
 
 	cmdMap["/connections"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		if(fncs && fncs() && p_connections)
+		if(p_connections)
 		{
-			fncs()->append(" Connections " + boost::lexical_cast<std::string>(p_connections->size()));
+			msgSignal(0, "", NCString(" Connections " + boost::lexical_cast<std::string>(p_connections->size()), nccolor::NCColor::DEFAULT), false);
 
 			for(const auto & cn : *p_connections)
 			{
-				fncs()->append("  " + cn->getName());
+				msgSignal(0, "", NCString("  " + cn->getName(), nccolor::NCColor::DEFAULT), false);
 			}
-			fncs()->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "List connections");
 
 	cmdMap["/list"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
+		msgSignal(0, "", NCString(ncCmd.cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+		app.forEachChild([&](ncobject::NCObject* obj)
 		{
-			ncs->append(NCString(ncCmd.cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT));
-			app.forEachChild([&](ncobject::NCObject* obj)
+			ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
+			if(lwin)
 			{
-				ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
-				if(lwin)
-				{
-					ncs->append("  " + lwin->getConfig().p_title);
-				}
-				return true;  // keep going through windows
-			});
-			ncs->append("");
-			ncs->refresh();
-		}
+				msgSignal(0, "", NCString("  " + lwin->getConfig().p_title, nccolor::NCColor::DEFAULT), false);
+			}
+			return true;  // keep going through windows
+		});
+		msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 	}, "Print open windows");
 
 	cmdMap["/refresh"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		if(fncs && fncs())
-		{
-			fncs()->append(NCString(ncCmd.cmd, nccolor::NCColor::COMMAND_HIGHLIGHT));
-			fncs()->append("");
-		}
+		msgSignal(0, "", NCString(ncCmd.cmd, nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 		app.refresh();
 	}, "Refresh all windows");
 
@@ -309,8 +295,7 @@ void NCCommandHandler::Setup
 			}
 			else
 			{
-				ncs->append("Unknown set option \"" + cmdParam[1] + "\"");
-				ncs->refresh();
+				msgSignal(0, "", NCString("Unknown set option \"" + cmdParam[1] + "\"", nccolor::NCColor::DEFAULT), true);
 			}
 		}
 	}, "wrap (length|word|cut)");
@@ -368,7 +353,7 @@ void NCCommandHandler::Setup
 					});
 				}
 			}
-			ncs->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "Win(s) get info about a window");
 
@@ -409,7 +394,7 @@ void NCCommandHandler::Setup
 		if(fncs && fncs())
 		{
 			fncs()->append(NCTimeUtils::getPrintableColorTimeStamp());
-			fncs()->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "Print current time");
 
@@ -418,7 +403,7 @@ void NCCommandHandler::Setup
 		if(fncs && fncs())
 		{
 			fncs()->append(NCString("Up for ", nccolor::NCColor::CHAT_NORMAL) + NCTimeUtils::getTimeDiff(_startTime));
-			fncs()->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "Print time up and running");
 
@@ -502,7 +487,7 @@ void NCCommandHandler::Setup
 				}
 				ncs->append(">> " + boost::lexical_cast<std::string>(i) + " " + sToPrint);
 			}
-			ncs->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "print debug output to test text wrapping");
 
@@ -516,32 +501,25 @@ void NCCommandHandler::Setup
 			{
 				ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
 			}
-			ncs->refresh();
+			msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 		}
 	}, "Print debug shorter string output to test page up/down");
 
 	cmdMap["/lorem"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		NCWinScrollback* ncs = fncs();
-		if(ncs != NULL)
+		msgSignal(0, "", NCString(ncCmd.cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+
+		NCString entry = NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
+		// Change color of e's for fun
+		entry.forEach([](char &c, char &color)
 		{
-			ncs->append(NCString(ncCmd.cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT));
-
-			NCString entry
-				= NCTimeUtils::getPrintableColorTimeStamp()
-				+ NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
-			// Change color of e's for fun
-			entry.forEach([](char &c, char &color)
+			if('e' == c)
 			{
-				if('e' == c)
-				{
-					color = nccolor::NCColor::CHAT_NORMAL;
-				}
-			});
+				color = nccolor::NCColor::CHAT_NORMAL;
+			}
+		});
 
-			ncs->append(entry);
-			ncs->refresh();
-		}
+		msgSignal(0, "", entry, true);
 	}, "Print debug lorem text to test space wrapping");
 
 }
