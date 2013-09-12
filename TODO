@@ -1,6 +1,16 @@
 
- TODO**
-  upgrade to BOOST's signal2
+ - Fix delconn on active connection (XMPP)
+ - Add backend to get multiple connections working at the same time
+ - CTRL-n go to next window with unseen updates
+ - Save chat histories (append to old, have max size of txt log)
+ - Add user nickname to chats
+ - Change to remove chat window border
+ - New msg/online buddies don't put (new) window on top
+ - Fix login from command line
+ - Change newconn command to take args: /newconn XMPP user@host.org as args
+ - Upgrade to BOOST's signal2
+ - Print all available commands (for remapping etc)
+
 
  GUI
   - Change buddy up/down use CTRL-up/down (use TAB/shifttab for change buddy)
@@ -11,40 +21,29 @@
    . Doesn't provide command specific hints (eg /jump Wina, Winb, Winc ...) 
   - Console window drops from top
   - Buddy list window fixes and animate hiding to right
-  - CTRL-n go to next window with unseen updates
   - Search and highlight (CTRL-f starts "/find" to cmd) 
   - Make sure boxes can be removed from window edges, make no boxes default and cfg settable
-  - /newconn should take args: /newconn XMPP user@host.orgi
    
  Network
   - Fix /delconn on XMPP (swiften), "Client not disconnected properly" 
   - change to a more generic command string sending to client i/fs (instead of connect, disconnect, etc?)
   - Add data model for handling sending msgs to specific user on specific connection
-DONE  - gloox i/f
   - boost extension for plugin i/f model
   - MS Communicator plugin creation
   - Add commands and functions to i/f for handling conversations, new buddies, etc
   - Handle multiple connections
 
  Other
-  - Save chat histories (append to old, have max size of txt log)
-  - OSX: boost, gloox, autotools/build scripts
+  - OSX: boost, autotools/build scripts (allow swiften like INCDIR, LIBDIR, etc)
   - Windows build
   - General code cleanup
   - Refactor cmds and keys into generic std::function-s that can get called and mapped to whatever
   
-
- Refactor
-  - Maybe remove PROTOCOL from input state?
-
- Fix Eclipse build settings so that can be used
+ Fix/Remove Eclipse build settings so that can be used
 should just generate makefiles automatically
 
 - Cleanup
- Finish cmd map
  Auto hide buddy list (animated)
- CTRL n for next new msg
- New msg/online buddies don't put (new) window on top
  Save chat logs
  Make colors configurable
  Save config: key remap, autologin, etc
@@ -69,7 +68,6 @@ should just generate makefiles automatically
 - Status bar
 
 - Server client improvements
- Use gloox
  Replace libpurple (ms communicator)
  Multiple connections (command management etc)
  Reconnect
@@ -361,6 +359,8 @@ Next up (TODO list)
  - Fix CTRL-r not always putting cursor on the correct place
     especially when a line wrapped...
  - Merge Jeremy and my views
+ - gloox i/f
+
 
 ----------------------------------------------------
 -- Fixed
