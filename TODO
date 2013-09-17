@@ -5,7 +5,7 @@
  - Save chat histories (append to old, have max size of txt log)
  - Add user nickname to chats
  - Change to remove chat window border
- - New msg/online buddies don't put (new) window on top
+DONE - New msg/online buddies don't put (new) window on top
  - Fix login from command line
  - Change newconn command to take args: /newconn XMPP user@host.org as args
  - Upgrade to BOOST's signal2

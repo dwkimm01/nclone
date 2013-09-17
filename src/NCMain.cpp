@@ -232,9 +232,11 @@ int doit(int argc, char* argv[])
 							// Check to make sure the message was added to a current window
 							if(!msgAdded)
 							{
+								auto const currentTop = win3->getTop();
 								cfg.p_title = s;
 								NCWinScrollback* addedWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 								addedWin->append(line);
+								win3->bringToFront(currentTop);
 							}
 
 							// Add to connectionToChats
