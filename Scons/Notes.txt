@@ -1,0 +1,18 @@
+
+
+source: 
+export LD_LIBRARY_PATH=/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/lib:/home/dwkimm01/Documents/Development/deps/boost_1_53_0/lib
+
+fb
+XMPP or Jabber
+userid@chat.facebook.com
+
+jabber ID ...
+
+port 5222
+server chat.facebook.com
+SSL/TLS yes
+allow plantext no
+
+
+got this from: https://developers.facebook.com/docs/chat/

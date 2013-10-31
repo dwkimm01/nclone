@@ -7,6 +7,7 @@
 //============================================================================
 
 #include <iostream>
+#include <fstream>
 #include <set>
 #include <thread>
 #include <boost/lexical_cast.hpp>
@@ -194,6 +195,9 @@ int doit(int argc, char* argv[])
 		// new connection here?
 
 
+		ofstream myfile;
+		myfile.open("/home/dwkimm01/LOG.txt");
+
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
@@ -202,6 +206,8 @@ int doit(int argc, char* argv[])
 						[&](ncclientif::NCClientIf* client, const string &s, const NCString &t, bool refresh)
 						{
 							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
+
+							myfile << s << " " << t.getString() << endl;
 
 							// Prefix message with timestamp
 							const auto nMsg = (!s.empty())?(NCTimeUtils::getPrintableColorTimeStamp()):(NCString("", nccolor::NCColor::CHATBUDDY_NORMAL));

@@ -5,10 +5,9 @@ env = Environment(CCFLAGS='-g')
 env.Append( CXXFLAGS='-std=c++0x' )
 
 # TODO, be able to load include paths from a config file
-#INCS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/include']
-INCS = ['/home/dwkimm01/Documents/Development/deps']
+INCS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/include', '/home/dwkimm01/Documents/Development/deps/boost_1_53_0/include']
 # TODO, be able to load lib paths from a config file
-LIBPATHS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/lib']
+LIBPATHS = ['/home/dwkimm01/Documents/Development/deps/swiften-2.0.0/lib', '/home/dwkimm01/Documents/Development/deps/boost_1_53_0/lib']
 # TODO, depending on the system/lib versions we have to explicitly load diff libs
 LIBS = ['Swiften', 'boost_regex', 'boost_filesystem', 'boost_program_options', 'boost_signals', 'boost_date_time', 'boost_system', 'boost_thread', 'ncurses', 'z', 'pthread']
 SRCS = Glob('build/*.cpp')
