@@ -7,7 +7,6 @@
 //============================================================================
 
 #include <iostream>
-#include <fstream>
 #include <set>
 #include <thread>
 #include <boost/lexical_cast.hpp>
@@ -16,8 +15,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>  // TODO TAKE OUT?
 
 #include "NCCurses.h" // TODO, move out of here when the keystroke reading gets moved
 #include <stdio.h>  // TODO, why is this here?
@@ -26,7 +24,7 @@
 #include "NCWin.h"
 #include "NCWinScrollback.h"
 #include "NCWinTime.h"
-#include "NCTimeUtils.h"
+//#include "NCTimeUtils.h"
 #include "NCCmdLineOptions.h"
 #include "NCConnectionString.h"
 #include "NCClientPurple.h"
@@ -42,6 +40,7 @@
 #include "NCCmd.h"
 #include "NCChats.h"
 #include "NCTypes.h"
+#include "NCControl.h"
 
 using namespace std;
 using namespace ncpp;
@@ -61,8 +60,6 @@ using namespace ncpp;
 // Main method
 int doit(int argc, char* argv[])
 {
-	// Thread
-	boost::recursive_mutex msgLock;
 
 	// Scope for NCApp
 	{
@@ -150,7 +147,6 @@ int doit(int argc, char* argv[])
 		NCWinScrollback* winKeys = new NCWinScrollback(&app, keysCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
 		app.bringToBack(winKeys);
 
-
 		// Time stamp window
 		auto timeCfg = cfg;
 		timeCfg.p_title = "Time";
@@ -162,105 +158,72 @@ int doit(int argc, char* argv[])
 		timeCfg.p_scrollOk = false;
 		ncwin::NCWin::ResizeFuncs timeResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w -1; });
 		ncwin::NCWin::ResizeFuncs timeResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 4; });
-
-		// TODO, perhaps the parent of winTime should be the parent of the chat windows
 		ncwin::NCWin* winTime = new ncwintime::NCWinTime(&app, timeCfg, ncwin::NCWin::ResizeFuncs(), ncwin::NCWin::ResizeFuncs(), timeResizeX, timeResizeY);
+		// TODO, perhaps the parent of winTime should be the parent of the chat windows
 
-		// Color printing
+		// Log color printing
 		NCString allColorsString("Colors ", nccolor::NCColor::CHAT_NORMAL);
 		nccolor::NCColor::forEachColor([&](const short colorNum, const short foreground, const short background)
 		{
 			allColorsString = allColorsString + NCString(boost::lexical_cast<string>(colorNum), colorNum);
 		});
 		winLog->append(allColorsString);
-
-		// Dependency versions
+		// Log dependency versions
 		NCString boostVersion("BOOST ", nccolor::NCColor::CHAT_NORMAL);
 		boostVersion = boostVersion + NCString(boost::lexical_cast<string>(BOOST_VERSION / 100000), nccolor::NCColor::CHAT_HIGHLIGHT);
 		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<string>(BOOST_VERSION / 100 % 1000), nccolor::NCColor::CHAT_HIGHLIGHT);
 		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<string>(BOOST_VERSION % 100), nccolor::NCColor::CHAT_HIGHLIGHT);
 		winLog->append(boostVersion);
-
+		// Log build date
 		NCString builtOn("nclone, built on ", nccolor::NCColor::CHAT_NORMAL);
 		builtOn = builtOn + NCString(__DATE__, nccolor::NCColor::CHAT_HIGHLIGHT);
 		builtOn = builtOn + NCString(" at ", nccolor::NCColor::CHAT_NORMAL);
 		builtOn = builtOn + NCString(__TIME__, nccolor::NCColor::CHAT_HIGHLIGHT);
 		winLog->append(builtOn);
 
-
 		// Client vector
 		vector<ncpp::ncclientif::NCClientIf*> connections;
-		map<string, set<string> > chatToConnections;
-		// TODO, if username, password, protocol are filled out jump start with a
-		// new connection here?
+
+		// Command history
+		nccmdhistory::NCCmdHistory cmdHist;
+
+		// New Connection information
+		string clientProtocol;
+		string clientUsername;
+		string clientPassword;
+
+		// Input collector
+		NCCmd ncCmd;
 
 
-		ofstream myfile;
-		myfile.open("/home/dwkimm01/LOG.txt");
+		// Controller
+		nccontrol::NCControl ncCtrl
+			( [&]() { return &app; }
+			, [&]() { return winLog; }
+			, [&]() { return win3; }
+			, [&]() { return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
+			, [&]() { return winBl; }
+			, [&]() { return winCmd; }
+			, [&]() { return winTime; }
+			, [&]() { return winKeys; }
+			, [&]() -> nccmdhistory::NCCmdHistory& { return cmdHist; }
+			, [&]() -> NCCmd& { return ncCmd; }
+			, [&]() -> NCWinCfg& { return cfg; }
+			, [&]() -> std::vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
+
+			, defaultScrollback
+			, chatResizeWidth
+			, chatResizeHeight
+			);
 
 		// Message received signal connect
 		msgSignal.connect
 			( boost::bind<void>
 				( function<void(ncclientif::NCClientIf*, const string &, const NCString &, bool)>
 					(
-						[&](ncclientif::NCClientIf* client, const string &s, const NCString &t, bool refresh)
+						[&](ncclientif::NCClientIf* client, const string &buddy, const NCString &msg, bool refresh)
 						{
-							boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
-
-							myfile << s << " " << t.getString() << endl;
-
-							// Prefix message with timestamp
-							const auto nMsg = (!s.empty())?(NCTimeUtils::getPrintableColorTimeStamp()):(NCString("", nccolor::NCColor::CHATBUDDY_NORMAL));
-							const auto line = nMsg
-									+ NCString( " ", nccolor::NCColor::CHATBUDDY_NORMAL)
-									+ t;
-							// Determine which window message will go to
-							const auto titleToFind
-								= (s == "DEBUG" || s == "INFO")?("Console"):
-								  (s == "" && win3 && dynamic_cast<NCWinScrollback*>(win3->getTop()))?
-										  (dynamic_cast<NCWinScrollback*>(win3->getTop())->getConfig().p_title):(s);
-
-							// Find window named "buddy name" and add text
-							bool msgAdded = false;
-
-							win3->forEachChild([&](ncobject::NCObject* o)
-							{
-								auto const winMsg = dynamic_cast<NCWinScrollback*>(o);
-								if(winMsg && titleToFind == winMsg->getConfig().p_title)
-								{
-									winMsg->append(line);
-									msgAdded = true;
-									return false;
-								}
-								return true;
-							});
-
-							// Check to make sure the message was added to a current window
-							if(!msgAdded)
-							{
-								auto const currentTop = win3->getTop();
-								cfg.p_title = s;
-								NCWinScrollback* addedWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
-								addedWin->append(line);
-								win3->bringToFront(currentTop);
-							}
-
-							// Add to connectionToChats
-							if(client && chatToConnections.find(s) == chatToConnections.end())
-							{
-								chatToConnections[s].insert(client->getName());
-							}
-
-							// Refresh the top window to see newly added text ... if we are the top window
-							if(refresh)
-							{
-								if(win3 && win3->getTop())
-									win3->getTop()->refresh();
-								if(refreshBuddyList)
-									refreshBuddyList();
-								if(winCmd)
-									winCmd->refresh();
-							}
+							ncCtrl.buddyAppendChat(client, buddy, msg, refresh);
 						}
 					)
 				, _1
@@ -271,19 +234,12 @@ int doit(int argc, char* argv[])
 			);
 
 
-		// Command history
-		nccmdhistory::NCCmdHistory cmdHist;
 
 		// Draw/show entire app by refreshing
 		app.refresh();
 
-		// New Connection information
-		string clientProtocol;
-		string clientUsername;
-		string clientPassword;
 
-		// Input collector
-		NCCmd ncCmd;
+
 
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
@@ -312,42 +268,14 @@ int doit(int argc, char* argv[])
 			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
 			, cfg
 			, connections
-			, chatToConnections
+//			, chatToConnections
+			, ncCtrl.getChatToConnections()
 			, msgSignal);
 
 		// Buddy list window
 		refreshBuddyList = [&]()
 		{
-			if(winBl && app.isOnTopOf(winBl, winLog))
-			{
-				auto const topChatWin = dynamic_cast<ncwin::NCWin*>(win3->getTop());
-				const auto topChatName = (topChatWin)
-						? (topChatWin->getConfig().p_title)
-						: ("");
-
-				winBl->clear();
-				win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
-				{
-					auto const ncw = dynamic_cast<ncwin::NCWin*>(nobj);
-					if(ncw)
-					{
-						auto currentColor = (topChatName == ncw->getConfig().p_title)
-								? (nccolor::NCColor::BUDDYLIST_HIGHLIGHT)
-								: (nccolor::NCColor::BUDDYLIST_NORMAL);
-						// TODO set the current window's name's background to something different (YELLOW)?
-
-						winBl->append(NCString(ncw->getConfig().p_title, currentColor));
-					}
-					else
-					{
-						winBl->append("Non window");
-					}
-					return true;
-				});
-				winBl->end();
-				winBl->refresh();
-			}
-
+			ncCtrl.buddyListRefresh();
 		};
 
 
@@ -355,7 +283,7 @@ int doit(int argc, char* argv[])
 		while(ncCmd.stillRunning)
 		{
 			{
-			boost::unique_lock<boost::recursive_mutex> scoped_lockA(msgLock);
+//			boost::unique_lock<boost::recursive_mutex> scoped_lockA(msgLock);
 
 
 			// Update Buddy List
