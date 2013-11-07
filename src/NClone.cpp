@@ -30,29 +30,24 @@ NClone::~NClone()
 {
 }
 
-void NClone::setup
-	( ncapp::NCApp &app
-	, NCWinScrollback* &winKeys
-	, NCWinScrollback* &winLog
-	, NCWinScrollback* &chats
-	, NCWinScrollback* &winBl
-	, NCWinScrollback* &winCmd
-	, ncwin::NCWin* &winTime
-	, std::function<NCWinScrollback*()> pncs
-	, nccmdhistory::NCCmdHistory &cmdHist
-	, NCCmd &ncCmd
-	, std::function<bool()> penteringPassword
-	, NCWinCfg &cfg
-	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-	, std::map<std::string, std::set<std::string> > &chatToConnections
-	, ncclientif::NCClientIf::MsgSignal &msgSignal )
+void NClone::setup(nccontrol::NCControl& ncControl)
+//	( ncapp::NCApp &app
+//	, NCWinScrollback* &winKeys
+//	, NCWinScrollback* &winLog
+//	, NCWinScrollback* &chats
+//	, NCWinScrollback* &winBl
+//	, NCWinScrollback* &winCmd
+//	, ncwin::NCWin* &winTime
+//	, std::function<NCWinScrollback*()> pncs
+//	, nccmdhistory::NCCmdHistory &cmdHist
+//	, NCCmd &ncCmd
+//	, std::function<bool()> penteringPassword
+//	, NCWinCfg &cfg
+//	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+//	, std::map<std::string, std::set<std::string> > &chatToConnections
+//	, ncclientif::NCClientIf::MsgSignal &msgSignal )
 {
-	// Save function for later use
-	ncs = pncs;
-	enteringPassword = penteringPassword;
-
-	cmdMap.Setup(ncs, app, chats, p_keyMap,
-			ncCmd, cmdHist, connections, cfg, msgSignal);
+	cmdMap.Setup(ncControl);
 
 	keyMap().set([&]()
 		{

@@ -20,86 +20,44 @@
 #include "NCColor.h"
 #include "NCException.h"
 #include "NCTimeUtils.h"
+#include "NCControl.h"
 
 namespace ncpp
 {
 
-/**
- * Parameters needed:
- * NCWinScrollBack ncs
- * NCApp app
- * NCWinScrollback win3
- * NCCmd ncCmd
- */
 NCCommandHandler::NCCommandHandler()
-	: p_connections(0)
+	: p_ncControl(0)
 {
 	_startTime = NCTimeUtils::getUtcTime();
 }
 
 NCCommandHandler::~NCCommandHandler() {}
 
-void NCCommandHandler::Setup
-	( std::function<NCWinScrollback*()> pncs
-	, ncapp::NCApp& app
-	, NCWinScrollback* &win3
-	, nckeymap::NCKeyMap &ncKeyMap
-	, NCCmd& ncCmd
-	, nccmdhistory::NCCmdHistory& cmdHist
-	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-	, NCWinCfg& cfg
-	, ncclientif::NCClientIf::MsgSignal &msgSignal )
+void NCCommandHandler::Setup(nccontrol::NCControl* ncControl)
+//	( std::function<NCWinScrollback*()> pncs
+//	, ncapp::NCApp& app
+//	, NCWinScrollback* &win3
+//	, nckeymap::NCKeyMap &ncKeyMap
+//	, NCCmd& ncCmd
+//	, nccmdhistory::NCCmdHistory& cmdHist
+//	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
+//	, NCWinCfg& cfg
+//	, ncclientif::NCClientIf::MsgSignal &msgSignal )
 {
-	fncs = pncs;
-	p_connections = &connections;
+	p_ncControl = ncControl;
 
 	// Use getters to get anything that can change, like state, etc
 
-	cmdMap["/exit"] = NCCommandHandler::Entry([&](const std::string& cmd) { ncCmd.stillRunning = false; }, "Quit application");
-	cmdMap["/quit"] = NCCommandHandler::Entry([&](const std::string& cmd) { ncCmd.stillRunning = false; }, "Quit application");
+	cmdMap["/exit"] = NCCommandHandler::Entry([&](const std::string& cmd) { p_ncControl->appQuit(); }, "Quit application");
+	cmdMap["/quit"] = NCCommandHandler::Entry([&](const std::string& cmd) { p_ncControl->appQuit(); }, "Quit application");
 	cmdMap["/help"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		msgSignal(0, "", NCString(ncCmd.cmd + ", help menu:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
-		msgSignal(0, "" , NCString("Commands", nccolor::NCColor::COMMAND_NORMAL), false);
-		for(auto e : cmdMap)
-		{
-			msgSignal(0, "", NCString("  " + std::get<0>(e) + " " + std::get<1>(e).p_help, nccolor::NCColor::COMMAND_NORMAL), false);
-		}
-		msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString(" Shortcuts", nccolor::NCColor::CHAT_NORMAL), false);
-		// TODO, would be cool if dynamically mapping keystrokes would show up here in the
-		// online help ... would need a KEYSTROKE type and a toString on that keystroke type...
-		msgSignal(0, "", NCString("  Escape     quit", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  CTRL-c     cancel current input", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  Tab        go to next window", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  Shift-Tab  go to previous window", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  CTRL-u     clear input window", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  Page-Up    Scroll up a window length", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  Page-Down  Scroll down a window length", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  Home       Scroll to top of scrollback", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  End        Scroll to bottom of scrollback", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  Enter      Send Message or process command", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  F3         Toggle Contact list window visibility", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  CTRL-r     Reverse search", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  CTRL-a     Move cursor to start of command", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("  CTRL-e     Move cursor to end of command", nccolor::NCColor::CHAT_NORMAL), false);
-		msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_NORMAL), true);
+		p_ncControl->appPrintHelp();
 	}, "Print help information");
 
 	cmdMap["/keys"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
-		for(auto k : ncKeyMap.getMap())
-		{
-			const NCString space(" ", nccolor::NCColor::CHAT_NORMAL);
-
-			msgSignal(0, "", space
-				+ NCString(k.second.name, nccolor::NCColor::CHAT_NORMAL)
-				+ space
-				+ NCString(boost::lexical_cast<std::string>(k.first), nccolor::NCColor::CHAT_HIGHLIGHT)
-				, false);
-		}
-		msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_NORMAL), true);
-
+		p_ncControl->appPrintKeyAssignments();
 	}, "Print list of assigned keys");
 
 	cmdMap["/key"] = NCCommandHandler::Entry([&](const std::string& cmd)
@@ -109,35 +67,27 @@ void NCCommandHandler::Setup
 		int counter = 0;
 		const std::string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
 		const boost::regex re(binStr);
-		const std::string text = ncCmd.cmd;  // TODO, refactor and take out this var
+
+		const std::string text = p_ncControl->getCommand().cmd; //  ncCmd.cmd;  // TODO, refactor and take out this var
 		if(boost::regex_search(text, re))
 		{
 			for(const auto & what : boost::make_iterator_range(boost::sregex_iterator(text.begin(),text.end(),boost::regex(binStr)),boost::sregex_iterator()) )
 			{
 				if(what.size() == 3)
 				{
-					msgSignal(0, "", NCString(" Remap: " + what[1].str() + " to " + what[2].str(), nccolor::NCColor::CHAT_HIGHLIGHT), false);
+					p_ncControl->appRemapKey(
+						what[1].str(),
+						boost::lexical_cast<int>(what[2].str()));
 
-					for(auto km : ncKeyMap.getMap())
-					{
-						if(km.second.name == what[1].str())
-						{
-							++counter;
-							auto kv = km.second.func;
-							ncKeyMap.getMap().erase(km.first);
-							ncKeyMap.set(kv, what[1], boost::lexical_cast<int>(what[2].str()));
-							break;
-						}
-					}
 				}
 			}
-			msgSignal(0, "", NCString(" Remapped " + boost::lexical_cast<std::string>(counter) + " keys", nccolor::NCColor::CHAT_HIGHLIGHT), false);
-			msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_HIGHLIGHT), true);
+//			msgSignal(0, "", NCString(" Remapped " + boost::lexical_cast<std::string>(counter) + " keys", nccolor::NCColor::CHAT_HIGHLIGHT), false);
+//			msgSignal(0, "", NCString("", nccolor::NCColor::CHAT_HIGHLIGHT), true);
 		}
 		else
 		{
-			msgSignal(0, "", NCString(" " + ncCmd.cmd, nccolor::NCColor::CHAT_HIGHLIGHT), false);
-			msgSignal(0, "", NCString(" Does not match " + binStr, nccolor::NCColor::CHAT_HIGHLIGHT), true);
+//			msgSignal(0, "", NCString(" " + ncCmd.cmd, nccolor::NCColor::CHAT_HIGHLIGHT), false);
+//			msgSignal(0, "", NCString(" Does not match " + binStr, nccolor::NCColor::CHAT_HIGHLIGHT), true);
 		}
 	}, "\"Command\" xxx remap number xxx to Command");
 
@@ -146,12 +96,11 @@ void NCCommandHandler::Setup
 		const boost::regex re("/history[[:space:]]+clear[[:space:]]*");
 		if(boost::regex_match(cmd, re))
 		{
-			msgSignal(0, "", NCString("Clearing history", nccolor::NCColor::CHAT_HIGHLIGHT), false);
-			cmdHist.clear();
+			p_ncControl->cmdHistoryClear();
 		}
 		else
 		{
-			msgSignal(0, "", NCString(ncCmd.cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+			p_ncControl->buddyAppendChat(0, "", NCString(p_ncControl->getCommand().cmd + ", command history:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 			for(auto x : cmdHist)
 			{
 				msgSignal(0, "", NCString(" " + x, nccolor::NCColor::DEFAULT), false);

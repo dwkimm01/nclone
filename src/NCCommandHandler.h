@@ -12,16 +12,11 @@
 #include <vector>
 #include <map>
 #include <functional>
-#include "NCCmd.h"
-#include "NCCmdHistory.h"
-#include "NCWinScrollback.h"
-#include "NCWinCfg.h"
-#include "NCApp.h"
-#include "NCKeyMap.h"
-#include "NCClientIf.h"
 
 namespace ncpp
 {
+
+namespace nccontrol { class NCControl; }
 
 class NCCommandHandler
 {
@@ -39,16 +34,7 @@ public:
 	/**
 	 * Setup
 	 */
-	void Setup
-		( std::function<NCWinScrollback*()> pncs
-		, ncapp::NCApp& app
-		, NCWinScrollback* &win3
-		, nckeymap::NCKeyMap &ncKeyMap
-		, NCCmd& ncCmd
-		, nccmdhistory::NCCmdHistory& cmdHist
-		, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-		, NCWinCfg& cfg
-		, ncclientif::NCClientIf::MsgSignal &msgSignal );
+	void Setup(nccontrol::NCControl* ncControl);
 
 	/**
 	 * Process Commands
@@ -60,7 +46,7 @@ public:
 	 */
 	std::tuple<std::string, std::string> FindClosest(const std::string &s);
 
-private:
+	// TODO, make private
 	class Entry
 	{
 	public:
@@ -72,11 +58,15 @@ private:
 		std::function<void(const std::string &cmd)> p_fn;
 		std::string p_help;
 	};
+
 	std::map<std::string, Entry> cmdMap;
-	std::function<NCWinScrollback*()> fncs;
+
+
+private:
+	nccontrol::NCControl* p_ncControl;
+
 	const int defaultScrollback = 500;
 	int _startTime;
-	std::vector<ncpp::ncclientif::NCClientIf*>* p_connections;
 };
 } // namespace ncpp
 

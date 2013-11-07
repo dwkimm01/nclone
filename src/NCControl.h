@@ -15,6 +15,7 @@
 #include "NCCmd.h"
 #include "NCClientIf.h"
 #include "NCKeyMap.h"
+#include "NCCommandHandler.h"
 
 namespace ncpp
 {
@@ -35,8 +36,12 @@ public:
 		, std::function<ncpp::NCWinScrollback*()> getDebugKeyWin
 		, std::function<nccmdhistory::NCCmdHistory&()> getCommandHistory
 		, std::function<NCCmd&()> getCommand
+		, std::function<ncpp::NCCommandHandler&()> getCommandHandler
+		, std::function<nckeymap::NCKeyMap&()> getKeyMap
+
 		, std::function<NCWinCfg&()> getDefaultWinCfg
 		, std::function<std::vector<ncpp::ncclientif::NCClientIf*>&()> getConnections
+		, std::function<void()> quitApp
 
 		, int defaultScrollbackLength
 		, ncwin::NCWin::ResizeFuncs chatResizeWidth
@@ -55,9 +60,9 @@ public:
 	void chatScrollUp(int i);
 	void chatScrollDown(int i);
 
-
 	void cmdHistoryPrevious();
 	void cmdHistoryNext();
+	void cmdHistoryClear();
 	void cmdCursorLeft();
 	void cmdCursorRight();
 	void cmdSkipWordLeft();
@@ -86,7 +91,7 @@ public:
 	void appTimeout();
 	void appPrintHelp();
 	void appPrintKeyAssignments();
-	void appRemapKey(const nckeymap::NCKeyMap::KeyType key, const std::string &cmd);
+	void appRemapKey(const std::string &cmd, const nckeymap::NCKeyMap::KeyType keyNew);
 	void appPrintHistory();
 
 	void appNewConnection();
@@ -109,6 +114,7 @@ public:
 
 	std::map<std::string, std::set<std::string>>& getChatToConnections();
 
+	NCCmd& getCommand();
 
 private:
 	// Thread
@@ -125,9 +131,13 @@ private:
 
 	std::function<nccmdhistory::NCCmdHistory&()> p_getCommandHistory;
 	std::function<NCCmd&()> p_getCommand;
+	std::function<ncpp::NCCommandHandler&()> p_getCommandHandler;
+	std::function<nckeymap::NCKeyMap&()> p_getKeyMap;
+
 	// Entering Password can just check p_getCommand.State == PASSWORD
 	std::function<NCWinCfg&()> p_getDefaultWinCfg;
 	std::function<std::vector<ncpp::ncclientif::NCClientIf*>&()> p_getConnections;
+	std::function<void()> p_quitApp;
 
 	int p_defaultScrollbackLength;
 	ncwin::NCWin::ResizeFuncs p_chatResizeWidth;

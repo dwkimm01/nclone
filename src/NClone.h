@@ -33,34 +33,21 @@ public:
 	NClone();
 	~NClone();
 
-	void setup
-	( ncapp::NCApp &app
-	, NCWinScrollback* &winKeys
-	, NCWinScrollback* &winLog
-	, NCWinScrollback* &chats
-	, NCWinScrollback* &winBl
-	, NCWinScrollback* &winCmd
-	, ncwin::NCWin* &winTime
-	, std::function<NCWinScrollback*()> pncs
-	, nccmdhistory::NCCmdHistory &cmdHist
-	, NCCmd &ncCmd
-	, std::function<bool()> penteringPassword  // TODO, takeout penteringPassowrd and just use ncCmd
-	, NCWinCfg &cfg
-	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-	, std::map<std::string, std::set<std::string> > &chatToConnections
-	, ncclientif::NCClientIf::MsgSignal &msgSignal );
+	void setup(nccontrol::NCControl& ncControl);
 
 	nckeymap::NCKeyMap& keyMap();
 	ncpp::NCCommandHandler cmdMap; // TODO, move to private
 
 private:
 
+	// Controller
+	nccontrol::NCControl& p_ncControl;
 	// Key map
 	nckeymap::NCKeyMap p_keyMap;
 	// Top chat window
-	std::function<NCWinScrollback*()> ncs;
+//	std::function<NCWinScrollback*()> ncs;
 	// Whether a password is being entered currently
-	std::function<bool()> enteringPassword;
+//	std::function<bool()> enteringPassword;
 
 	// Timeout/idle count
 	boost::posix_time::ptime now;
@@ -68,7 +55,6 @@ private:
 	std::string clientProtocol;
 	std::string clientUsername;
 	std::string clientPassword;
-
 };
 
 } // namespace nclone

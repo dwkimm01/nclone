@@ -9,7 +9,6 @@
 #include <iostream>
 #include <set>
 #include <thread>
-#include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/string.hpp>
@@ -63,6 +62,10 @@ int doit(int argc, char* argv[])
 
 	// Scope for NCApp
 	{
+
+		nclone::NClone nclone;
+
+
 		// Parse command line options
 		nccmdlineoptions::NCCmdLineOptions progArgs(argc, argv);
 		if(progArgs.shouldExit()) return 0;
@@ -208,8 +211,10 @@ int doit(int argc, char* argv[])
 			, [&]() { return winKeys; }
 			, [&]() -> nccmdhistory::NCCmdHistory& { return cmdHist; }
 			, [&]() -> NCCmd& { return ncCmd; }
+			, [&]() -> ncpp::NCCommandHandler& { return nclone.cmdMap; }
 			, [&]() -> NCWinCfg& { return cfg; }
 			, [&]() -> std::vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
+			, [&]() { ncCmd.stillRunning = false; }
 
 			, defaultScrollback
 			, chatResizeWidth
@@ -261,7 +266,6 @@ int doit(int argc, char* argv[])
 
 
 		// Processing keys (and command) setup
-		nclone::NClone nclone;
 		nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
 			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 			, cmdHist, ncCmd
