@@ -24,6 +24,8 @@
 
 namespace ncpp
 {
+namespace nccontrol { class NCControl; }
+
 namespace nclone
 {
 
@@ -33,7 +35,7 @@ public:
 	NClone();
 	~NClone();
 
-	void setup(nccontrol::NCControl& ncControl);
+	void setup(nccontrol::NCControl* ncControl);
 
 	nckeymap::NCKeyMap& keyMap();
 	ncpp::NCCommandHandler cmdMap; // TODO, move to private
@@ -41,7 +43,7 @@ public:
 private:
 
 	// Controller
-	nccontrol::NCControl& p_ncControl;
+	nccontrol::NCControl* p_ncControl;
 	// Key map
 	nckeymap::NCKeyMap p_keyMap;
 	// Top chat window

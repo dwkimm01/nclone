@@ -61,6 +61,22 @@ void NCControl::toggleKeysWindowVisibility()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getDebugKeyWin || !p_getDebugKeyWin() ||
+	   !p_getLogWin || !p_getLogWin() ||
+	   !p_getNCApp || !p_getNCApp())
+		return;
+
+//	if(!winKeys || !winLog) return;
+	// Bring winKeys to top if it's not on top, if it is push it to the back
+	if(p_getNCApp()->isOnTopOf(p_getDebugKeyWin(), p_getLogWin()))
+	{
+		p_getNCApp()->bringToBack(p_getDebugKeyWin());
+	}
+	else
+	{
+		p_getNCApp()->bringToFront(p_getDebugKeyWin());
+	}
+	p_getNCApp()->refresh();
 }
 
 void NCControl::toggleBuddyListWindowVisibility()

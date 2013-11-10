@@ -5,8 +5,9 @@
  *      Author: dwkimm01
  */
 
-#include "NCCurses.h"
 #include "NClone.h"
+#include "NCControl.h"
+#include "NCCurses.h"
 #include "NCStringUtils.h"
 #include "NCTimeUtils.h"
 #include "NCColor.h"
@@ -22,6 +23,7 @@ namespace nclone
 {
 
 NClone::NClone()
+	: p_ncControl(0)
 {
 	now = second_clock::local_time();
 }
@@ -30,7 +32,7 @@ NClone::~NClone()
 {
 }
 
-void NClone::setup(nccontrol::NCControl& ncControl)
+void NClone::setup(nccontrol::NCControl* ncControl)
 //	( ncapp::NCApp &app
 //	, NCWinScrollback* &winKeys
 //	, NCWinScrollback* &winLog
@@ -47,22 +49,14 @@ void NClone::setup(nccontrol::NCControl& ncControl)
 //	, std::map<std::string, std::set<std::string> > &chatToConnections
 //	, ncclientif::NCClientIf::MsgSignal &msgSignal )
 {
+	p_ncControl = ncControl;
+
 	cmdMap.Setup(ncControl);
 
 	keyMap().set([&]()
 		{
-			if(!winKeys || !winLog) return;
-			// Bring winKeys to top if it's not on top, if it is push it to the back
-			if(app.isOnTopOf(winKeys, winLog))
-			{
-				app.bringToBack(winKeys);
-				app.refresh();
-			}
-			else
-			{
-				app.bringToFront(winKeys);
-				app.refresh();
-			}
+			if(p_ncControl)
+				p_ncControl->toggleKeysWindowVisibility();
 		}
 		, "Win Keys toggle", KEY_F(4));
 
