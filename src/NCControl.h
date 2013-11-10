@@ -63,6 +63,7 @@ public:
 	void cmdHistoryPrevious();
 	void cmdHistoryNext();
 	void cmdHistoryClear();
+	void cmdHistoryPrint();
 	void cmdCursorLeft();
 	void cmdCursorRight();
 	void cmdSkipWordLeft();
@@ -104,6 +105,8 @@ public:
 
 	void appGetCurrentTime();
 	void appGetUpTime();
+
+	void appSet(const std::string &setting);
 
 	void appNewWin(const std::string &name);
 	void appDelWin(const std::string &name);
