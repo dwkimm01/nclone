@@ -212,6 +212,7 @@ int doit(int argc, char* argv[])
 			, [&]() -> nccmdhistory::NCCmdHistory& { return cmdHist; }
 			, [&]() -> NCCmd& { return ncCmd; }
 			, [&]() -> ncpp::NCCommandHandler& { return nclone.cmdMap; }
+			, [&]() -> nckeymap::NCKeyMap& { return nclone.keyMap(); }
 			, [&]() -> NCWinCfg& { return cfg; }
 			, [&]() -> std::vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
 			, [&]() { ncCmd.stillRunning = false; }
@@ -266,7 +267,7 @@ int doit(int argc, char* argv[])
 
 
 		// Processing keys (and command) setup
-		nclone.setup(app, winKeys, winLog, win3, winBl, winCmd, winTime
+		nclone.setup(/*app, winKeys, winLog, win3, winBl, winCmd, winTime
 			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
 			, cmdHist, ncCmd
 			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
@@ -274,7 +275,7 @@ int doit(int argc, char* argv[])
 			, connections
 //			, chatToConnections
 			, ncCtrl.getChatToConnections()
-			, msgSignal);
+			, */ ncCtrl);
 
 		// Buddy list window
 		refreshBuddyList = [&]()
