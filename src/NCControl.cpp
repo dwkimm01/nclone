@@ -4,6 +4,7 @@
 #include "NCControl.h"
 #include "NCTimeUtils.h"
 #include "NCColor.h"
+#include "TestExampleText.h"
 
 namespace ncpp
 {
@@ -643,9 +644,10 @@ void NCControl::appGetUpTime()
 
 void NCControl::appSet(const std::string &setting)
 {
-	std::string cmd = setting;
+	auto cmd = setting;
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-	NCWinScrollback* ncs = fncs();
+//	NCWinScrollback* ncs = fncs();
+	auto ncs = p_getCurrentChatWin();
 	std::vector<std::string> cmdParam;
 	boost::split(cmdParam, cmd, boost::is_space()); // boost::is_any_of("\t"));
 	if(cmdParam.size() == 3 && "/set" == cmdParam[0])
@@ -674,7 +676,7 @@ void NCControl::appSet(const std::string &setting)
 		}
 		else
 		{
-			msgSignal(0, "", NCString("Unknown set option \"" + cmdParam[1] + "\"", nccolor::NCColor::DEFAULT), true);
+			buddyAppendChat(0, "", NCString("Unknown set option \"" + cmdParam[1] + "\"", nccolor::NCColor::DEFAULT), true);
 		}
 	}
 
@@ -685,14 +687,14 @@ void NCControl::appNewWin(const std::string &name)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 	// TODO, check fncs and fcs() everywhere!!
-	NCWinScrollback* ncs = fncs();
-	ncs->append(NCString(ncCmd.cmd + ", create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+	auto ncs = p_getCurrentChatWin();
+	ncs->append(NCString("Create new window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
-	ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 1 - ncwin->getConfig().p_x; } );
-	ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 5; } );
-	ncs->append(cmd);
+	ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return p_getNCApp()->maxWidth() - 1 - ncwin->getConfig().p_x; } );
+	ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return p_getNCApp()->maxHeight() - 5; } );
+	ncs->append(name);
 	typedef boost::split_iterator<std::string::iterator> ItrType;
-	std::string ccmd = cmd;
+	std::string ccmd = name;
     for (ItrType i = boost::make_split_iterator(ccmd, boost::first_finder(" ", boost::is_iequal()));
          i != ItrType();
          ++i)
@@ -701,13 +703,15 @@ void NCControl::appNewWin(const std::string &name)
     	const std::string winName = boost::copy_range<std::string>(*i);
     	if("/newwin" != winName)
     	{
+    		auto cfg = p_getDefaultWinCfg();
     		cfg.p_title = winName;
     		ncs->append("Creating new window " + cfg.p_title);
-    		auto myNewWin = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+
+    		auto myNewWin = new NCWinScrollback(p_getChatsWin(), cfg, p_defaultScrollbackLength, p_chatResizeWidth, p_chatResizeHeight);
     		myNewWin->append("Opened win " + cfg.p_title);
     	}
     }
-   	fncs()->refresh();
+   	p_getCurrentChatWin()->refresh();
 
 }
 
@@ -716,14 +720,14 @@ void NCControl::appDelWin(const std::string &name)
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
 	// TODO, check fncs and fcs() everywhere!!
-	NCWinScrollback* ncs = fncs();
-	ncs->append(NCString(ncCmd.cmd + ", delete window", nccolor::NCColor::COMMAND_HIGHLIGHT));
+	NCWinScrollback* ncs = p_getCurrentChatWin();
+	ncs->append(NCString("Delete window", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
-	ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - 1 - ncwin->getConfig().p_x; } );
-	ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 5; } );
-	ncs->append(cmd);
+	ncwin::NCWin::ResizeFuncs chatResizeWidth([&](ncwin::NCWin* ncwin) { return p_getNCApp()->maxWidth() - 1 - ncwin->getConfig().p_x; } );
+	ncwin::NCWin::ResizeFuncs chatResizeHeight([&](ncwin::NCWin* ncwin) { return p_getNCApp()->maxHeight() - 5; } );
+	ncs->append(name);
 	typedef boost::split_iterator<std::string::iterator> ItrType;
-	std::string ccmd = cmd;
+	std::string ccmd = name;
     for (ItrType i = boost::make_split_iterator(ccmd, boost::first_finder(" ", boost::is_iequal()));
          i != ItrType();
          ++i)
@@ -732,7 +736,7 @@ void NCControl::appDelWin(const std::string &name)
     	const std::string winName = boost::copy_range<std::string>(*i);
     	if("/delwin" != winName)
     	{
-    		win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
+    		p_getChatsWin()->forEachChild([&](ncpp::ncobject::NCObject* nobj)
     		{
     			auto nObjWin = dynamic_cast<ncwin::NCWin*>(nobj);
     			if(nObjWin && nObjWin->getConfig().p_title == winName)
@@ -744,18 +748,17 @@ void NCControl::appDelWin(const std::string &name)
     		});
     	}
     }
-    fncs()->refresh();
-
+    p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::appDebug1()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
-	NCWinScrollback* ncs = fncs();
-	if(ncs != NULL)
+	auto ncs = p_getCurrentChatWin();
+	if(NULL != ncs)
 	{
-		ncs->append(NCString(ncCmd.cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
+		ncs->append(NCString(p_getCommand().cmd + ", debug 1", nccolor::NCColor::COMMAND_HIGHLIGHT));
 		const int max = ncs->getConfig().p_h;
 		for(int i = 1; i < max*5; ++i)
 		{
@@ -766,30 +769,29 @@ void NCControl::appDebug1()
 			}
 			ncs->append(">> " + boost::lexical_cast<std::string>(i) + " " + sToPrint);
 		}
-		msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
+		buddyAppendChat(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 	}
-
 }
 
 void NCControl::appDebug2()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-	NCWinScrollback* ncs = fncs();
-	if(ncs != NULL)
+	auto ncs = p_getCurrentChatWin();
+	if(NULL != ncs)
 	{
-		ncs->append(NCString(ncCmd.cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
-		for(int cnt = 0; app.maxHeight() * 2 + 10 > cnt; ++cnt)
+		ncs->append(NCString(p_getCommand().cmd + ", debug 2", nccolor::NCColor::COMMAND_HIGHLIGHT));
+		for(int cnt = 0; p_getNCApp()->maxHeight() * 2 + 10 > cnt; ++cnt)
 		{
 			ncs->append(">> " + boost::lexical_cast<std::string>(cnt));
 		}
-		msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
+		buddyAppendChat(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 	}
 }
 
 void NCControl::appDebugLorem()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-	msgSignal(0, "", NCString(ncCmd.cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+	buddyAppendChat(0, "", NCString(p_getCommand().cmd + ", debug lorem", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 
 	NCString entry = NCString(" " + testexampletext::TestExampleText::get(), nccolor::NCColor::DEFAULT);
 	// Change color of e's for fun
@@ -801,10 +803,8 @@ void NCControl::appDebugLorem()
 		}
 	});
 
-	msgSignal(0, "", entry, true);
-
+	buddyAppendChat(0, "", entry, true);
 }
-
 
 std::map<std::string, std::set<std::string>>& NCControl::getChatToConnections()
 {

@@ -15,7 +15,6 @@
 #include "NCCommandHandler.h"
 #include "NCString.h"
 #include "NCWinCfg.h"
-#include "TestExampleText.h"
 #include "NCColor.h"
 #include "NCException.h"
 #include "NCTimeUtils.h"
