@@ -32,7 +32,8 @@ NCControl::NCControl
 	, ncwin::NCWin::ResizeFuncs chatResizeWidth
 	, ncwin::NCWin::ResizeFuncs chatResizeHeight
 	)
-	: p_getNCApp(getNCApp)
+	: 	_startTime(NCTimeUtils::getUtcTime())
+	, p_getNCApp(getNCApp)
 	, p_getLogWin(getLogWin)
 	, p_getChatsWin(getChatsWin)
 	, p_getCurrentChatWin(getCurrentChatWin)
@@ -237,7 +238,7 @@ void NCControl::buddyJump(const std::string &name)
 	buddyAppendChat(0, "", NCString(getCommand().cmd + ", jump to window", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 
 	typedef boost::split_iterator<std::string::iterator> ItrType;
-	std::string ccmd = cmd;
+	std::string ccmd = name;
 	for (ItrType i = boost::make_split_iterator(ccmd, boost::first_finder(" ", boost::is_iequal()));
 		 i != ItrType();
 		 ++i)
@@ -245,15 +246,15 @@ void NCControl::buddyJump(const std::string &name)
 		const std::string winName = boost::copy_range<std::string>(*i);
 		if(winName != "/jump")
 		{
-			win3->forEachChild([&](ncpp::ncobject::NCObject* nobj)
+			p_getChatsWin()->forEachChild([&](ncpp::ncobject::NCObject* nobj)
 			{
 				auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
 				if(nobjwin && nobjwin->getConfig().p_title == winName)
 				{
 					// TODO, replace this logic for refreshing with more generic NCWin usage (refresh)
-					auto nobjsb = dynamic_cast<NCWinScrollback*>(nobjwin);
-					if(nobjsb) ncs = nobjsb;
-					win3->bringToFront(nobj);  // TODO, do we want to reorder the list like this?
+//	??				auto nobjsb = dynamic_cast<NCWinScrollback*>(nobjwin);
+//	??				if(nobjsb) ncs = nobjsb;
+					p_getChatsWin()->bringToFront(nobj);  // TODO, do we want to reorder the list like this?
 				}
 				return true;
 			});
@@ -266,14 +267,8 @@ void NCControl::buddyJump(const std::string &name)
 void NCControl::buddyClearChat()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-
-	if(fncs && fncs())
-	{
-		// Clear top buffer
-		fncs()->clear();
-		fncs()->refresh();
-	}
-
+	p_getCurrentChatWin()->clear();
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std::string &buddyName, const NCString &msg, const bool refresh)
@@ -480,28 +475,26 @@ void NCControl::appNewConnection()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
-	buddyAppendChat(0, "", NCString(cmd, nccolor::NCColor::DEFAULT), false);
 	// Collect up user information:
 	//  protocol: XMPP
 	//  login: user@gmail.com
 	//  password: xxxx
 	getCommand().inputState = NCCmd::PROTOCOL;
-	buddyAppendChat(0, "", NCString(ncCmd.cmd + " Creating new connection", nccolor::NCColor::DEFAULT), false);
+	buddyAppendChat(0, "", NCString("Creating new connection", nccolor::NCColor::DEFAULT), false);
 	buddyAppendChat(0, "", NCString("   Enter protocol (e.g. XMPP, DUMMY)", nccolor::NCColor::DEFAULT), true);
-
 }
 
 void NCControl::appDelConnection(const std::string &connName)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
-	if(p_connections)
+	if(p_getConnections && 0 < p_getConnections().size())
 	{
-		std::string cnxList = cmd;
+		std::string cnxList = connName;
 		boost::replace_all(cnxList, "/delconn", "");
 		if(cnxList.size() == 0)
 		{
-			msgSignal(0, "", NCString(" Specify connection to delete", nccolor::NCColor::DEFAULT), false);
+			buddyAppendChat(0, "", NCString(" Specify connection to delete", nccolor::NCColor::DEFAULT), false);
 		}
 
 		typedef boost::split_iterator<std::string::iterator> ItrType;
@@ -513,7 +506,7 @@ void NCControl::appDelConnection(const std::string &connName)
 			buddyAppendChat(0, "", NCString(" Looking to delete " + cnxName, nccolor::NCColor::DEFAULT), false);
 
 			int count = 0;
-			for(const auto & cn : *p_connections)
+			for(const auto & cn : p_getConnections())//*p_connections)
 			{
 				if(cn->getName() == cnxName)
 				{
@@ -530,13 +523,13 @@ void NCControl::appDelConnection(const std::string &connName)
 				buddyAppendChat(0, "", NCString("Cannot delete " + cnxName + ", no connection by that name", nccolor::NCColor::DEFAULT), false);
 				continue;
 			}
-			for(auto citr = p_connections->begin(); citr != p_connections->end(); ++citr)
+			for(auto citr = p_getConnections().begin(); citr != p_getConnections().end(); ++citr)
 			{
 				if((*citr)->getName() == cnxName)
 				{
 					buddyAppendChat(0, "", NCString("Deleting " + cnxName, nccolor::NCColor::DEFAULT), false);
 					auto connectionToDelete = *citr;
-					citr = p_connections->erase(citr);
+					citr = p_getConnections().erase(citr);
 //TODO remove entry from chatsToConnection
 
 					delete connectionToDelete;
@@ -547,17 +540,16 @@ void NCControl::appDelConnection(const std::string &connName)
 
 		buddyAppendChat(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 	}
-
 }
 
 void NCControl::appListConnections()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-	if(p_connections)
+	if(p_getConnections && 0 < p_getConnections().size())
 	{
-		buddyAppendChat(0, "", NCString(" Connections " + boost::lexical_cast<std::string>(p_connections->size()), nccolor::NCColor::DEFAULT), false);
+		buddyAppendChat(0, "", NCString(" Connections " + boost::lexical_cast<std::string>(p_getConnections().size()), nccolor::NCColor::DEFAULT), false);
 
-		for(const auto & cn : *p_connections)
+		for(const auto & cn : p_getConnections())
 		{
 			buddyAppendChat(0, "", NCString("  " + cn->getName(), nccolor::NCColor::DEFAULT), false);
 		}
@@ -569,8 +561,8 @@ void NCControl::appListWindows()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
-	buddyAppendChat(0, "", NCString(ncCmd.cmd + ", Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
-	app.forEachChild([&](ncobject::NCObject* obj)
+	buddyAppendChat(0, "", NCString("Window list:", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+	p_getNCApp()->forEachChild([&](ncobject::NCObject* obj)
 	{
 		ncwin::NCWin* lwin = dynamic_cast<ncwin::NCWin*>(obj);
 		if(lwin)
@@ -586,18 +578,16 @@ void NCControl::appListWindows()
 void NCControl::appWindowInfo(const std::string &name)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-//	msgSignal(0, "", NCString(ncCmd.cmd, nccolor::NCColor::COMMAND_HIGHLIGHT), false);
-	NCWinScrollback* ncs = fncs();
-	if(ncs != NULL)
+	if(p_getCurrentChatWin)
 	{
-		ncs->append(NCString(ncCmd.cmd + ", window info", nccolor::NCColor::COMMAND_HIGHLIGHT));
+		buddyAppendChat(0, "", NCString("Window info", nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 
 		// Create the window list, if there is no window listed add current/top window to list
-		std::string winList = cmd;
+		std::string winList = name;
 		boost::replace_all(winList, "/info", "");
 		if(winList.size() == 0)
 		{
-			winList = ncs->getConfig().p_title;
+			winList = p_getCurrentChatWin()->getConfig().p_title;
 		}
 
 		typedef boost::split_iterator<std::string::iterator> ItrType;
@@ -607,27 +597,27 @@ void NCControl::appWindowInfo(const std::string &name)
 			const std::string winName = boost::copy_range<std::string>(*i);
 //				if(winName != "/info")
 			{
-				app.forEachChild([&](ncpp::ncobject::NCObject* nobj)
+				p_getNCApp()->forEachChild([&](ncpp::ncobject::NCObject* nobj)
 				{
 					auto nobjwin = dynamic_cast<ncwin::NCWin*>(nobj);
 					if(nobjwin && nobjwin->getConfig().p_title == winName)
 					{
-						ncs->append("  Window " + winName);
-						ncs->append("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w));
-						ncs->append("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h));
-						ncs->append("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x));
-						ncs->append("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y));
+						buddyAppendChat(0, "", NCString("  Window " + winName, nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+						buddyAppendChat(0, "", NCString("     width: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_w), nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+						buddyAppendChat(0, "", NCString("     height: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_h), nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+						buddyAppendChat(0, "", NCString("     x: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_x), nccolor::NCColor::COMMAND_HIGHLIGHT), false);
+						buddyAppendChat(0, "", NCString("     y: " + boost::lexical_cast<std::string>(nobjwin->getConfig().p_y), nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 						const std::string borderVal = (nobjwin->getConfig().p_hasBorder)?(std::string("on")):(std::string("off"));
-						ncs->append(std::string("     border: ") + borderVal);
+						buddyAppendChat(0, "", NCString(std::string("     border: ") + borderVal, nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 						NCWinScrollback* nwstmp = dynamic_cast<NCWinScrollback*>(nobjwin);
 						if(nwstmp)
-							ncs->append(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()) );
+							buddyAppendChat(0, "", NCString(std::string("     entries: ") + boost::lexical_cast<std::string>(nwstmp->entryCount()), nccolor::NCColor::COMMAND_HIGHLIGHT), false);
 					}
 					return true;
 				});
 			}
 		}
-		msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
+		p_getCurrentChatWin()->refresh();
 	}
 	p_getNCApp()->refresh();
 
@@ -642,22 +632,13 @@ void NCControl::appSetWrapForChat(const std::string &wrapScheme)
 void NCControl::appGetCurrentTime()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-	if(fncs && fncs())
-	{
-		fncs()->append(NCTimeUtils::getPrintableColorTimeStamp());
-		msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
-	}
-
+	buddyAppendChat(0, "", NCTimeUtils::getPrintableColorTimeStamp(), true);
 }
 
 void NCControl::appGetUpTime()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
-	if(fncs && fncs())
-	{
-		fncs()->append(NCString("Up for ", nccolor::NCColor::CHAT_NORMAL) + NCTimeUtils::getTimeDiff(_startTime));
-		msgSignal(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
-	}
+	buddyAppendChat(0, "", NCString("Up for ", nccolor::NCColor::CHAT_NORMAL) + NCTimeUtils::getTimeDiff(_startTime), true);
 }
 
 void NCControl::appSet(const std::string &setting)

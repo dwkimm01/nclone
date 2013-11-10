@@ -66,7 +66,6 @@ private:
 	nccontrol::NCControl* p_ncControl;
 
 	const int defaultScrollback = 500;
-	int _startTime;
 };
 } // namespace ncpp
 

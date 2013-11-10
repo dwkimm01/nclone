@@ -27,7 +27,6 @@ namespace ncpp
 NCCommandHandler::NCCommandHandler()
 	: p_ncControl(0)
 {
-	_startTime = NCTimeUtils::getUtcTime();
 }
 
 NCCommandHandler::~NCCommandHandler() {}

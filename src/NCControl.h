@@ -120,6 +120,8 @@ public:
 	NCCmd& getCommand();
 
 private:
+	int _startTime;
+
 	// Thread
 	boost::recursive_mutex p_msgLock;
 
