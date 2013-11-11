@@ -5,7 +5,7 @@
  *      Author: dkimmel
  */
 #include <string>
-#include <iostream>
+//#include <iostream>
 #include <stdlib.h>
 #include "NCCurses.h"
 #include "NCWin.h"

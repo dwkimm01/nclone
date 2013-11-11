@@ -5,7 +5,6 @@
  *      Author: dwkimm01
  */
 
-#include <iostream>
 #include <thread>
 #include <boost/bind.hpp>
 #include "Swiften/Swiften.h"
@@ -67,15 +66,12 @@ public:
 	void handleVCardReceived(const JID& actualJID, VCard::ref vcard, ErrorPayload::ref error)
 	{
     	p_debugLogCB("DEBUG", NCString("RECEIVED " + actualJID.toString() + " " + vcard->getFullName(), nccolor::NCColor::CHAT_NORMAL));
-
 	}
-
 
     void handleVCardChanged(const JID& jid, VCard::ref vcard)
     {
     	p_debugLogCB("DEBUG", NCString("changed: " + jid.toString() + " " + vcard->getFullName(), nccolor::NCColor::CHAT_NORMAL));
     }
-
 
     void handleOwnVCardChanged(VCard::ref vcard)
     {
@@ -86,7 +82,6 @@ public:
     {
     	p_debugLogCB("DEBUG", NCString("nchg: " + jid.toString(), nccolor::NCColor::CHAT_NORMAL));
     }
-
 
 	~Data()
 	{
@@ -122,7 +117,6 @@ public:
 //
 //		}
 	}
-
 
 
 //	IQ::ref createVCardResult()

@@ -5,7 +5,6 @@
  * Author:  Jeremy Myslinski, David Kimmel
  */
 
-#include <iostream>
 #include <boost/lexical_cast.hpp>
 #include "NCString.h"
 #include "NCWin.h"

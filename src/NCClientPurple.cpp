@@ -68,7 +68,6 @@ void NCClientPurple::debugLog(const String &level, const String &logLine) {}
 #include <signal.h>
 #include <libpurple/purple.h>
 #include <thread>
-#include <iostream>
 #include "NCClientPurple.h"
 #include "NCStringUtils.h"
 #include "NCEnvironmentVariables.h"
