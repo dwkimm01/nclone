@@ -2,7 +2,7 @@
  * NCApp.h
  *
  *  Created on: Oct 23, 2012
- *      Author: dkimmel
+ *      Author: David Kimmel
  */
 
 #ifndef NCAPP_H_
