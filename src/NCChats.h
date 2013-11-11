@@ -53,39 +53,6 @@ private:
 };
 
 
-//int main(int argc, char* argv[])
-//{
-//   // account signed in + buddyname => unique key
-//
-//   Chats chats;
-//
-//   cout << "Size = " << chats.size() << std::endl;
-//   chats.add("wellsureitis@gmail.com", "buddy1@gmail.com");
-//   chats.add("wellsureitis@gmail.com", "buddy2@gmail.com");
-//   chats.add("davidwkimmel@gmail.com", "aron@gmail.com");
-//
-//   auto b = chats.get("wellsureitis@gmail.com", "buddy1@gmail.com");
-//   if(NULL != b)
-//   {
-//      cout << "b " << b->display() << endl;
-//   }
-//
-//
-//   chats.append("wellsureitis@gmail.com", "buddy1@gmail.com", "Msg 1");
-//   chats.append("wellsureitis@gmail.com", "buddy1@gmail.com", "Msg 2");
-//   chats.append("davidwkimmel@gmail.com", "aron@gmail.com", "Msg 2");
-//   chats.forEachBuddy([](Buddy &b) { std::cout << " (" << b.connection() << ") -> " << b.display()
-//      << " " << b.getChat().size() << " " << b.getStatus()
-//      << " Updated(" << b.getChatUpdated() << ")"
-//      << std::endl; } );
-//
-//
-//   cout << "Size = " << chats.size() << std::endl;
-//   chats.remove("wellsureitis@gmail.com", "buddy1@gmail.com");
-//   cout << "Size = " << chats.size() << std::endl;
-//
-//   return 0;
-//}
 
 
 
