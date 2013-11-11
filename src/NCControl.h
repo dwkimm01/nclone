@@ -6,7 +6,6 @@
 #include <functional>
 #include <map>
 #include <set>
-//#include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
 
@@ -53,6 +52,7 @@ public:
 	void toggleKeysWindowVisibility();
 	void toggleBuddyListWindowVisibility();
 	void toggleConsoleWindowVisibility();
+	void toggleInsert();
 
 	void chatPageUp();
 	void chatPageDown();

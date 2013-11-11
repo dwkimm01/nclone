@@ -115,6 +115,12 @@ void NCControl::toggleConsoleWindowVisibility()
 	p_getCurrentChatWin()->refresh();
 }
 
+void NCControl::toggleInsert()
+{
+	// TODO, INSERT doesn't seem to work on laptop: gives 331
+	buddyAppendChat(0, "", NCString("Insert toggle", nccolor::NCColor::CHAT_HIGHLIGHT), true);
+}
+
 void NCControl::chatPageUp()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);

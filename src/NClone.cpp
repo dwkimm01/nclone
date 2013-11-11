@@ -30,8 +30,6 @@ void NClone::setup(nccontrol::NCControl* ncControl)
 {
 	p_ncControl = ncControl;
 
-//	cmdMap.Setup(ncControl);
-
 	keyMap().set([&]()
 		{
 			if(p_ncControl)
@@ -228,7 +226,11 @@ void NClone::setup(nccontrol::NCControl* ncControl)
 			p_ncControl->cmdEnter();
 	}, "Enter", '\n');  // KEY_ENTER, '\n', 10
 
-	// KEY_IL: // TODO, INSERT doesn't seem to work on laptop
+	keyMap().set([&]()
+	{
+		if(p_ncControl)
+			p_ncControl->toggleInsert();
+	}, "Insert", KEY_IL);  // KEY_ENTER, '\n', 10
 
 	// Default key processing
 	keyMap().set([&](nckeymap::NCKeyMap::KeyType key)
