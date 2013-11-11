@@ -30,7 +30,7 @@ std::string NCPathUtils::getSaveDir()
 std::string NCPathUtils::getSaveDirFile(const std::string &fileName)
 {
 	boost::filesystem::path p(getSaveDir());
-	p /= "history";
+	p /= fileName;
 	return p.string();
 }
 
