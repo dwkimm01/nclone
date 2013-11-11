@@ -26,27 +26,23 @@ using namespace ncpp;
 // Main method
 int doit(int argc, char* argv[])
 {
-
 	// Scope for NCApp
 	{
-
-		nclone::NClone nclone;
-
-
-		// Parse command line options
+		// Parse command line options, before ncurses starts up in NCApp
 		nccmdlineoptions::NCCmdLineOptions progArgs(argc, argv);
 		if(progArgs.shouldExit()) return 0;
-		progArgs.print();
+
+		// Start up application
+		ncapp::NCApp app;
+		// Key processing
+		nclone::NClone nclone;
+		// Chats, data model
+		ncchats::NCChats chats;
 
 		// Signals connects client APIs to windows/backend
 		ncclientif::NCClientIf::MsgSignal msgSignal;
 		std::function<void()> refreshBuddyList;
 
-		// Chats, data model
-		ncchats::NCChats chats;
-
-		// Start up application
-		ncapp::NCApp app;
 
 		// Resize functions
 		ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );

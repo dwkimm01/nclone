@@ -69,6 +69,7 @@ public:
 			if(p_vm.count("help"))
 			{
 				std::cout << desc << std::endl;
+				print();
 				p_shouldExit = true;
 			}
 
@@ -97,6 +98,7 @@ public:
 	int loglevel() const { return p_vm["loglevel"].as<int>(); }
 	const std::string& connection() const { return p_connection; }
 
+	// Print help to stdout
 	void print()
 	{
 		// If there is nothing to do just exit

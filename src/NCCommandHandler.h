@@ -9,7 +9,6 @@
 #define NCCOMMANDHANDLER_H_
 
 #include <string>
-#include <vector>
 #include <map>
 #include <functional>
 

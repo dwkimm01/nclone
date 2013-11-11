@@ -1034,6 +1034,10 @@ void NCControl::appListConnections()
 		}
 		buddyAppendChat(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
 	}
+	else
+	{
+		buddyAppendChat(0, "", NCString("No connections", nccolor::NCColor::DEFAULT), true);
+	}
 }
 
 void NCControl::appListWindows()
