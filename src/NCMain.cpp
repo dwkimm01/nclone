@@ -26,7 +26,7 @@ using namespace ncpp;
 int doit(int argc, char* argv[])
 {
 	// Scope for NCApp
-	{
+	{ // TODO, don't need this
 		// Parse command line options, before ncurses starts up in NCApp
 		nccmdlineoptions::NCCmdLineOptions progArgs(argc, argv);
 		if(progArgs.shouldExit()) return 0;
