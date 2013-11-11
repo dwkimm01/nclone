@@ -14,13 +14,11 @@
  * Notes:
  * http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/init.html
  * TODO
- * http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/init.html
  *  use: raw(); after initscr, to get line buffering disabled
  *  use keypad(stdscr, TRUE); after raw to get F1, F2, etc
  *  use noecho(); to not echo while we do getch
  *  use attron(A_BOLD); before printw to make bold
  *  use attrof(A_BOLD); after printw to turn off bold
- *
  */
 
 namespace ncpp
