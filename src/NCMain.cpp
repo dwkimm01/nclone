@@ -208,14 +208,11 @@ int doit(int argc, char* argv[])
 		if(!progArgs.connection().empty())
 		{
 			// New Connection information
-			auto const ncs = dynamic_cast<NCWinScrollback*>(chatWin.getTop());
 			ncCtrl.buddyAppendChat(0, "", NCString("Using cmd line account", nccolor::NCColor::CHATBUDDY_NORMAL), true);
-			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
-
-			const auto clientUsername = cstr.username() + "@" + cstr.hostname();
-			ncCmd.inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
+			const ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 			const auto clientProtocol = cstr.protocol();
-			ncCtrl.buddyAppendChat(0, "", NCString(" Enter password for " + clientUsername + " (" + clientProtocol + ")", nccolor::NCColor::CHATBUDDY_NORMAL), true);
+			const auto clientUsername = cstr.username() + "@" + cstr.hostname();
+			ncCtrl.appNewConnection(clientProtocol, clientUsername);
 		}
 
 		// Processing keys (and command) setup

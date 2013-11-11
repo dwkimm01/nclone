@@ -98,6 +98,7 @@ public:
 	void appPrintHistory();
 
 	void appNewConnection();
+	void appNewConnection(const std::string &protocol, const std::string &username);
 	void appDelConnection(const std::string &connName);
 	void appListConnections();
 

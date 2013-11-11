@@ -992,6 +992,16 @@ void NCControl::appNewConnection()
 	buddyAppendChat(0, "", NCString("   Enter protocol (e.g. XMPP, DUMMY)", nccolor::NCColor::DEFAULT), true);
 }
 
+void NCControl::appNewConnection(const std::string &protocol, const std::string &username)
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	p_clientProtocol = protocol;
+	p_clientUsername = username;
+	p_getCommand().inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
+	buddyAppendChat(0, "", NCString(" Enter password for " + p_clientUsername + " (" + p_clientProtocol + ")", nccolor::NCColor::CHATBUDDY_NORMAL), true);
+}
+
 void NCControl::appDelConnection(const std::string &connName)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
