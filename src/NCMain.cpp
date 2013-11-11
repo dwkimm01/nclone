@@ -208,7 +208,6 @@ int doit(int argc, char* argv[])
 		if(!progArgs.connection().empty())
 		{
 			// New Connection information
-			ncCtrl.buddyAppendChat(0, "", NCString("Using cmd line account", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 			const ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 			const auto clientProtocol = cstr.protocol();
 			const auto clientUsername = cstr.username() + "@" + cstr.hostname();
@@ -230,7 +229,7 @@ int doit(int argc, char* argv[])
 			// Update command window
 			ncCtrl.cmdWindowUpdate();
 
-			// Get user input
+			// Get user input, will timeout eventually
 			nclone.keyMap()(winCmd.GetUserInput());
 		}
 	} // end NCApp scope

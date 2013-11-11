@@ -996,6 +996,7 @@ void NCControl::appNewConnection(const std::string &protocol, const std::string 
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	buddyAppendChat(0, "", NCString("Using cmd line account", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 	p_clientProtocol = protocol;
 	p_clientUsername = username;
 	p_getCommand().inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
