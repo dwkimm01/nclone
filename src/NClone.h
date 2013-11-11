@@ -11,7 +11,6 @@
 #include <string>
 #include <functional>
 #include <set>
-#include <boost/date_time.hpp>
 #include <boost/signal.hpp>
 #include "NCApp.h"
 #include "NCWinScrollback.h"
@@ -46,13 +45,6 @@ private:
 	nccontrol::NCControl* p_ncControl;
 	// Key map
 	nckeymap::NCKeyMap p_keyMap;
-	// Top chat window
-//	std::function<NCWinScrollback*()> ncs;
-	// Whether a password is being entered currently
-//	std::function<bool()> enteringPassword;
-
-	// Timeout/idle count
-	boost::posix_time::ptime now;
 
 	std::string clientProtocol;
 	std::string clientUsername;

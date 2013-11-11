@@ -6,6 +6,10 @@
 #include "NCColor.h"
 #include "TestExampleText.h"
 
+using namespace boost::gregorian;
+using namespace boost::posix_time;
+
+
 namespace ncpp
 {
 namespace nccontrol
@@ -33,7 +37,8 @@ NCControl::NCControl
 	, ncwin::NCWin::ResizeFuncs chatResizeWidth
 	, ncwin::NCWin::ResizeFuncs chatResizeHeight
 	)
-	: 	_startTime(NCTimeUtils::getUtcTime())
+	: now(second_clock::local_time())
+	, _startTime(NCTimeUtils::getUtcTime())
 	, p_getNCApp(getNCApp)
 	, p_getLogWin(getLogWin)
 	, p_getChatsWin(getChatsWin)
@@ -66,7 +71,6 @@ void NCControl::toggleKeysWindowVisibility()
 	   !p_getNCApp || !p_getNCApp())
 		return;
 
-//	if(!winKeys || !winLog) return;
 	// Bring winKeys to top if it's not on top, if it is push it to the back
 	if(p_getNCApp()->isOnTopOf(p_getDebugKeyWin(), p_getLogWin()))
 	{
@@ -83,42 +87,82 @@ void NCControl::toggleBuddyListWindowVisibility()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getChatsWin || !p_getBuddyListWin || !p_getLogWin || !p_getNCApp) return;
+	// Bring buddy list to top if it's not on top, if it is push it to the back
+	if(p_getNCApp()->isOnTopOf(p_getBuddyListWin(), p_getLogWin()))
+	{
+		p_getNCApp()->bringToBack(p_getBuddyListWin());
+		p_getCurrentChatWin()->refresh();
+		if(p_getTimeWin && p_getTimeWin())
+			p_getTimeWin()->refresh();
+	}
+	else
+	{
+		p_getNCApp()->bringToFront(p_getBuddyListWin());
+		p_getBuddyListWin()->refresh();
+	}
+}
+
+void NCControl::toggleConsoleWindowVisibility()
+{
+	if(!p_getCurrentChatWin()) return;
+	// TODO, toggle visible dropdown (from top) console window
+	p_getCurrentChatWin()->append("<Console window toggle>");
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::chatPageUp()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->pageUp();
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::chatPageDown()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->pageDown();
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::chatHome()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->home();
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::chatEnd()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->end();
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::chatScrollUp(int i)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->scrollUp(i);
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::chatScrollDown(int i)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->scrollDown(i);
+	p_getCurrentChatWin()->refresh();
 }
 
 
@@ -126,11 +170,28 @@ void NCControl::cmdHistoryPrevious()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+
+
+	// TODO, going up when the history is blank erases everything...
+	p_getCommand().cmd = (--p_getCommandHistory()).getCommand();
+	p_getCommand().cmdIdx = p_getCommand().cmd.size();
+	if(!p_getCommandWin || !p_getCommandWin()) return;
+	p_getCommandWin()->clear();
+	p_getCommandWin()->append(p_getCommand().cmd);
+	p_getCommandWin()->refresh();
+
 }
 
 void NCControl::cmdHistoryNext()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	p_getCommand().cmd = (++p_getCommandHistory()).getCommand();
+	p_getCommand().cmdIdx = p_getCommand().cmd.size();
+	if(!p_getCommandWin || !p_getCommandWin()) return;
+	p_getCommandWin()->clear();
+	p_getCommandWin()->append(p_getCommand().cmd);
+	p_getCommandWin()->refresh();
 
 }
 
@@ -156,11 +217,41 @@ void NCControl::cmdCursorLeft()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(NCCmd::REVERSEISEARCH == p_getCommand().inputState)
+	{
+		p_getCommand().inputState = NCCmd::NORMAL;
+		p_getCommand().cmd = p_getCommand().foundCmd;
+		p_getCommand().foundCmd = "";
+		p_getCommand().prefix("");
+		p_getCommand().postfix("");
+		p_getCommand().cmdIdx = p_getCommand().foundIdx;
+		p_getCommand().foundIdx = 0;
+		if(!p_getCommandWin || !p_getCommandWin()) return;
+		p_getCommandWin()->append(p_getCommand().display());
+		p_getCommandWin()->refresh();
+	}
+	if(0 < p_getCommand().cmdIdx) --p_getCommand().cmdIdx;
+
 }
 
 void NCControl::cmdCursorRight()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(NCCmd::REVERSEISEARCH == p_getCommand().inputState)
+	{
+		p_getCommand().inputState = NCCmd::NORMAL;
+		p_getCommand().cmd = p_getCommand().foundCmd;
+		p_getCommand().foundCmd = "";
+		p_getCommand().prefix("");
+		p_getCommand().postfix("");
+		p_getCommand().cmdIdx = p_getCommand().foundIdx;
+		p_getCommand().foundIdx = 0;
+		if(!p_getCommandWin || !p_getCommandWin()) return;
+		p_getCommandWin()->append(p_getCommand().display());
+		p_getCommandWin()->refresh();
+	}
+	if(p_getCommand().cmd.size() > (unsigned int)p_getCommand().cmdIdx) ++p_getCommand().cmdIdx;
 
 }
 
@@ -168,29 +259,98 @@ void NCControl::cmdSkipWordLeft()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	// Move cursor to previous word start
+	// find first non-white character
+	for(int nsp = p_getCommand().cmdIdx-1; nsp > 0; --nsp)
+	{
+		if(' ' != p_getCommand().cmd[nsp])
+		{
+			// Find last non-white character
+			for(int wd = nsp-1; wd > 0; --wd)
+			{
+				if(' ' == p_getCommand().cmd[wd])
+				{
+					p_getCommand().cmdIdx = wd+1;
+					nsp = 0;
+					break;
+				}
+			}
+			// Didn't set p_getCommand()cmdIdx yet so we're at the beginning
+			if(0 != nsp)
+			{
+				p_getCommand().cmdIdx = 0;
+			}
+		}
+	}
+
 }
 
 void NCControl::cmdSkipWordRight()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	// Move cursor to next word end (space)
+	for(unsigned int sp = p_getCommand().cmdIdx+1; sp <= p_getCommand().cmd.size(); ++sp)
+	{
+		if(' ' == p_getCommand().cmd[sp] || p_getCommand().cmd.size() == sp)
+		{
+			p_getCommand().cmdIdx = sp;
+			break;
+		}
+	}
 }
 
 void NCControl::cmdSkipToBegin() // CTRL-a
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	p_getCommand().cmdIdx = 0;
+	p_getCommand().inputState = NCCmd::NORMAL;
 }
 
 void NCControl::cmdSkipToEnd()   // CTRL-e
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	p_getCommand().cmdIdx = p_getCommand().cmd.size();
+	p_getCommand().inputState = NCCmd::NORMAL;
 }
 
 void NCControl::cmdReverseSearchStart()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(!p_getCurrentChatWin()) return;
+	// TODO, reverse history search
+	if(NCCmd::REVERSEISEARCH != p_getCommand().inputState)
+	{
+		p_getCommand().inputState = NCCmd::REVERSEISEARCH;
+		// TODO, might want to separate Reverse Search from p_getCommandHistory()ory and not reuse so much
+		p_getCommand().prefix(" srch: ");
+//				p_getCommand().postfix(" 0");
+		p_getCommand().foundIdx = 0;
+	}
+	// else
+	{
+		// Already in reverse search state, need to find next match
+		--p_getCommandHistory();
+		for(auto itr = p_getCommandHistory().itr(); itr != p_getCommandHistory().begin(); --itr)
+		{
+			const auto pos = (*itr).find(p_getCommand().cmd);
+			if(pos != std::string::npos)
+			{
+				p_getCommand().prefix(" srch: ");
+				p_getCommand().postfix(" " + boost::lexical_cast<std::string>(itr.getIndex()));
+				p_getCommand().foundCmd = *itr;
+				p_getCommand().foundIdx = pos;
+
+				p_getCommandWin()->append(p_getCommand().display());
+				p_getCommandWin()->refresh();
+				p_getCommandHistory().setIdx(itr);
+				break;
+			}
+		}
+	}
 
 }
 
@@ -198,24 +358,69 @@ void NCControl::cmdBackspace()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(p_getCommand().cmd.empty()) return;
+	p_getCommand().cmd.erase(p_getCommand().cmd.begin() + (--p_getCommand().cmdIdx));
+
+	if(NCCmd::PASSWORD == p_getCommand().inputState)
+	{
+		// If this is a password print x's instead
+		std::string xInput;
+		xInput.reserve(p_getCommand().cmd.size());
+		for(unsigned int i = 0; p_getCommand().cmd.size() > i; ++i)
+			xInput.push_back('x');
+		if(p_getCommandWin && p_getCommandWin())
+		{
+			p_getCommandWin()->append(xInput);
+			p_getCommandWin()->refresh();
+		}
+	}
+	else
+	{
+		if(p_getCommandWin && p_getCommandWin())
+		{
+			p_getCommandWin()->append(p_getCommand().cmd);
+			p_getCommandWin()->refresh();
+		}
+	}
 }
 
 void NCControl::cmdDelete()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	p_getCommand().cmd.erase(p_getCommand().cmdIdx, 1);
+	if(!p_getCommandWin || !p_getCommandWin()) return;
+	p_getCommandWin()->append(p_getCommand().display());
+	p_getCommandWin()->refresh();
 }
 
 void NCControl::cmdDeleteBeforeCursor()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	p_getCommand().cmd.erase(0, p_getCommand().cmdIdx);
+	p_getCommand().cmdIdx = 0;
+	if(!p_getCommandWin || !p_getCommandWin()) return;
+	p_getCommandWin()->append(p_getCommand().cmd);
+	p_getCommandWin()->refresh();
 }
 
 void NCControl::cmdCancelInput() // CTRL-c
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	// TODO, print msg to p_getCurrentChatWin if canceling p_getCommand()inputState != NORMAL...
+	p_getCommand().cmd.clear();
+	p_getCommand().cmdIdx = 0;
+	p_getCommand().inputState = NCCmd::NORMAL;
+	p_getCommand().foundIdx = 0;
+	p_getCommand().foundCmd = "";
+	p_getCommand().prefix("");
+	p_getCommand().postfix("");
+	p_getCommandHistory().resetIndex();
+	if(!p_getCommandWin || !p_getCommandWin()) return;
+	p_getCommandWin()->clear();
+	p_getCommandWin()->refresh();
 }
 
 void NCControl::cmdEnter()
@@ -234,17 +439,29 @@ void NCControl::buddyNextUnread() // CTRL-n
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->append("CTRL-n");
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::buddyNext()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
+	if(!p_getChatsWin || !p_getChatsWin() ||
+		!p_getCurrentChatWin || !p_getCurrentChatWin())
+		return;
+	p_getChatsWin()->rotate();
+	p_getCurrentChatWin()->refresh();
 }
 
 void NCControl::buddyPrevious()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(!p_getChatsWin || !p_getChatsWin()) return;
+	p_getChatsWin()->rotateBack();
+	p_getCurrentChatWin()->refresh();
 
 }
 
@@ -405,11 +622,38 @@ void NCControl::appQuit()
 void NCControl::appRefresh()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(p_getNCApp && p_getNCApp())
+		p_getNCApp()->refresh();
 }
 
 void NCControl::appTimeout()
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(p_getTimeWin && p_getTimeWin())
+	{
+		// Update timestamp
+		p_getTimeWin()->refresh();
+	}
+
+	// Get time current time and calculate timeout for idle timeout check
+	const ptime nowp = second_clock::local_time();
+	const ptime nowNext = now + minutes(15); // seconds(900); // 15 mins
+
+	// Checkout idle status
+	// Check to see if there was an idle timeout
+	if(nowp > nowNext)
+	{
+		if(p_getCurrentChatWin && p_getCurrentChatWin())
+		{
+			const NCString TimeoutStr("  -- Timeout -- ", 2);
+			p_getCurrentChatWin()->append(NCTimeUtils::getPrintableColorTimeStamp() + TimeoutStr);
+			p_getCurrentChatWin()->refresh();
+			// Finally, update timeout so we don't do this again right away
+			now = second_clock::local_time();
+		}
+	}
 
 }
 

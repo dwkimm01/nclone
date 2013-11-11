@@ -8,6 +8,7 @@
 #include <set>
 //#include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
+#include <boost/date_time.hpp>
 
 #include "NCApp.h"
 #include "NCWinScrollback.h"
@@ -49,9 +50,9 @@ public:
 		);
 
 
-
 	void toggleKeysWindowVisibility();
 	void toggleBuddyListWindowVisibility();
+	void toggleConsoleWindowVisibility();
 
 	void chatPageUp();
 	void chatPageDown();
@@ -120,6 +121,9 @@ public:
 	NCCmd& getCommand();
 
 private:
+	// Timeout/idle count
+	boost::posix_time::ptime now;
+
 	int _startTime;
 
 	// Thread
@@ -139,7 +143,7 @@ private:
 	std::function<ncpp::NCCommandHandler&()> p_getCommandHandler;
 	std::function<nckeymap::NCKeyMap&()> p_getKeyMap;
 
-	// Entering Password can just check p_getCommand.State == PASSWORD
+	// Entering Password can just check NCCmd::PASSWORD == p_getCommand().inputState
 	std::function<NCWinCfg&()> p_getDefaultWinCfg;
 	std::function<std::vector<ncpp::ncclientif::NCClientIf*>&()> p_getConnections;
 	std::function<void()> p_quitApp;
