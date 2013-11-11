@@ -13,6 +13,8 @@
 namespace ncpp
 {
 
+// TODO DELETE THIS FILE
+
 // TODO, merge this class with NCKeyProcessor
 class NCInput
 {

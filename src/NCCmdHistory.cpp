@@ -35,8 +35,8 @@ struct line_reader: std::ctype<char>
 
 
 NCCmdHistory::NCCmdHistory(const int maxHistory)
-	: _cmds(maxHistory)
-	, _cmdsIndex(0)
+	: p_cmds(maxHistory)
+	, p_cmdsIndex(0)
 {
 	// Try to load saved history
 	std::ifstream file(ncpathutils::NCPathUtils::getHistoryFile());
@@ -63,56 +63,88 @@ void NCCmdHistory::add(const std::string &cmd)
 {
 	// I believe the correct behavior is just to keep on adding new commands regardless
 	// of whether they have been entered before or were selected from the history
-	_cmds.push_back(cmd);
+	p_cmds.push_back(cmd);
 	resetIndex();
 }
 
 unsigned int NCCmdHistory::size() const
 {
-	return _cmds.size();
+	return p_cmds.size();
 }
 
 unsigned int NCCmdHistory::maxSize() const
 {
-	return _cmds.max_size();
+	return p_cmds.max_size();
 }
 
 void NCCmdHistory::resize(const int s)
 {
-	_cmds.resize(s);
+	p_cmds.resize(s);
 }
 
 const std::string& NCCmdHistory::getCommand() const
 {
-	if(_cmds.size() > 0 && _cmds.size() > _cmdsIndex )
+	if(p_cmds.size() > 0 && p_cmds.size() > p_cmdsIndex )
 	{
-		return _cmds[_cmdsIndex];
+		return p_cmds[p_cmdsIndex];
 	}
-	return _nextCmd;
+	return p_nextCmd;
 }
 
 void NCCmdHistory::resetIndex()
 {
-	_cmdsIndex = _cmds.size();
+	p_cmdsIndex = p_cmds.size();
 }
 
 NCCmdHistory& NCCmdHistory::operator++()
 {
-	_cmdsIndex = (_cmds.size() > _cmdsIndex) ? (_cmdsIndex + 1) : (_cmds.size());
+	p_cmdsIndex = (p_cmds.size() > p_cmdsIndex) ? (p_cmdsIndex + 1) : (p_cmds.size());
 	return *this;
 }
 
 NCCmdHistory& NCCmdHistory::operator--()
 {
-	_cmdsIndex = (_cmdsIndex > 0) ? (_cmdsIndex - 1) : (0);
+	p_cmdsIndex = (p_cmdsIndex > 0) ? (p_cmdsIndex - 1) : (0);
 	return *this;
 }
 
 void NCCmdHistory::clear()
 {
-	_cmds.clear();
+	p_cmds.clear();
 	resetIndex();
 }
+
+// ---------------------------------------------------------------------------
+// iterator helpers
+
+NCCmdHistory::iterator NCCmdHistory::begin() { return iterator(*this, 0); }
+NCCmdHistory::iterator NCCmdHistory::end() { return iterator(*this, p_cmds.size()); }
+
+// TODO, make this return a reverse iterator from current index for NClone::CTRL-r reverse i search
+NCCmdHistory::iterator NCCmdHistory::itr() { return iterator(*this, p_cmdsIndex); }
+void NCCmdHistory::setIdx(const iterator &itr) { p_cmdsIndex = itr.getIndex(); }
+
+std::string& NCCmdHistory::operator[](const unsigned int i) { return p_cmds[i]; }
+
+// ---------------------------------------------------------------------------
+// iterator
+
+NCCmdHistory::iterator::iterator(NCCmdHistory& cmds, const unsigned int index) : p_cmds(cmds), p_index(index) {}
+unsigned int NCCmdHistory::iterator::getIndex() const { return p_index; }
+void NCCmdHistory::iterator::increment() { ++p_index; }
+void NCCmdHistory::iterator::decrement() { --p_index; }
+
+bool NCCmdHistory::iterator::equal(iterator const& other) const
+{
+    return this->p_index == other.p_index;
+}
+
+std::string& NCCmdHistory::iterator::dereference() const
+{
+    return p_cmds[p_index];
+}
+
+
 
 } // namespace nccmdhistory
 } // namespace ncpp

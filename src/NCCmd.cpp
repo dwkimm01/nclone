@@ -51,8 +51,6 @@ int NCCmd::getScrollUp(const int windowWidth) const
 	const int cmdTotal = cmd.size() / windowWidth;
 	const int cmdIdxLine = displayIdx() / windowWidth;
 	return cmdTotal - cmdIdxLine;
-
-//	(cmd.size() / windowWidth) - (displayIdx() / windowWidth);
 }
 
 int NCCmd::getScrollIdx(const int windowWidth) const

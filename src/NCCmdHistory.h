@@ -65,36 +65,24 @@ public:
 
 	// -----------------------------------------------------------------------
 	// Iterator
-    class iterator: public boost::iterator_facade
-       < iterator  // CRTP, just use the Iterator name
+    class iterator : public boost::iterator_facade
+       < iterator     // CRTP, just use the Iterator name
        , std::string  // Value type of what is iterated over (contained element type)
-//       , boost::forward_traversal_tag // type of traversal allowed
        , boost::bidirectional_traversal_tag
        >  // Reference and Difference can be omitted
     {
     public:
-        iterator(NCCmdHistory& cmds, const unsigned int index) : p_cmds(cmds), p_index(index) {}
-
-        unsigned int getIndex() const { return p_index; }
+        iterator(NCCmdHistory& cmds, const unsigned int index);
+        unsigned int getIndex() const;
 
     private:
         friend class boost::iterator_core_access;
 
-        void increment() { ++p_index; }
+        void increment();
+        void decrement();
+        bool equal(iterator const& other) const;
 
-        void decrement() { --p_index; }
-
-
-        bool equal(iterator const& other) const
-        {
-            return this->p_index == other.p_index;
-        }
-
-        std::string& dereference() const
-        {
-            return p_cmds[p_index];
-        }
-
+        std::string& dereference() const;
 
     private:
         NCCmdHistory &p_cmds;
@@ -102,20 +90,18 @@ public:
     };
 
     // Iterator
-    iterator begin() { return iterator(*this, 0); }
-    iterator end() { return iterator(*this, _cmds.size()); }
-
-    // TODO, make this return a reverse iterator from current index for NClone::CTRL-r reverse i search
-    iterator itr() { return iterator(*this, _cmdsIndex); }
-    void setIdx(const iterator &itr) { _cmdsIndex = itr.getIndex(); }
+    iterator begin();
+    iterator end();
+    iterator itr();
+    void setIdx(const iterator &itr);
 
 private:
-	boost::circular_buffer<std::string> _cmds;
-	unsigned int _cmdsIndex;
+	boost::circular_buffer<std::string> p_cmds;
+	unsigned int p_cmdsIndex;
 
-	std::string& operator[](const unsigned int i) { return _cmds[i]; }
+	std::string& operator[](const unsigned int i);
 
-	std::string _nextCmd;
+	std::string p_nextCmd;
 };
 
 } // namespace nccmdhistory

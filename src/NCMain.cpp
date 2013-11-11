@@ -11,7 +11,7 @@
 #include "NCWinTime.h"
 #include "NCCmdLineOptions.h"
 #include "NCConnectionString.h"
-#include "NCInput.h"
+//#include "NCInput.h"
 #include "NCString.h"
 #include "NCStringUtils.h"
 #include "NCColor.h"
@@ -256,9 +256,6 @@ int doit(int argc, char* argv[])
 		// Loop forever until input tells us to return
 		while(ncCmd.stillRunning)
 		{
-			{
-//			boost::unique_lock<boost::recursive_mutex> scoped_lockA(msgLock);
-
 
 			// Update Buddy List
 			if(refreshBuddyList) refreshBuddyList();
@@ -277,33 +274,11 @@ int doit(int argc, char* argv[])
 			winCmd->scrollUp(ncCmd.getScrollUp(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))));
 			winCmd->refresh();
 			winCmd->cursorSet(ncCmd.getScrollIdx(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))), 1);
-			}
 
 			// Get user input
 			int c = 0;
 			(*winCmd) >> c;  // app >> c;
-
-//	TODO		boost::unique_lock<boost::recursive_mutex> scoped_lock(msgLock);
-
-			// Show keystroke in keystroke debug window
-			if(KEY_TIMEOUT != c)
-			{
-				const char ks[] = {(char)c, 0};
-				const string keyStroke = (ncstringutils::NCStringUtils::isPrint(c))
-					? (string("Key ") + string(ks))
-					: (string("Key ") + boost::lexical_cast<string>(c));
-				winKeys->append(keyStroke);
-			}
-
-			auto const ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
-
-			if(ncs)
-			{
-				// Use Keymap
-				nclone.keyMap()(c);
-			} // if ncs
-			// TODO, why do we check ncs???
-
+			nclone.keyMap()(c);
 		}
 	} // end NCApp scope
 

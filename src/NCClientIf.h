@@ -9,7 +9,7 @@
 #define NCCLIENTIF_H_
 
 #include <string>
-#include "boost/signal.hpp"
+#include <boost/signal.hpp>
 #include "NCString.h"
 
 
@@ -61,7 +61,6 @@ public:
    virtual void addBuddy(const String &who, const String &group) = 0;
    virtual void removeBuddy(const String &who, const String &group) = 0;
    virtual void setAway(const String &state, const String &msg) = 0;
-
 
    // --------------------------------------------------------------
    // Callbacks

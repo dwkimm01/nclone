@@ -755,6 +755,15 @@ void NCControl::buddyListRefresh()
 
 void NCControl::appProcessKeystroke(nckeymap::NCKeyMap::KeyType key)
 {
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	// Show keystroke in keystroke debug window
+	const char ks[] = {(char)key, 0};
+	const auto keyStroke = (ncstringutils::NCStringUtils::isPrint(key))
+		? (std::string("Key ") + std::string(ks))
+		: (std::string("Key ") + boost::lexical_cast<std::string>(key));
+	p_getDebugKeyWin()->append(keyStroke);
+
 	// Filter out non-printable characters
 	// TODO, implement as boost ns::print
 	if (ncstringutils::NCStringUtils::isPrint(key))
@@ -857,7 +866,8 @@ void NCControl::appTimeout()
 
 	// Get time current time and calculate timeout for idle timeout check
 	const ptime nowp = second_clock::local_time();
-	const ptime nowNext = now + minutes(15); // seconds(900); // 15 mins
+	// const ptime nowNext = now + seconds(300); // 5 mins
+	const ptime nowNext = now + minutes(15);
 
 	// Checkout idle status
 	// Check to see if there was an idle timeout
