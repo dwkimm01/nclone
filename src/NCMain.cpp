@@ -222,29 +222,17 @@ int doit(int argc, char* argv[])
 		if(!progArgs.connection().empty())
 		{
 			auto const ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
-			ncs->append(" Using cmd line account");
-			ncs->refresh();
+			ncCtrl.buddyAppendChat(0, "", NCString("Using cmd line account", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 
 			clientUsername = cstr.username() + "@" + cstr.hostname();
 			ncCmd.inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
 			clientProtocol = cstr.protocol();
-			ncs->append(" Enter password for " + clientUsername + " (" + clientProtocol + ")");
-			ncs->refresh();
+			ncCtrl.buddyAppendChat(0, "", NCString(" Enter password for " + clientUsername + " (" + clientProtocol + ")", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 		}
-
 
 		// Processing keys (and command) setup
 		nclone.setup(&ncCtrl);
-				/*app, winKeys, winLog, win3, winBl, winCmd, winTime
-			, [&](){return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
-			, cmdHist, ncCmd
-			, [&](){return NCCmd::PASSWORD == ncCmd.inputState; }
-			, cfg
-			, connections
-//			, chatToConnections
-			, ncCtrl.getChatToConnections()
-			, */
 
 		// Buddy list window
 		refreshBuddyList = [&]()
