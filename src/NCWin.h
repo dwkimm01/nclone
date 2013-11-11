@@ -85,6 +85,7 @@ public:
 	 * <b>Purpose:</b> Get a single char as input
 	 */
 	NCWin& operator>>(int &c);
+	int GetUserInput();
 
 
 private:

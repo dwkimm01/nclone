@@ -376,5 +376,10 @@ NCWin& NCWin::operator>>(int &c)
 	return *this;
 }
 
+int NCWin::GetUserInput()
+{
+	return p_data->getChar();
+}
+
 } // namespace ncwin
 } // namespace ncpp

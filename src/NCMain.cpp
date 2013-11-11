@@ -231,9 +231,7 @@ int doit(int argc, char* argv[])
 			ncCtrl.cmdWindowUpdate();
 
 			// Get user input
-			int c = 0;
-			winCmd >> c;  // app >> c;
-			nclone.keyMap()(c);
+			nclone.keyMap()(winCmd.GetUserInput());
 		}
 	} // end NCApp scope
 
