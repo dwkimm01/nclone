@@ -901,7 +901,6 @@ void NCControl::appTimeout()
 			now = second_clock::local_time();
 		}
 	}
-
 }
 
 void NCControl::appPrintHelp()

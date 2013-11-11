@@ -65,12 +65,12 @@ public:
 
 	void handleVCardReceived(const JID& actualJID, VCard::ref vcard, ErrorPayload::ref error)
 	{
-    	p_debugLogCB("DEBUG", NCString("RECEIVED " + actualJID.toString() + " " + vcard->getFullName(), nccolor::NCColor::CHAT_NORMAL));
+    	p_debugLogCB("DEBUG", NCString("Received [" + actualJID.toString() + "] -> [" + vcard->getFullName() + "]", nccolor::NCColor::CHAT_NORMAL));
 	}
 
     void handleVCardChanged(const JID& jid, VCard::ref vcard)
     {
-    	p_debugLogCB("DEBUG", NCString("changed: " + jid.toString() + " " + vcard->getFullName(), nccolor::NCColor::CHAT_NORMAL));
+    	p_debugLogCB("DEBUG", NCString("Changed: [" + jid.toString() + "] to [" + vcard->getFullName() + "]", nccolor::NCColor::CHAT_NORMAL));
     }
 
     void handleOwnVCardChanged(VCard::ref vcard)
@@ -94,7 +94,7 @@ public:
 
 	void handleRosterReceived(ErrorPayload::ref error)
 	{
-		p_debugLogCB("DEBUG", NCString("HANDLEROSTERRECEIVED", nccolor::NCColor::COMMAND_HIGHLIGHT));
+		p_debugLogCB("DEBUG", NCString("handleRosterReceived", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
 		if (error)
 		{
@@ -106,7 +106,7 @@ public:
 
 	void handleRosterReceivedB(boost::shared_ptr<RosterPayload> rosterPayload)
 	{
-		p_debugLogCB("DEBUG", NCString("HANDLEROSTERRECEIVED B", nccolor::NCColor::COMMAND_HIGHLIGHT));
+		p_debugLogCB("DEBUG", NCString("handleRosterReceivedB", nccolor::NCColor::COMMAND_HIGHLIGHT));
 
 //		if((bool)rosterPayload)
 //		{
@@ -281,11 +281,7 @@ NCClientSwiften::NCClientSwiften
 
 		const std::string vc = p_data->get(presence->getFrom().toString());
 //		const std::string vc = p_data->client->getNickResolver()->jidToNick(presence->getFrom().toString());
-
-
-
-		p_debugLogCB("DEBUG", NCString(">> " + vc, nccolor::NCColor::CHATBUDDY_NORMAL));
-
+		p_debugLogCB("DEBUG", NCString("JID " + vc, nccolor::NCColor::CHATBUDDY_NORMAL));
 
 
 		// Automatically approve subscription requests

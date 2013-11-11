@@ -1,4 +1,7 @@
 
+ - Get buddy chat backend integrated
+ - Add nickname setting
+ - Cleanup Client Swiften code
  - Fix delconn on active connection (XMPP)
  - Add backend to get multiple connections working at the same time
  - CTRL-n go to next window with unseen updates
