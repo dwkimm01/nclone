@@ -32,11 +32,11 @@
 #include "NCString.h"
 #include "NCStringUtils.h"
 #include "NCException.h"
-#include "NCCmdHistory.h"
+//#include "NCCmdHistory.h"
 #include "NCColor.h"
-#include "NCKeyMap.h"
+//#include "NCKeyMap.h"
 #include "NClone.h"
-#include "NCCmd.h"
+//#include "NCCmd.h"
 #include "NCChats.h"
 #include "NCTypes.h"
 #include "NCControl.h"
@@ -197,7 +197,8 @@ int doit(int argc, char* argv[])
 
 		// Input collector
 		NCCmd ncCmd;
-
+		// Command handling
+		NCCommandHandler ncCommandHandler;
 
 		// Controller
 		nccontrol::NCControl ncCtrl
@@ -211,7 +212,7 @@ int doit(int argc, char* argv[])
 			, [&]() { return winKeys; }
 			, [&]() -> nccmdhistory::NCCmdHistory& { return cmdHist; }
 			, [&]() -> NCCmd& { return ncCmd; }
-			, [&]() -> ncpp::NCCommandHandler& { return nclone.cmdMap; }
+			, [&]() -> ncpp::NCCommandHandler& { return ncCommandHandler; } // return nclone.cmdMap; }
 			, [&]() -> nckeymap::NCKeyMap& { return nclone.keyMap(); }
 			, [&]() -> NCWinCfg& { return cfg; }
 			, [&]() -> std::vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
@@ -221,6 +222,10 @@ int doit(int argc, char* argv[])
 			, chatResizeWidth
 			, chatResizeHeight
 			);
+
+		// Setup
+		ncCommandHandler.Setup(&ncCtrl);
+
 
 		// Message received signal connect
 		msgSignal.connect

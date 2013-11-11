@@ -88,6 +88,7 @@ public:
 
 	void buddyListRefresh();
 
+	void appProcessKeystroke(nckeymap::NCKeyMap::KeyType key);
 	void appQuit();
 	void appRefresh();
 	void appTimeout();
@@ -154,6 +155,11 @@ private:
 
 	// Chat
 	std::map<std::string, std::set<std::string>> p_chatToConnections;
+
+	// TODO, change to less state-full
+	std::string p_clientProtocol;
+	std::string p_clientUsername;
+	std::string p_clientPassword;
 
 };
 

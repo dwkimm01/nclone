@@ -11,15 +11,7 @@
 #include <string>
 #include <functional>
 #include <set>
-#include <boost/signal.hpp>
-#include "NCApp.h"
-#include "NCWinScrollback.h"
 #include "NCKeyMap.h"
-#include "NCCmdHistory.h"
-#include "NCCmd.h"
-#include "NCCommandHandler.h"
-#include "NCClientIf.h"
-
 
 namespace ncpp
 {
@@ -37,7 +29,8 @@ public:
 	void setup(nccontrol::NCControl* ncControl);
 
 	nckeymap::NCKeyMap& keyMap();
-	ncpp::NCCommandHandler cmdMap; // TODO, move to private
+
+//	ncpp::NCCommandHandler cmdMap; // TODO, move to private
 
 private:
 
@@ -46,9 +39,6 @@ private:
 	// Key map
 	nckeymap::NCKeyMap p_keyMap;
 
-	std::string clientProtocol;
-	std::string clientUsername;
-	std::string clientPassword;
 };
 
 } // namespace nclone
