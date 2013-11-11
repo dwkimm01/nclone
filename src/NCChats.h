@@ -14,8 +14,6 @@
 #include <map>
 #include <functional>
 
-//#include "NCString.h"
-
 namespace ncpp
 {
 namespace ncchats
@@ -53,7 +51,23 @@ private:
 };
 
 
-
+//   auto b = chats.get("wellsureitis@gmail.com", "buddy1@gmail.com");
+//   if(NULL != b)
+//   {
+//      cout << "b " << b->display() << endl;
+//   }
+//
+//   chats.append("wellsureitis@gmail.com", "buddy1@gmail.com", "Msg 1");
+//   chats.append("wellsureitis@gmail.com", "buddy1@gmail.com", "Msg 2");
+//   chats.append("davidwkimmel@gmail.com", "aron@gmail.com", "Msg 2");
+//   chats.forEachBuddy([](Buddy &b) { std::cout << " (" << b.connection() << ") -> " << b.display()
+//      << " " << b.getChat().size() << " " << b.getStatus()
+//      << " Updated(" << b.getChatUpdated() << ")"
+//      << std::endl; } );
+//
+//   cout << "Size = " << chats.size() << std::endl;
+//   chats.remove("wellsureitis@gmail.com", "buddy1@gmail.com");
+//   cout << "Size = " << chats.size() << std::endl;
 
 
 

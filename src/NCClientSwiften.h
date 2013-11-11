@@ -37,7 +37,7 @@ public:
    	   , std::function<void(const String&, const int, const int)> connectionStepCB
    	   , std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> msgReceivedCB
    	   , std::function<void(const String&, const NCString&)> debugLogCB
-   	   , std::function<void(const NCString&)> buddySignedOnCB
+   	   , std::function<void(const String&, const String&)> buddySignedOnCB
    	   );
 
    virtual ~NCClientSwiften();
@@ -89,7 +89,7 @@ private:
    std::function<void(const String&, const int, const int)> p_connectionStepCB;
    std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> p_msgReceivedCB;
    std::function<void(const String&, const NCString&)> p_debugLogCB;
-   std::function<void(const NCString&)> p_buddySignedOnCB;
+   std::function<void(const String&, const String&)> p_buddySignedOnCB;
 };
 
 } // namespace ncclientswiften

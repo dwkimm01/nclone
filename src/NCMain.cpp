@@ -100,8 +100,8 @@ int doit(int argc, char* argv[])
 		// TODO, add X,Y position resize functions
 		ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 		ncwin::NCWin::ResizeFuncs emptyResize;
-		NCWinScrollback* winBl = new NCWinScrollback(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
-		winBl->setWrapCut();
+		NCWinScrollback winBl(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
+		winBl.setWrapCut();
 
 		// Debug keystroke window
 		auto keysCfg = blCfg;
@@ -161,7 +161,7 @@ int doit(int argc, char* argv[])
 			, [&]() { return &winLog; }
 			, [&]() { return &chatWin; }
 			, [&]() { return dynamic_cast<NCWinScrollback*>(chatWin.getTop()); }
-			, [&]() { return winBl; }
+			, [&]() { return &winBl; }
 			, [&]() { return &winCmd; }
 			, [&]() { return winTime; }
 			, [&]() { return winKeys; }
@@ -169,6 +169,7 @@ int doit(int argc, char* argv[])
 			, [&]() -> NCCmd& { return ncCmd; }
 			, [&]() -> ncpp::NCCommandHandler& { return ncCommandHandler; }
 			, [&]() -> nckeymap::NCKeyMap& { return nclone.keyMap(); }
+			, [&]() -> ncchats::NCChats& { return chats; }
 			, [&]() -> NCWinCfg& { return cfg; }
 			, [&]() -> vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
 			, [&]() { ncCmd.stillRunning = false; }

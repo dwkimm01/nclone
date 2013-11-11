@@ -31,11 +31,13 @@ namespace ncclientswiften
 class NCClientSwiften::Data
 {
 public:
-	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const NCString&)> debugLogCB)
+	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const NCString&)> debugLogCB, std::function<void(const String&, const String&)> buddySignedOnCB)
 		: p_name(name)
 		, networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
 		, p_debugLogCB(debugLogCB)
+		, p_buddySignedOnCB(buddySignedOnCB)
+
 	{
 		client->getVCardManager()->onVCardChanged.connect(boost::bind(&Data::handleVCardChanged, this, _1, _2));
 		client->getVCardManager()->onOwnVCardChanged.connect(boost::bind(&Data::handleOwnVCardChanged, this, _1));
@@ -65,6 +67,8 @@ public:
 
 	void handleVCardReceived(const JID& actualJID, VCard::ref vcard, ErrorPayload::ref error)
 	{
+		p_buddySignedOnCB(p_name, actualJID.toString());
+
     	p_debugLogCB("DEBUG", NCString("Received [" + actualJID.toString() + "] -> [" + vcard->getFullName() + "]", nccolor::NCColor::CHAT_NORMAL));
 	}
 
@@ -205,6 +209,7 @@ public:
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
 	std::function<void(const String&, const NCString&)> p_debugLogCB;
+	std::function<void(const String&, const String&)> p_buddySignedOnCB;
 
 };
 
@@ -217,9 +222,9 @@ NCClientSwiften::NCClientSwiften
    , std::function<void(const String&, const int, const int)> connectionStepCB
    , std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> msgReceivedCB
    , std::function<void(const String&, const NCString&)> debugLogCB
-   , std::function<void(const NCString&)> buddySignedOnCB
+   , std::function<void(const String&, const String&)> buddySignedOnCB
    )
-   : p_data(new NCClientSwiften::Data(name, password, protocol, debugLogCB))
+   : p_data(new NCClientSwiften::Data(name, password, protocol, debugLogCB, buddySignedOnCB))
    , p_connectionStepCB(connectionStepCB)
    , p_msgReceivedCB(msgReceivedCB)
    , p_debugLogCB(debugLogCB)

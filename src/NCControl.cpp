@@ -32,6 +32,7 @@ NCControl::NCControl
 	, std::function<NCCmd&()> getCommand
 	, std::function<ncpp::NCCommandHandler&()> getCommandHandler
 	, std::function<nckeymap::NCKeyMap&()> getKeyMap
+	, std::function<ncchats::NCChats&()> getChats
 
 	, std::function<NCWinCfg&()> getDefaultWinCfg
 	, std::function<std::vector<ncpp::ncclientif::NCClientIf*>&()> getConnections
@@ -55,6 +56,8 @@ NCControl::NCControl
 	, p_getCommand(getCommand)
 	, p_getCommandHandler(getCommandHandler)
 	, p_getKeyMap(getKeyMap)
+	, p_getChats(getChats)
+
 	, p_getDefaultWinCfg(getDefaultWinCfg)
 	, p_getConnections(getConnections)
 	, p_quitApp(quitApp)
@@ -543,7 +546,7 @@ void NCControl::cmdEnter()
 				, [&](const String &s, const int, const int) { }  // connectionStepCB
 				, [&](ncclientif::NCClientIf* client, const String &s, const NCString &t, bool r) { buddyAppendChat(client, s, t, r); }
 				, [&](const String &s, const NCString &t) { buddyAppendChat(0, s, t, true); } // debugLogCB
-				, [&](const NCString &t) { buddyAppendChat(0, "", t, true); } // buddySignedOnCB
+				, [&](const String &connection, const String &buddyId) { buddyAdd(connection, buddyId); } // buddySignedOnCB
 				) );
 		}
 		else if("DUMMY" == p_clientProtocol)
@@ -769,8 +772,43 @@ void NCControl::buddyListRefresh()
 			p_getBuddyListWin()->refresh();
 		}
 	}
+}
+
+void NCControl::buddyPrint()
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(p_getChats)
+	{
+		int buddyCount = 0;
+		// std::function<void(ncbuddy::NCBuddy &buddy)> fn
+		p_getChats().forEachBuddy([&](ncbuddy::NCBuddy &buddy)
+			{
+				++buddyCount;
+				buddyAppendChat(0, "", NCString(" " + buddy.connection() + " -> " + buddy.full(), nccolor::NCColor::CHAT_NORMAL), false);
+			});
+
+		buddyAppendChat(0, "", NCString("Total " + boost::lexical_cast<std::string>(buddyCount) + " buddies", nccolor::NCColor::CHAT_NORMAL), true);
+	}
+}
+
+void NCControl::buddyAdd(const std::string &connection, const std::string &buddyId)
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(p_getChats)
+	{
+		p_getChats().add(connection, buddyId);
+	}
+}
+
+void NCControl::buddyName(const std::string &connection, const std::string &buddyId, const std::string &nickname)
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
 }
+
+
 
 void NCControl::appProcessKeystroke(nckeymap::NCKeyMap::KeyType key)
 {

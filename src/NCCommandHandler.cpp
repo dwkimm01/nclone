@@ -136,6 +136,11 @@ void NCCommandHandler::Setup(nccontrol::NCControl* ncControl)
 		p_ncControl->buddyJump(cmd);
 	}, "Win(s) jump to window (reorder)");
 
+	cmdMap["/buddies"] = NCCommandHandler::Entry([&](const std::string& cmd)
+	{
+		p_ncControl->buddyPrint();
+	}, "Buddy list");
+
 	cmdMap["/time"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
 		p_ncControl->appGetCurrentTime();

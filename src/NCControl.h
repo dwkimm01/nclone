@@ -16,6 +16,7 @@
 #include "NCClientIf.h"
 #include "NCKeyMap.h"
 #include "NCCommandHandler.h"
+#include "NCChats.h"
 
 namespace ncpp
 {
@@ -39,6 +40,7 @@ public:
 		, std::function<ncpp::NCCommandHandler&()> getCommandHandler
 		, std::function<nckeymap::NCKeyMap&()> getKeyMap
 
+		, std::function<ncchats::NCChats&()> getChats
 		, std::function<NCWinCfg&()> getDefaultWinCfg
 		, std::function<std::vector<ncpp::ncclientif::NCClientIf*>&()> getConnections
 		, std::function<void()> quitApp
@@ -87,6 +89,10 @@ public:
 	void buddyClearChat();
 	void buddyAppendChat(ncclientif::NCClientIf* const client, const std::string &buddyName, const NCString &msg, const bool refresh);
 	void buddyListRefresh();
+	void buddyPrint();
+	void buddyAdd(const std::string &connection, const std::string &buddyId);
+	void buddyName(const std::string &connection, const std::string &buddyId, const std::string &nickname);
+
 
 	void appProcessKeystroke(nckeymap::NCKeyMap::KeyType key);
 	void appQuit();
@@ -145,6 +151,7 @@ private:
 	std::function<NCCmd&()> p_getCommand;
 	std::function<ncpp::NCCommandHandler&()> p_getCommandHandler;
 	std::function<nckeymap::NCKeyMap&()> p_getKeyMap;
+	std::function<ncchats::NCChats&()> p_getChats;
 
 	// Entering Password can just check NCCmd::PASSWORD == p_getCommand().inputState
 	std::function<NCWinCfg&()> p_getDefaultWinCfg;
