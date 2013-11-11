@@ -86,7 +86,7 @@ int doit(int argc, char* argv[])
 		cfg.p_y += 1;
 		cfg.p_hasBorder = false;
 		// TODO, forced to have one window here since there is no null check later on... fix this
-		NCWinScrollback* winLog = new NCWinScrollback(&chatWin, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+		NCWinScrollback winLog(&chatWin, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
 		// Buddy list window
 		auto blCfg = cfg;
@@ -130,19 +130,19 @@ int doit(int argc, char* argv[])
 		{
 			allColorsString = allColorsString + NCString(boost::lexical_cast<string>(colorNum), colorNum);
 		});
-		winLog->append(allColorsString);
+		winLog.append(allColorsString);
 		// Log dependency versions
 		NCString boostVersion("BOOST ", nccolor::NCColor::CHAT_NORMAL);
 		boostVersion = boostVersion + NCString(boost::lexical_cast<string>(BOOST_VERSION / 100000), nccolor::NCColor::CHAT_HIGHLIGHT);
 		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<string>(BOOST_VERSION / 100 % 1000), nccolor::NCColor::CHAT_HIGHLIGHT);
 		boostVersion = boostVersion + NCString(".", nccolor::NCColor::CHAT_NORMAL) + NCString(boost::lexical_cast<string>(BOOST_VERSION % 100), nccolor::NCColor::CHAT_HIGHLIGHT);
-		winLog->append(boostVersion);
+		winLog.append(boostVersion);
 		// Log build date
 		NCString builtOn("nclone, built on ", nccolor::NCColor::CHAT_NORMAL);
 		builtOn = builtOn + NCString(__DATE__, nccolor::NCColor::CHAT_HIGHLIGHT);
 		builtOn = builtOn + NCString(" at ", nccolor::NCColor::CHAT_NORMAL);
 		builtOn = builtOn + NCString(__TIME__, nccolor::NCColor::CHAT_HIGHLIGHT);
-		winLog->append(builtOn);
+		winLog.append(builtOn);
 
 		// Client vector
 		vector<ncpp::ncclientif::NCClientIf*> connections;
@@ -158,7 +158,7 @@ int doit(int argc, char* argv[])
 		// Controller
 		nccontrol::NCControl ncCtrl
 			( [&]() { return &app; }
-			, [&]() { return winLog; }
+			, [&]() { return &winLog; }
 			, [&]() { return &chatWin; }
 			, [&]() { return dynamic_cast<NCWinScrollback*>(chatWin.getTop()); }
 			, [&]() { return winBl; }
