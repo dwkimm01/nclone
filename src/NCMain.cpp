@@ -66,8 +66,8 @@ int doit(int argc, char* argv[])
 		cfg.p_y = app.maxHeight() - cfg.p_h;
 		cfg.p_hasBorder = true;
 		cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
-		NCWinScrollback* winCmd = new NCWinScrollback(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
-		winCmd->setWrapLength();
+		NCWinScrollback winCmd(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
+		winCmd.setWrapLength();
 
 		// Set of chat windows
 		cfg.p_title = "Chats";
@@ -76,7 +76,7 @@ int doit(int argc, char* argv[])
 		cfg.p_x = 0;
 		cfg.p_y = 0;
 		cfg.p_hasBorder = true;
-		NCWinScrollback* win3 = new NCWinScrollback(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
+		NCWinScrollback chatWin(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
 
 		// First chat window
 		cfg.p_title = "Console";
@@ -86,7 +86,7 @@ int doit(int argc, char* argv[])
 		cfg.p_y += 1;
 		cfg.p_hasBorder = false;
 		// TODO, forced to have one window here since there is no null check later on... fix this
-		NCWinScrollback* winLog = new NCWinScrollback(win3, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+		NCWinScrollback* winLog = new NCWinScrollback(&chatWin, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
 
 		// Buddy list window
 		auto blCfg = cfg;
@@ -159,10 +159,10 @@ int doit(int argc, char* argv[])
 		nccontrol::NCControl ncCtrl
 			( [&]() { return &app; }
 			, [&]() { return winLog; }
-			, [&]() { return win3; }
-			, [&]() { return dynamic_cast<NCWinScrollback*>(win3->getTop()); }
+			, [&]() { return &chatWin; }
+			, [&]() { return dynamic_cast<NCWinScrollback*>(chatWin.getTop()); }
 			, [&]() { return winBl; }
-			, [&]() { return winCmd; }
+			, [&]() { return &winCmd; }
 			, [&]() { return winTime; }
 			, [&]() { return winKeys; }
 			, [&]() -> nccmdhistory::NCCmdHistory& { return cmdHist; }
@@ -208,7 +208,7 @@ int doit(int argc, char* argv[])
 		if(!progArgs.connection().empty())
 		{
 			// New Connection information
-			auto const ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
+			auto const ncs = dynamic_cast<NCWinScrollback*>(chatWin.getTop());
 			ncCtrl.buddyAppendChat(0, "", NCString("Using cmd line account", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 
@@ -235,7 +235,7 @@ int doit(int argc, char* argv[])
 
 			// Get user input
 			int c = 0;
-			(*winCmd) >> c;  // app >> c;
+			winCmd >> c;  // app >> c;
 			nclone.keyMap()(c);
 		}
 	} // end NCApp scope
