@@ -6,10 +6,6 @@
  */
 
 #include <boost/lexical_cast.hpp>
-#include <boost/signal.hpp>
-#include <boost/bind.hpp>
-#include <boost/circular_buffer.hpp>
-#include <boost/date_time.hpp>
 #include <boost/regex.hpp>
 
 #include "NCCommandHandler.h"
@@ -31,15 +27,6 @@ NCCommandHandler::NCCommandHandler()
 NCCommandHandler::~NCCommandHandler() {}
 
 void NCCommandHandler::Setup(nccontrol::NCControl* ncControl)
-//	( std::function<NCWinScrollback*()> pncs
-//	, ncapp::NCApp& app
-//	, NCWinScrollback* &win3
-//	, nckeymap::NCKeyMap &ncKeyMap
-//	, NCCmd& ncCmd
-//	, nccmdhistory::NCCmdHistory& cmdHist
-//	, std::vector<ncpp::ncclientif::NCClientIf*> &connections
-//	, NCWinCfg& cfg
-//	, ncclientif::NCClientIf::MsgSignal &msgSignal )
 {
 	p_ncControl = ncControl;
 

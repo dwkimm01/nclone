@@ -8,9 +8,6 @@
 #ifndef NCLONE_H_
 #define NCLONE_H_
 
-#include <string>
-#include <functional>
-#include <set>
 #include "NCKeyMap.h"
 
 namespace ncpp
@@ -30,10 +27,7 @@ public:
 
 	nckeymap::NCKeyMap& keyMap();
 
-//	ncpp::NCCommandHandler cmdMap; // TODO, move to private
-
 private:
-
 	// Controller
 	nccontrol::NCControl* p_ncControl;
 	// Key map

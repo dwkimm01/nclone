@@ -30,6 +30,17 @@ void NClone::setup(nccontrol::NCControl* ncControl)
 {
 	p_ncControl = ncControl;
 
+	//keys that naim supported
+	// HOME, ALT-TAB, SHIFT-TAB: cycle backwards through buddy list
+	// Typing:
+	//        loadkeys -d
+	//        keycode 15 = Tab Tab
+	//        alt keycode 15 = Meta_Tab
+	//        shift keycode 15 = F26
+	//        string F26 ="\033[Z"
+	//
+	// INSERT, DELETE: switch between connections
+
 	keyMap().set([&]()
 		{
 			if(p_ncControl)

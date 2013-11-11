@@ -1,60 +1,27 @@
 //============================================================================
-// Name        : hw.cpp
+// Name        : NCMain.cpp
 // Author      : DK
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
+// Description : Chat client, text mode
 //============================================================================
 
-#include <iostream>
-#include <set>
-#include <thread>
-#include <boost/bind.hpp>
-#include <boost/circular_buffer.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
-#include <boost/range/iterator_range.hpp>
-#include <boost/thread.hpp>  // TODO TAKE OUT?
-
-#include "NCCurses.h" // TODO, move out of here when the keystroke reading gets moved
-#include <stdio.h>  // TODO, why is this here?
-
 #include "NCApp.h"
-#include "NCWin.h"
 #include "NCWinScrollback.h"
 #include "NCWinTime.h"
-//#include "NCTimeUtils.h"
 #include "NCCmdLineOptions.h"
 #include "NCConnectionString.h"
-#include "NCClientPurple.h"
-#include "TestExampleText.h"
 #include "NCInput.h"
 #include "NCString.h"
 #include "NCStringUtils.h"
-#include "NCException.h"
-//#include "NCCmdHistory.h"
 #include "NCColor.h"
-//#include "NCKeyMap.h"
 #include "NClone.h"
-//#include "NCCmd.h"
 #include "NCChats.h"
 #include "NCTypes.h"
 #include "NCControl.h"
 
 using namespace std;
 using namespace ncpp;
-
-//keys that naim supported
-// HOME, ALT-TAB, SHIFT-TAB: cycle backwards through buddy list
-// Typing:
-//        loadkeys -d
-//        keycode 15 = Tab Tab
-//        alt keycode 15 = Meta_Tab
-//        shift keycode 15 = F26
-//        string F26 ="\033[Z"
-//
-// INSERT, DELETE: switch between connections
-
 
 // Main method
 int doit(int argc, char* argv[])
@@ -212,7 +179,7 @@ int doit(int argc, char* argv[])
 			, [&]() { return winKeys; }
 			, [&]() -> nccmdhistory::NCCmdHistory& { return cmdHist; }
 			, [&]() -> NCCmd& { return ncCmd; }
-			, [&]() -> ncpp::NCCommandHandler& { return ncCommandHandler; } // return nclone.cmdMap; }
+			, [&]() -> ncpp::NCCommandHandler& { return ncCommandHandler; }
 			, [&]() -> nckeymap::NCKeyMap& { return nclone.keyMap(); }
 			, [&]() -> NCWinCfg& { return cfg; }
 			, [&]() -> std::vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
