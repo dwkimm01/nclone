@@ -12,33 +12,85 @@ namespace ncpp
 namespace ncchats
 {
 
-NCChats::NCChats() {}
-NCChats::~NCChats() {}
-
-void NCChats::Add(const std::string &connection, const std::string &buddy, const NCString &msg)
+NCChats::NCChats()
 {
-
 }
 
-void NCChats::Remove(const std::string &id)
+void NCChats::add(const std::string &connectionName, const std::string& buddyName)
 {
-
+   ncbuddy::NCBuddy b(connectionName, buddyName, buddyName);
+   p_connections[connectionName][buddyName] = b;
 }
 
-std::string NCChats::GetId(const std::string &connection, const std::string &buddy)
+void NCChats::remove(const std::string &connectionName, const std::string& buddyName)
 {
-
+   auto cn = p_connections.find(connectionName);
+   if(p_connections.end() != cn)
+   {
+      /*auto buddy = cn->second.find(buddyName);
+      if(cn->second.end() != buddy)
+      {
+         cn->second.erase(buddy);
+      }*/
+      cn->second.erase(buddyName);
+   }
 }
 
-NCTextBuffer* NCChats::GetChat(const std::string &id)
+ncbuddy::NCBuddy* NCChats::get(const std::string &connectionName, const std::string &buddyName)
 {
-	auto const itr = p_chatMap.find(id);
-	if(itr != p_chatMap.end())
-		return &(itr->second.p_textBuffer);
-	return 0;
+   auto cn = p_connections.find(connectionName);
+   if(p_connections.end() != cn)
+   {
+      auto buddy = cn->second.find(buddyName);
+      if(cn->second.end() != buddy)
+      {
+         return &(buddy->second);
+      }
+   }
+   return NULL;
 }
 
+void NCChats::append(const std::string &connectionName, const std::string &buddyName, const std::string &msg)
+{
+   auto b = get(connectionName, buddyName);
+   if(!b)
+   {
+      add(connectionName, buddyName);
+   }
+   b = get(connectionName, buddyName);
+   b->appendChat(msg);
+}
 
+int NCChats::size() const
+{
+   int r = 0;
+   for(const auto & cn : p_connections)
+   {
+      r += cn.second.size();
+   }
+   return r;
+}
+
+void NCChats::clear()
+{
+   p_connections.clear();
+}
+
+void NCChats::close(const std::string &connection)
+{
+   p_connections.erase(connection);
+}
+
+void NCChats::forEachBuddy(std::function<void(ncbuddy::NCBuddy &buddy)> fn)
+{
+   for(auto & cn : p_connections)
+   {
+      for(auto &bd : cn.second)
+      {
+         fn(bd.second);
+      }
+   }
+}
 
 } // namespace ncchats
 } // namespace ncpp
