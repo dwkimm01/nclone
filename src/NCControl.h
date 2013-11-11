@@ -78,6 +78,7 @@ public:
 	void cmdCancelInput(); // CTRL-c
 	void cmdEnter();
 	void cmdHandleKey(const nckeymap::NCKeyMap::KeyType key);
+	void cmdWindowUpdate();
 
 	void buddyNextUnread(); // CTRL-n
 	void buddyNext();
@@ -85,7 +86,6 @@ public:
 	void buddyJump(const std::string &name);
 	void buddyClearChat();
 	void buddyAppendChat(ncclientif::NCClientIf* const client, const std::string &buddyName, const NCString &msg, const bool refresh);
-
 	void buddyListRefresh();
 
 	void appProcessKeystroke(nckeymap::NCKeyMap::KeyType key);
@@ -113,6 +113,7 @@ public:
 	void appNewWin(const std::string &name);
 	void appDelWin(const std::string &name);
 
+	void appKeyWinDebugRefresh();
 	void appDebug1();
 	void appDebug2();
 	void appDebugLorem();

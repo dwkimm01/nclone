@@ -251,7 +251,8 @@ NCClientSwiften::NCClientSwiften
 
 	p_data->client->onDataRead.connect([&](const SafeByteArray&)
 	{
-		p_debugLogCB("DEBUG", NCString("got some data", nccolor::NCColor::CHATBUDDY_NORMAL));
+		// This happens a lot
+		// p_debugLogCB("DEBUG", NCString("got some data", nccolor::NCColor::CHATBUDDY_NORMAL));
 	});
 
 	// Message Incoming

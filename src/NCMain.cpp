@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : NCMain.cpp
-// Author      : DK
+// Author      : David Kimmel
 // Version     :
 // Copyright   : Your copyright notice
 // Description : Chat client, text mode
@@ -11,7 +11,6 @@
 #include "NCWinTime.h"
 #include "NCCmdLineOptions.h"
 #include "NCConnectionString.h"
-//#include "NCInput.h"
 #include "NCString.h"
 #include "NCStringUtils.h"
 #include "NCColor.h"
@@ -41,8 +40,6 @@ int doit(int argc, char* argv[])
 
 		// Signals connects client APIs to windows/backend
 		ncclientif::NCClientIf::MsgSignal msgSignal;
-		std::function<void()> refreshBuddyList;
-
 
 		// Resize functions
 		ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );
@@ -153,11 +150,6 @@ int doit(int argc, char* argv[])
 		// Command history
 		nccmdhistory::NCCmdHistory cmdHist;
 
-		// New Connection information
-		string clientProtocol;
-		string clientUsername;
-		string clientPassword;
-
 		// Input collector
 		NCCmd ncCmd;
 		// Command handling
@@ -178,7 +170,7 @@ int doit(int argc, char* argv[])
 			, [&]() -> ncpp::NCCommandHandler& { return ncCommandHandler; }
 			, [&]() -> nckeymap::NCKeyMap& { return nclone.keyMap(); }
 			, [&]() -> NCWinCfg& { return cfg; }
-			, [&]() -> std::vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
+			, [&]() -> vector<ncpp::ncclientif::NCClientIf*>& { return connections; }
 			, [&]() { ncCmd.stillRunning = false; }
 
 			, defaultScrollback
@@ -188,7 +180,6 @@ int doit(int argc, char* argv[])
 
 		// Setup
 		ncCommandHandler.Setup(&ncCtrl);
-
 
 		// Message received signal connect
 		msgSignal.connect
@@ -207,13 +198,8 @@ int doit(int argc, char* argv[])
 				)
 			);
 
-
-
 		// Draw/show entire app by refreshing
-		app.refresh();
-
-
-
+		ncCtrl.appRefresh();
 
 		// TODO, allow CTRL-c to cancel a /newconn ??
 
@@ -221,47 +207,31 @@ int doit(int argc, char* argv[])
 		// If there are cmd args use them to (jump) start/create a connection
 		if(!progArgs.connection().empty())
 		{
+			// New Connection information
 			auto const ncs = dynamic_cast<NCWinScrollback*>(win3->getTop());
 			ncCtrl.buddyAppendChat(0, "", NCString("Using cmd line account", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 			ncconnectionstring::NCConnectionString cstr(progArgs.connection());
 
-			clientUsername = cstr.username() + "@" + cstr.hostname();
+			const auto clientUsername = cstr.username() + "@" + cstr.hostname();
 			ncCmd.inputState = NCCmd::PASSWORD;  // Jump to end of connection user input
-			clientProtocol = cstr.protocol();
+			const auto clientProtocol = cstr.protocol();
 			ncCtrl.buddyAppendChat(0, "", NCString(" Enter password for " + clientUsername + " (" + clientProtocol + ")", nccolor::NCColor::CHATBUDDY_NORMAL), true);
 		}
 
 		// Processing keys (and command) setup
 		nclone.setup(&ncCtrl);
 
-		// Buddy list window
-		refreshBuddyList = [&]()
-		{
-			ncCtrl.buddyListRefresh();
-		};
-
-
 		// Loop forever until input tells us to return
 		while(ncCmd.stillRunning)
 		{
-
 			// Update Buddy List
-			if(refreshBuddyList) refreshBuddyList();
-
+			ncCtrl.buddyListRefresh();
 
 			// Refresh winKeys if it is on top
-			if(winKeys && app.isOnTopOf(winKeys, winLog))
-			{
-				winKeys->refresh();
-			}
+			ncCtrl.appKeyWinDebugRefresh();
 
-			// Refresh the command window to move the cursor back
-			// TODO, also we will want to do some updating possibly no matter what?
-			// All of this is to put the cursor in the correct place for editing a line
-			winCmd->end();
-			winCmd->scrollUp(ncCmd.getScrollUp(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))));
-			winCmd->refresh();
-			winCmd->cursorSet(ncCmd.getScrollIdx(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))), 1);
+			// Update command window
+			ncCtrl.cmdWindowUpdate();
 
 			// Get user input
 			int c = 0;
@@ -273,7 +243,6 @@ int doit(int argc, char* argv[])
 	cout << "nclone exiting successfully" << endl;
 	return 0;
 }
-
 
 // Entry point
 int main(int argc, char* argv[])

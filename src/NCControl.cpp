@@ -577,6 +577,25 @@ void NCControl::cmdHandleKey(const nckeymap::NCKeyMap::KeyType key)
 
 }
 
+void NCControl::cmdWindowUpdate()
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	// Refresh the command window to move the cursor back
+	// TODO, also we will want to do some updating possibly no matter what?
+	// All of this is to put the cursor in the correct place for editing a line
+
+	if(!p_getCommandWin || !p_getCommandWin()) return;
+	auto winCmd = p_getCommandWin();
+	if(!p_getCommand) return;
+	auto& ncCmd = p_getCommand();
+
+	winCmd->end();
+	winCmd->scrollUp(ncCmd.getScrollUp(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))));
+	winCmd->refresh();
+	winCmd->cursorSet(ncCmd.getScrollIdx(winCmd->getConfig().p_w - ((winCmd->getConfig().p_hasBorder)?(2):(0))), 1);
+}
+
 void NCControl::buddyNextUnread() // CTRL-n
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
@@ -1242,6 +1261,20 @@ void NCControl::appDelWin(const std::string &name)
     }
     p_getCurrentChatWin()->refresh();
 }
+
+void NCControl::appKeyWinDebugRefresh()
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(p_getDebugKeyWin && p_getDebugKeyWin() &&
+			p_getNCApp && p_getNCApp() &&
+			p_getChatsWin && p_getChatsWin() &&
+			p_getNCApp()->isOnTopOf(p_getDebugKeyWin(), p_getChatsWin()))
+	{
+		p_getDebugKeyWin()->refresh();
+	}
+}
+
 
 void NCControl::appDebug1()
 {
