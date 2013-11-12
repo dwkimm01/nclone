@@ -2,7 +2,7 @@
  * NCWinScrollback.h
  *
  *  Created on: Oct 25, 2012
- *      Author: dwkimm01
+ *      Author: David Kimmel
  */
 
 #ifndef NCWINSCROLLBACK_H_
@@ -20,8 +20,13 @@ class NCWinScrollback : public ncwin::NCWin
 public:
 	/**
 	 * <b>Purpose:</b> CTOR
-	 * TODO, would be nice to have a dynamic Config system so that we
-	 * could add things like scrollback to the config
+	 * @param ncobject::NCObject* parent ncobject
+	 * @param NCWinCfg cfg to use for window
+	 * @param int scrollback max entries to keep
+	 * @param ncwin::NCWin::ResizeFuncs resizeWidth resize width of window
+	 * @param ncwin::NCWin::ResizeFuncs resizeHeight resize height of window
+	 * @param ncwin::NCWin::ResizeFuncs resizeX resize X position of window
+	 * @param ncwin::NCWin::ResizeFuncs resizeY resize Y position of window
 	 */
 	NCWinScrollback
 		( ncobject::NCObject* parent = 0
@@ -44,17 +49,46 @@ public:
 
 	/**
 	 * <b>Purpose:</b> Add a string line to the end of the buffer
+	 * @param const std::string &line to add to buffer
 	 */
 	void append(const std::string &line);
 
+	/**
+	 * <b>Purpose:</b> Add an NCString line to the end of the buffer
+	 * @param const ncpp::NCSTring &line to add to buffer
+	 */
 	void append(const ncpp::NCString &line);
 
+	/**
+	 * <b>Purpose:</b> Scroll window down n positions
+	 * @param const int n number of lines to scroll down
+	 */
 	void scrollDown(const int n);
+
+	/**
+	 * <b>Purpose:</b> Scroll window up n positions
+	 * @param const int n number of lines to scroll up
+	 */
 	void scrollUp(const int n);
 
+	/**
+	 * <b>Purpose:</b> Scroll window down by window height minus one
+	 */
 	void pageDown();
+
+	/**
+	 * <b>Purpose:</b> Scroll window up by window height minus one
+	 */
 	void pageUp();
+
+	/**
+	 * <b>Purpose:</b> Scroll window to very top
+	 */
 	void home();
+
+	/**
+	 * <b>Purpose:</b> Scroll window to very bottom
+	 */
 	void end();
 
 	/**
@@ -62,15 +96,37 @@ public:
 	 */
 	void clear();
 
-	// Set different wrap strategies
+	/**
+	 * <b>Purpose:</b> Set wrap based on length of string
+	 */
 	void setWrapLength();
+
+	/**
+	 * <b>Purpose:</b> Set wrap based on spaces first and length second
+	 */
 	void setWrapWordLength();
+
+	/**
+	 * <b>Purpose:</b> Set wrap based on only writing what can fit
+	 */
 	void setWrapCut();
 
-	// Get the text area height and width
+	/**
+	 * <b>Purpose:</b> Get the text area height
+	 * @return text height of window
+	 */
 	int getTextHeight() const;
+
+	/**
+	 * <b>Purpose:</b> Get the text area width
+	 * @return text width of window
+	 */
 	int getTextWidth() const;
 
+	/**
+	 * <b>Purpose:</b> Get total count of entries in text buffer
+	 * @return count of entries in buffer
+	 */
 	int entryCount() const;
 
 private:
