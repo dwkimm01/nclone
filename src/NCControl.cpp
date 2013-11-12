@@ -112,6 +112,8 @@ void NCControl::toggleBuddyListWindowVisibility()
 
 void NCControl::toggleConsoleWindowVisibility()
 {
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
 	if(!p_getCurrentChatWin()) return;
 	// TODO, toggle visible dropdown (from top) console window
 	p_getCurrentChatWin()->append("<Console window toggle>");
@@ -790,7 +792,10 @@ void NCControl::buddyPrint()
 						+ buddy.connection() + "] to ["
 						+ buddy.full() + "] aka ["
 						+ buddy.nick() + "] status ["
-						+ buddy.getStatus() + "]", nccolor::NCColor::CHAT_NORMAL), false);
+						+ buddy.getStatus() + "] "
+						+ ((buddy.getChatUpdated())?("N"):("."))
+						, nccolor::NCColor::CHAT_NORMAL), false);
+
 			});
 
 		buddyAppendChat(0, "", NCString("Total " + boost::lexical_cast<std::string>(buddyCount) + " buddies", nccolor::NCColor::CHAT_NORMAL), true);
@@ -1047,6 +1052,7 @@ void NCControl::appNewConnection(const std::string &protocol, const std::string 
 
 void NCControl::appDelConnection(const std::string &connName)
 {
+	// TODO, might not have to delete like this now
 	std::vector<ncpp::ncclientif::NCClientIf*> toDelete;
 
 	{
