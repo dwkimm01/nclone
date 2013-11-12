@@ -714,10 +714,16 @@ void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std:
 	}
 
 	// Add to connectionToChats
-	if(client && getChatToConnections().find(buddyName) == getChatToConnections().end())
+//	if(client && getChatToConnections().find(buddyName) == getChatToConnections().end())
+//	{
+//		getChatToConnections()[buddyName].insert(client->getName());
+//	}
+	// TODO, delete getChatToConnections
+	if(client && p_getChats)
 	{
-		getChatToConnections()[buddyName].insert(client->getName());
+		p_getChats().append(client->getName(), buddyName, line);
 	}
+
 
 	// Refresh the top window to see newly added text ... if we are the top window
 	if(refresh)

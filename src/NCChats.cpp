@@ -12,7 +12,8 @@ namespace ncpp
 namespace ncchats
 {
 
-NCChats::NCChats()
+NCChats::NCChats(const int scrollBack)
+	: p_scrollBack(scrollBack)
 {
 }
 
@@ -21,7 +22,7 @@ void NCChats::add(const std::string &connectionName, const std::string& buddyNam
 	if(p_connections.find(connectionName) == p_connections.end() ||
 	   p_connections[connectionName].find(buddyName) == p_connections[connectionName].end())
 	{
-		ncbuddy::NCBuddy b(connectionName, buddyName, nickName);
+		ncbuddy::NCBuddy b(connectionName, buddyName, nickName, p_scrollBack);
 		p_connections[connectionName][buddyName] = b;
 	}
 
@@ -60,7 +61,7 @@ ncbuddy::NCBuddy* NCChats::get(const std::string &connectionName, const std::str
    return NULL;
 }
 
-void NCChats::append(const std::string &connectionName, const std::string &buddyName, const std::string &msg)
+void NCChats::append(const std::string &connectionName, const std::string &buddyName, const NCString &msg)
 {
    auto b = get(connectionName, buddyName);
    if(!b)

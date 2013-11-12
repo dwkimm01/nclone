@@ -5,10 +5,10 @@ namespace ncpp
 namespace ncbuddy
 {
 
-NCBuddy::NCBuddy() : p_chatUpdated(false) {}
+NCBuddy::NCBuddy() : p_chatUpdated(false), p_chatText(0) {}
 
-NCBuddy::NCBuddy(const std::string &connection, const std::string &fullName, const std::string &nickName)
-	: p_connnection(connection), p_fullName(fullName), p_nickName(nickName), p_dispName(nickName), p_status("Available"), p_chatUpdated(false)
+NCBuddy::NCBuddy(const std::string &connection, const std::string &fullName, const std::string &nickName, const int scrollBack)
+	: p_connnection(connection), p_fullName(fullName), p_nickName(nickName), p_dispName(nickName), p_status("Available"), p_chatUpdated(false), p_chatText(scrollBack)
 {
 }
 
@@ -16,13 +16,13 @@ const std::string& NCBuddy::connection() const { return p_connnection; }
 const std::string& NCBuddy::full() const { return p_fullName; }
 const std::string& NCBuddy::nick() const { return p_nickName; }
 const std::string& NCBuddy::display() const { return p_nickName; }
-void NCBuddy::appendChat(const std::string &msg)
+void NCBuddy::appendChat(const NCString &msg)
 {
-	p_chatText.push_back(msg);
+	p_chatText.addRow(msg);
 	p_chatUpdated = true;
 }
 
-std::vector<std::string>& NCBuddy::getChat() { return p_chatText; }
+NCTextBuffer& NCBuddy::getChat() { return p_chatText; }
 std::string NCBuddy::getStatus() const { return p_status; }
 
 void NCBuddy::setStatus(const std::string &status) { p_status = status; }

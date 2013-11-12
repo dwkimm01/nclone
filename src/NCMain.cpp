@@ -36,7 +36,9 @@ int doit(int argc, char* argv[])
 		// Key processing
 		nclone::NClone nclone;
 		// Chats, data model
-		ncchats::NCChats chats;
+		// Default settings
+		const int defaultScrollback = 500;
+		ncchats::NCChats chats(defaultScrollback);
 
 		// Signals connects client APIs to windows/backend
 		ncclientif::NCClientIf::MsgSignal msgSignal;
@@ -51,8 +53,6 @@ int doit(int argc, char* argv[])
 		ncwin::NCWin::ResizeFuncs cmdResizeHeight([&](ncwin::NCWin* ncwin) { return 3; } );
 		ncwin::NCWin::ResizeFuncs cmdResizeY([&](ncwin::NCWin* ncwin) { return app.maxHeight() - 3; } );
 
-		// Default settings
-		const int defaultScrollback = 500;
 
 		// Config used to give settings to all of the windows
 		NCWinCfg cfg;

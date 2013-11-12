@@ -9,6 +9,7 @@
 #define NCCHATS_H_
 
 #include "NCBuddy.h"
+#include "NCString.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -25,7 +26,7 @@ public:
    /**
     * <b>Purpose:</b> CTOR, default
     */
-   NCChats();
+   NCChats(const int scrollBack);
 
    void add(const std::string &connectionName, const std::string& buddyName,
 		   const std::string& nickName, const std::string& status);
@@ -34,7 +35,7 @@ public:
 
    ncbuddy::NCBuddy* get(const std::string &connectionName, const std::string &buddyName);
 
-   void append(const std::string &connectionName, const std::string &buddyName, const std::string &msg);
+   void append(const std::string &connectionName, const std::string &buddyName, const NCString &msg);
 
    int size() const;
 
@@ -48,6 +49,7 @@ private:
    typedef std::map<std::string, ncbuddy::NCBuddy> Buddies;
    typedef std::map<std::string, Buddies> Connections;
    Connections p_connections;
+   int p_scrollBack;
 
 };
 
