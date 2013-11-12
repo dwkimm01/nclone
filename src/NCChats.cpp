@@ -16,10 +16,20 @@ NCChats::NCChats()
 {
 }
 
-void NCChats::add(const std::string &connectionName, const std::string& buddyName)
+void NCChats::add(const std::string &connectionName, const std::string& buddyName, const std::string& nickName, const std::string& status)
 {
-   ncbuddy::NCBuddy b(connectionName, buddyName, buddyName);
-   p_connections[connectionName][buddyName] = b;
+	if(p_connections.find(connectionName) == p_connections.end() ||
+	   p_connections[connectionName].find(buddyName) == p_connections[connectionName].end())
+	{
+		ncbuddy::NCBuddy b(connectionName, buddyName, nickName);
+		p_connections[connectionName][buddyName] = b;
+	}
+
+	auto& b = p_connections[connectionName][buddyName];
+	if("" != nickName )
+		b.setNickName(nickName);
+	if("" != status)
+		b.setStatus(status);
 }
 
 void NCChats::remove(const std::string &connectionName, const std::string& buddyName)
@@ -55,7 +65,7 @@ void NCChats::append(const std::string &connectionName, const std::string &buddy
    auto b = get(connectionName, buddyName);
    if(!b)
    {
-      add(connectionName, buddyName);
+      add(connectionName, buddyName, buddyName, "Unknown");
    }
    b = get(connectionName, buddyName);
    b->appendChat(msg);

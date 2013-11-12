@@ -90,7 +90,7 @@ public:
 	void buddyAppendChat(ncclientif::NCClientIf* const client, const std::string &buddyName, const NCString &msg, const bool refresh);
 	void buddyListRefresh();
 	void buddyPrint();
-	void buddyAdd(const std::string &connection, const std::string &buddyId);
+	void buddyAdd(const std::string &connection, const std::string &buddyName, const std::string &nickName, const std::string &status);
 	void buddyName(const std::string &connection, const std::string &buddyId, const std::string &nickname);
 
 

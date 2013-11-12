@@ -7,6 +7,7 @@
 
 #include <thread>
 #include <boost/bind.hpp>
+
 #include "Swiften/Swiften.h"
 #include "NCClientSwiften.h"
 #include "NCColor.h"
@@ -31,19 +32,16 @@ namespace ncclientswiften
 class NCClientSwiften::Data
 {
 public:
-	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const NCString&)> debugLogCB, std::function<void(const String&, const String&)> buddySignedOnCB)
+	Data(const std::string& name, const std::string& password, const std::string &protocol, std::function<void(const String&, const NCString&)> debugLogCB, std::function<void(const String&, const String&, const String&, const String&)> buddyUpdateCB)
 		: p_name(name)
 		, networkFactories(&eventLoop)
 		, client(new Swift::Client(name, password, &networkFactories))
 		, p_debugLogCB(debugLogCB)
-		, p_buddySignedOnCB(buddySignedOnCB)
-
+		, p_buddyUpdateCB(buddyUpdateCB)
 	{
 		client->getVCardManager()->onVCardChanged.connect(boost::bind(&Data::handleVCardChanged, this, _1, _2));
 		client->getVCardManager()->onOwnVCardChanged.connect(boost::bind(&Data::handleOwnVCardChanged, this, _1));
-
 		client->getNickResolver()->onNickChanged.connect(boost::bind(&Data::handleNickChanged, this, _1, _2));
-
 
 		client->getRoster()->onInitialRosterPopulated.connect([&]()
 		{
@@ -56,18 +54,16 @@ public:
 		});
 
 		client->getRoster()->onJIDAdded.connect([&](const JID& jid)
-			{
-				p_debugLogCB("DEBUG", NCString("GOT IT!! " + jid.toString(), nccolor::NCColor::CHATBUDDY_NORMAL));
-			});
+		{
+			p_debugLogCB("DEBUG", NCString("GOT IT!! " + jid.toString(), nccolor::NCColor::CHATBUDDY_NORMAL));
+		});
 
-//		client->getPresenceOracle()->getAllPresence(JID(name));
-
-
+		// client->getPresenceOracle()->getAllPresence(JID(name));
 	}
 
 	void handleVCardReceived(const JID& actualJID, VCard::ref vcard, ErrorPayload::ref error)
 	{
-		p_buddySignedOnCB(p_name, actualJID.toString());
+		p_buddyUpdateCB(p_name, actualJID.toString(), vcard->getFullName(), "");
 
     	p_debugLogCB("DEBUG", NCString("Received [" + actualJID.toString() + "] -> [" + vcard->getFullName() + "]", nccolor::NCColor::CHAT_NORMAL));
 	}
@@ -209,12 +205,11 @@ public:
 	Swift::SimpleEventLoop eventLoop;
 	std::shared_ptr<std::thread> loopThread;
 	std::function<void(const String&, const NCString&)> p_debugLogCB;
-	std::function<void(const String&, const String&)> p_buddySignedOnCB;
-
+	std::function<void(const String&, const String&, const String&, const String&)> p_buddyUpdateCB;
 };
 
-
-
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 NCClientSwiften::NCClientSwiften
    ( const NCClientSwiften::String &name
    , const NCClientSwiften::String &password
@@ -222,18 +217,16 @@ NCClientSwiften::NCClientSwiften
    , std::function<void(const String&, const int, const int)> connectionStepCB
    , std::function<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> msgReceivedCB
    , std::function<void(const String&, const NCString&)> debugLogCB
-   , std::function<void(const String&, const String&)> buddySignedOnCB
+   , std::function<void(const String&, const String&, const String&, const String&)> buddyUpdateCB
    )
-   : p_data(new NCClientSwiften::Data(name, password, protocol, debugLogCB, buddySignedOnCB))
+   : p_data(new NCClientSwiften::Data(name, password, protocol, debugLogCB, buddyUpdateCB))
    , p_connectionStepCB(connectionStepCB)
    , p_msgReceivedCB(msgReceivedCB)
    , p_debugLogCB(debugLogCB)
-   , p_buddySignedOnCB(buddySignedOnCB)
+   , p_buddyUpdateCB(buddyUpdateCB)
 {
-
 	p_data->client = new Client(name, password, &p_data->networkFactories);
 	p_data->client->setAlwaysTrustCertificates();
-
 
 	// Connected
 	p_data->client->onConnected.connect([&]()
@@ -249,9 +242,7 @@ NCClientSwiften::NCClientSwiften
 		rosterRequest->onResponse.connect(bind(&NCClientSwiften::Data::handleRosterReceivedB
 				, p_data, _1));
 
-
 		rosterRequest->send();
-
 	});
 
 	p_data->client->onDataRead.connect([&](const SafeByteArray&)
@@ -304,13 +295,10 @@ NCClientSwiften::NCClientSwiften
 
 	p_data->loopThread.reset(new std::thread([&]()
 	{
-		p_debugLogCB("DEBUG", NCString("Running event loop begin", nccolor::NCColor::CHAT_HIGHLIGHT));
+		p_debugLogCB("DEBUG", NCString("Running event loop", nccolor::NCColor::CHAT_HIGHLIGHT));
 		p_data->eventLoop.run();
-		p_debugLogCB("DEBUG", NCString("Running event loop done", nccolor::NCColor::CHAT_HIGHLIGHT));
-
+		// Can't log here if called from inside the recursive lock
 	}));
-
-
 }
 
 NCClientSwiften::~NCClientSwiften()
@@ -319,13 +307,19 @@ NCClientSwiften::~NCClientSwiften()
 	{
 		p_debugLogCB("DEBUG", NCString("Disconnecting", nccolor::NCColor::CHAT_HIGHLIGHT));
 		p_data->client->disconnect();
+
+		p_debugLogCB("DEBUG", NCString("Stop", nccolor::NCColor::CHAT_HIGHLIGHT));
 		p_data->eventLoop.stop();
+		p_debugLogCB("DEBUG", NCString("Join", nccolor::NCColor::CHAT_HIGHLIGHT));
+
 		p_data->loopThread->join();
+		p_debugLogCB("DEBUG", NCString("Join Done", nccolor::NCColor::CHAT_HIGHLIGHT));
 
 		delete p_data;
 		p_data = 0;
 	}
 }
+
 
 NCClientSwiften::String NCClientSwiften::getName()
 {

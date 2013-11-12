@@ -546,7 +546,8 @@ void NCControl::cmdEnter()
 				, [&](const String &s, const int, const int) { }  // connectionStepCB
 				, [&](ncclientif::NCClientIf* client, const String &s, const NCString &t, bool r) { buddyAppendChat(client, s, t, r); }
 				, [&](const String &s, const NCString &t) { buddyAppendChat(0, s, t, true); } // debugLogCB
-				, [&](const String &connection, const String &buddyId) { buddyAdd(connection, buddyId); } // buddySignedOnCB
+				, [&](const String &connection, const String &buddyName, const String &nickName, const String &status)
+						{ buddyAdd(connection, buddyName, nickName, status); } // buddySignedOnCB
 				) );
 		}
 		else if("DUMMY" == p_clientProtocol)
@@ -785,20 +786,24 @@ void NCControl::buddyPrint()
 		p_getChats().forEachBuddy([&](ncbuddy::NCBuddy &buddy)
 			{
 				++buddyCount;
-				buddyAppendChat(0, "", NCString(" " + buddy.connection() + " -> " + buddy.full(), nccolor::NCColor::CHAT_NORMAL), false);
+				buddyAppendChat(0, "", NCString(" ["
+						+ buddy.connection() + "] to ["
+						+ buddy.full() + "] aka ["
+						+ buddy.nick() + "] status ["
+						+ buddy.getStatus() + "]", nccolor::NCColor::CHAT_NORMAL), false);
 			});
 
 		buddyAppendChat(0, "", NCString("Total " + boost::lexical_cast<std::string>(buddyCount) + " buddies", nccolor::NCColor::CHAT_NORMAL), true);
 	}
 }
 
-void NCControl::buddyAdd(const std::string &connection, const std::string &buddyId)
+void NCControl::buddyAdd(const std::string &connection, const std::string &buddyName, const std::string &nickName, const std::string &status)
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
 	if(p_getChats)
 	{
-		p_getChats().add(connection, buddyId);
+		p_getChats().add(connection, buddyName, nickName, status);
 	}
 }
 
@@ -1042,6 +1047,9 @@ void NCControl::appNewConnection(const std::string &protocol, const std::string 
 
 void NCControl::appDelConnection(const std::string &connName)
 {
+	std::vector<ncpp::ncclientif::NCClientIf*> toDelete;
+
+	{
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
 	if(p_getConnections && 0 < p_getConnections().size())
@@ -1088,13 +1096,19 @@ void NCControl::appDelConnection(const std::string &connName)
 					citr = p_getConnections().erase(citr);
 //TODO remove entry from chatsToConnection
 
-					delete connectionToDelete;
+//					delete connectionToDelete;
+					toDelete.push_back(connectionToDelete);
 					break;
 				}
 			}
 		}
 
 		buddyAppendChat(0, "", NCString("", nccolor::NCColor::DEFAULT), true);
+	}
+	}
+	for(auto ptr : toDelete)
+	{
+		delete ptr;
 	}
 }
 

@@ -66,7 +66,8 @@ const std::string NCConnectionString::protocol() const
 {
 	// TODO, better and overridable login logic for picking protocol from hostname or even
 	// just being able to force it
-	if(p_hostname.find("gmail.com") != std::string::npos)
+	if(p_hostname.find("gmail.com") != std::string::npos ||
+	   p_hostname.find("chat.facebook.com") != std::string::npos)
 	{
 		return "XMPP";
 	}

@@ -28,5 +28,11 @@ std::string NCBuddy::getStatus() const { return p_status; }
 void NCBuddy::setStatus(const std::string &status) { p_status = status; }
 bool NCBuddy::getChatUpdated() const { return p_chatUpdated; }
 
+void NCBuddy::setNickName(const std::string& nickName)
+{
+	p_nickName = nickName;
+}
+
+
 } // namespace ncbuddy
 } // namespace ncpp

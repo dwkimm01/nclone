@@ -1,19 +1,14 @@
 
- - Get buddy chat backend integrated
- - Add nickname setting
+ - No error log msgs when failed login, also need to delete connection?
  - Cleanup Client Swiften code
- - Fix delconn on active connection (XMPP)
  - Add backend to get multiple connections working at the same time
  - CTRL-n go to next window with unseen updates
- - Save chat histories (append to old, have max size of txt log)
+ - Save chat histories to file (append to old, have max size of txt log)
  - Add user nickname to chats
  - Change to remove chat window border
-DONE - New msg/online buddies don't put (new) window on top
- - Fix login from command line
  - Change newconn command to take args: /newconn XMPP user@host.org as args
  - Upgrade to BOOST's signal2
  - Print all available commands (for remapping etc)
-
 
  GUI
   - Change buddy up/down use CTRL-up/down (use TAB/shifttab for change buddy)
@@ -335,7 +330,11 @@ Next up (TODO list)
 
 ----------------------------------------------------
 -- Done
-
+ - Fix login from command line
+ - Fix delconn on active connection (XMPP), just deadlocks
+ - Add nickname setting
+ - Get buddy chat backend integrated
+ - New msg/online buddies don't put (new) window on top
  - Add a timeout to the window when user doesn't press anything for awhile 
  - Highlight current chat window in different color in buddy list
  - NCTextWinFormatter spaces aware

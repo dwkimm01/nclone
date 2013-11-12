@@ -27,7 +27,8 @@ public:
     */
    NCChats();
 
-   void add(const std::string &connectionName, const std::string& buddyName);
+   void add(const std::string &connectionName, const std::string& buddyName,
+		   const std::string& nickName, const std::string& status);
 
    void remove(const std::string &connectionName, const std::string& buddyName);
 

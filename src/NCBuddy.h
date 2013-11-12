@@ -27,6 +27,8 @@ public:
    void setStatus(const std::string &status);
    bool getChatUpdated() const;
 
+   void setNickName(const std::string& nickName);
+
 private:
    std::string p_connnection;
    std::string p_fullName;
