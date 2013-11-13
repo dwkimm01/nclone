@@ -1,4 +1,6 @@
 
+ - Add INCDIR, LIBDIR to SConstruct
+ - Get rid of build warnings
  - No error log msgs when failed login, also need to delete connection?
  - Cleanup Client Swiften code
  - Add backend to get multiple connections working at the same time

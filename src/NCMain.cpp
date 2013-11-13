@@ -64,7 +64,7 @@ int doit(int argc, char* argv[])
 	cfg.p_y = app.maxHeight() - cfg.p_h;
 	cfg.p_hasBorder = true;
 	cfg.p_scrollOk = true;  // make it easier to detect problems with proper printing
-	NCWinScrollback winCmd(&app, cfg, 1, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
+	NCWinScrollback winCmd(&app, cfg, 1, 0, cmdResizeWidth, cmdResizeHeight, ncwin::NCWin::ResizeFuncs(), cmdResizeY);
 	winCmd.setWrapLength();
 
 	// Set of chat windows
@@ -74,7 +74,7 @@ int doit(int argc, char* argv[])
 	cfg.p_x = 0;
 	cfg.p_y = 0;
 	cfg.p_hasBorder = true;
-	NCWinScrollback chatWin(&app, cfg, defaultScrollback, borderResizeWidth, borderResizeHeight);
+	NCWinScrollback chatWin(&app, cfg, defaultScrollback, 0, borderResizeWidth, borderResizeHeight);
 
 	// First chat window
 	cfg.p_title = "Console";
@@ -84,7 +84,7 @@ int doit(int argc, char* argv[])
 	cfg.p_y += 1;
 	cfg.p_hasBorder = false;
 	// TODO, forced to have one window here since there is no null check later on... fix this
-	NCWinScrollback winLog(&chatWin, cfg, defaultScrollback, chatResizeWidth, chatResizeHeight);
+	NCWinScrollback winLog(&chatWin, cfg, defaultScrollback, 0, chatResizeWidth, chatResizeHeight);
 
 	// Buddy list window
 	auto blCfg = cfg;
@@ -98,14 +98,14 @@ int doit(int argc, char* argv[])
 	// TODO, add X,Y position resize functions
 	ncwin::NCWin::ResizeFuncs blResizeX([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_w; });
 	ncwin::NCWin::ResizeFuncs emptyResize;
-	NCWinScrollback winBl(&app, blCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
+	NCWinScrollback winBl(&app, blCfg, defaultScrollback, 0, emptyResize, emptyResize, blResizeX);
 	winBl.setWrapCut();
 
 	// Debug keystroke window
 	auto keysCfg = blCfg;
 	keysCfg.p_title = "Keys";
 	keysCfg.p_y = 10;
-	NCWinScrollback* winKeys = new NCWinScrollback(&app, keysCfg, defaultScrollback, emptyResize, emptyResize, blResizeX);
+	NCWinScrollback* winKeys = new NCWinScrollback(&app, keysCfg, defaultScrollback, 0, emptyResize, emptyResize, blResizeX);
 	app.bringToBack(winKeys);
 
 	// Time stamp window

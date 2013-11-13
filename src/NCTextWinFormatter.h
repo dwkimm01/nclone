@@ -79,7 +79,7 @@ public:
 		, const unsigned int maxWidth
 		, const unsigned int maxHeight )
 	{
-		typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
+//		typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 
 		unsigned int accum = 0;
 		unsigned int offsMajor = end - begin;
@@ -202,7 +202,7 @@ public:
 		unsigned int accum = 0;
 		int initialOffset = offs.second;
 
-		typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
+//		typedef boost::algorithm::find_iterator<std::string::iterator> Itr;
 		// Start at offsMajor + offsMinor, counting at most MAXHEIGHT lines
 		for(auto lineItr = begin + offs.first; lineItr != end && accum < lines; ++lineItr, ++offsMajor)
 		{

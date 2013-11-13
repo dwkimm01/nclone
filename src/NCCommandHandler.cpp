@@ -48,7 +48,7 @@ void NCCommandHandler::Setup(nccontrol::NCControl* ncControl)
 	{
 // TODO		if(ncCmd.cmd.find("/key") == 0)
 		// Example to remap CTRL-Left to F9: /key "Cursor Skip Left" 273
-		int counter = 0;
+//		int counter = 0;
 		const std::string binStr = "/key[[:space:]]+\"([[:word:][:space:]]+)\"[[:space:]]+([[:digit:]]+)";
 		const boost::regex re(binStr);
 

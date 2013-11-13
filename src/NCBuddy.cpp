@@ -5,10 +5,10 @@ namespace ncpp
 namespace ncbuddy
 {
 
-NCBuddy::NCBuddy() : p_chatUpdated(false), p_chatText(0) {}
+NCBuddy::NCBuddy() : p_chatText(0), p_chatUpdated(false) {}
 
 NCBuddy::NCBuddy(const std::string &connection, const std::string &fullName, const std::string &nickName, const int scrollBack)
-	: p_connnection(connection), p_fullName(fullName), p_nickName(nickName), p_dispName(nickName), p_status("Available"), p_chatUpdated(false), p_chatText(scrollBack)
+	: p_connnection(connection), p_fullName(fullName), p_nickName(nickName), p_dispName(nickName), p_chatText(scrollBack), p_status("Available"), p_chatUpdated(false)
 {
 }
 

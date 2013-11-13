@@ -8,6 +8,7 @@
 #ifndef NCWINSCROLLBACK_H_
 #define NCWINSCROLLBACK_H_
 
+#include <memory>
 #include "NCWin.h"
 #include "NCTextBuffer.h"
 #include "NCString.h"
@@ -18,6 +19,24 @@ namespace ncpp
 class NCWinScrollback : public ncwin::NCWin
 {
 public:
+	class ContentIF
+	{
+	public:
+		virtual ~ContentIF();
+		virtual NCTextBuffer& textBuffer() = 0;
+	};
+
+	class Content : public ContentIF
+	{
+		NCTextBuffer p_buff;
+	public:
+		Content(int scrollBack) : p_buff(scrollBack) {}
+		~Content() {}
+		NCTextBuffer& textBuffer() { return p_buff; }
+
+	};
+
+
 	/**
 	 * <b>Purpose:</b> CTOR
 	 * @param ncobject::NCObject* parent ncobject
@@ -32,6 +51,7 @@ public:
 		( ncobject::NCObject* parent = 0
 		, NCWinCfg cfg = NCWinCfg()
 		, const int scrollback = 200
+		, ContentIF* content = 0
 		, ncwin::NCWin::ResizeFuncs resizeWidth = ResizeFuncs()
 		, ncwin::NCWin::ResizeFuncs resizeHeight = ResizeFuncs()
 		, ncwin::NCWin::ResizeFuncs resizeX = ResizeFuncs()
@@ -130,7 +150,10 @@ public:
 	int entryCount() const;
 
 private:
-	NCTextBuffer p_buff;
+//	NCTextBuffer p_buff;
+	std::shared_ptr<ContentIF> p_content;
+	std::function<NCTextBuffer&()> p_buff;
+
 	// Note, the second value will definitely be
 	// dependent on the width and height of the
 	// window

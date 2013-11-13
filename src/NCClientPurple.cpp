@@ -27,7 +27,7 @@ NCClientPurple::NCClientPurple
 NCClientPurple::~NCClientPurple() {}
 
 
-NCClientPurple::String NCClientPurple::getName() {}
+NCClientPurple::String NCClientPurple::getName() { return p_name; }
 
 // --------------------------------------------------------------
 // State change

@@ -475,8 +475,8 @@ void NCControl::cmdEnter()
 				const std::string buddyName = p_getCurrentChatWin()->getConfig().p_title;
 
 				// Find connection associated with this user
-				auto cnxItr = p_chatToConnections.find(buddyName);
-				if(p_chatToConnections.end() != cnxItr)
+				auto cnxItr = getChatToConnections().find(buddyName);
+				if(getChatToConnections().end() != cnxItr)
 				{
 					if(cnxItr->second.size() > 0)
 					{
@@ -708,16 +708,22 @@ void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std:
 		auto const currentTop = p_getCurrentChatWin();
 		auto cfg = p_getDefaultWinCfg();
 		cfg.p_title = buddyName;
-		NCWinScrollback* addedWin = new NCWinScrollback(p_getChatsWin(), cfg, p_defaultScrollbackLength, p_chatResizeWidth, p_chatResizeHeight);
+		NCWinScrollback* addedWin = new NCWinScrollback(
+				p_getChatsWin(),
+				cfg,
+				p_defaultScrollbackLength,
+				0,
+				p_chatResizeWidth,
+				p_chatResizeHeight);
 		addedWin->append(line);
 		p_getChatsWin()->bringToFront(currentTop);
 	}
 
 	// Add to connectionToChats
-//	if(client && getChatToConnections().find(buddyName) == getChatToConnections().end())
-//	{
-//		getChatToConnections()[buddyName].insert(client->getName());
-//	}
+	if(client && getChatToConnections().find(buddyName) == getChatToConnections().end())
+	{
+		getChatToConnections()[buddyName].insert(client->getName());
+	}
 	// TODO, delete getChatToConnections
 	if(client && p_getChats)
 	{
@@ -1292,7 +1298,7 @@ void NCControl::appNewWin(const std::string &name)
     		cfg.p_title = winName;
     		ncs->append("Creating new window " + cfg.p_title);
 
-    		auto myNewWin = new NCWinScrollback(p_getChatsWin(), cfg, p_defaultScrollbackLength, p_chatResizeWidth, p_chatResizeHeight);
+    		auto myNewWin = new NCWinScrollback(p_getChatsWin(), cfg, p_defaultScrollbackLength, 0, p_chatResizeWidth, p_chatResizeHeight);
     		myNewWin->append("Opened win " + cfg.p_title);
     	}
     }
