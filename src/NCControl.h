@@ -125,8 +125,6 @@ public:
 	void appDebug2();
 	void appDebugLorem();
 
-	std::map<std::string, std::set<std::string>>& getChatToConnections();
-
 	NCCmd& getCommand();
 
 private:
@@ -162,10 +160,7 @@ private:
 	ncwin::NCWin::ResizeFuncs p_chatResizeWidth;
 	ncwin::NCWin::ResizeFuncs p_chatResizeHeight;
 
-	// Chat
-	std::map<std::string, std::set<std::string>> p_chatToConnections;
-
-	// TODO, change to less state-full
+	// TODO, change to less state-full, maybe push into NCCmd?
 	std::string p_clientProtocol;
 	std::string p_clientUsername;
 	std::string p_clientPassword;

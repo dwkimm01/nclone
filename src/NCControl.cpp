@@ -6,13 +6,12 @@
 #include "NCColor.h"
 #include "NCStringUtils.h"
 #include "NCClientSwiften.h"
+#include "NCChatWin.h"
 #include "NCClientDummy.h"
 #include "TestExampleText.h"
 
-
 using namespace boost::gregorian;
 using namespace boost::posix_time;
-
 
 namespace ncpp
 {
@@ -469,44 +468,38 @@ void NCControl::cmdEnter()
 // TODO, "console" gets added as a window with this bad code
 				else
 				{
-				ncclientif::NCClientIf* client = 0;
+					ncclientif::NCClientIf* client = 0;
+					std::string buddyName;
 
-				// Pick buddy
-				const std::string buddyName = p_getCurrentChatWin()->getConfig().p_title;
-
-				// Find connection associated with this user
-				auto cnxItr = getChatToConnections().find(buddyName);
-				if(getChatToConnections().end() != cnxItr)
-				{
-					if(cnxItr->second.size() > 0)
+					// Pick buddy name
+//					const std::string buddyName = p_getCurrentChatWin()->getConfig().p_title;
+					if(p_getCurrentChatWin && p_getCurrentChatWin() && dynamic_cast<NCChatWin*>(p_getCurrentChatWin()))
 					{
-						// client
-						std::string clientName = *(cnxItr->second.begin());
-
-						for(auto connection : p_getConnections())
+						const std::string clientName = dynamic_cast<NCChatWin*>(p_getCurrentChatWin())->getConnectionName();
+						buddyName = dynamic_cast<NCChatWin*>(p_getCurrentChatWin())->getBuddyName();
+						for(auto c : p_getConnections())
 						{
-							if(connection->getName() == clientName)
+							if(c && c->getName() == clientName)
 							{
-								// TODO, fix to a more proper matching up of chat to connection
-								client = connection;
+								client = c;
 								break;
 							}
 						}
 					}
-				}
 
 
-				if(client)
-				{
+
+					if(client)
+					{
 // TODO, upgrade this logic p_getCurrentChatWin()->append(" sending to (" + buddyName + ") msg(" + p_getCommand()cmd + ")");
-					client->msgSend(buddyName, p_getCommand().cmd);
-				}
+						client->msgSend(buddyName, p_getCommand().cmd);
+					}
 
-				const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
-				// Add msg to top (front) buffer
-				const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + p_getCommand().cmd, outgoingMsgColor);
-//					p_getCurrentChatWin()->append(nMsg + p_getCurrentChatWintring(" (to " + buddyName + ")", outgoingMsgColor));
-				p_getCurrentChatWin()->append(nMsg);
+					const auto outgoingMsgColor = nccolor::NCColor::CHAT_NORMAL;
+					// Add msg to top (front) buffer
+					const NCString nMsg = NCTimeUtils::getPrintableColorTimeStamp() + NCString(" " + p_getCommand().cmd, outgoingMsgColor);
+					p_getCurrentChatWin()->append(nMsg + NCString(" (to " + buddyName + ")", outgoingMsgColor));
+//					p_getCurrentChatWin()->append(nMsg);
 				}
 
 				p_getCurrentChatWin()->refresh();
@@ -708,7 +701,9 @@ void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std:
 		auto const currentTop = p_getCurrentChatWin();
 		auto cfg = p_getDefaultWinCfg();
 		cfg.p_title = buddyName;
-		NCWinScrollback* addedWin = new NCWinScrollback(
+		auto addedWin = new NCChatWin(
+				client->getName(),
+				buddyName,
 				p_getChatsWin(),
 				cfg,
 				p_defaultScrollbackLength,
@@ -719,17 +714,12 @@ void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std:
 		p_getChatsWin()->bringToFront(currentTop);
 	}
 
-	// Add to connectionToChats
-	if(client && getChatToConnections().find(buddyName) == getChatToConnections().end())
-	{
-		getChatToConnections()[buddyName].insert(client->getName());
-	}
-	// TODO, delete getChatToConnections
+	// Add text to data
+	// TODO, use this getChats instead of letting NCChatWin create it's own content member
 	if(client && p_getChats)
 	{
 		p_getChats().append(client->getName(), buddyName, line);
 	}
-
 
 	// Refresh the top window to see newly added text ... if we are the top window
 	if(refresh)
@@ -751,7 +741,6 @@ void NCControl::buddyListRefresh()
 	if(p_getBuddyListWin && p_getBuddyListWin() && p_getLogWin && p_getLogWin()
 		&& p_getNCApp && p_getNCApp() && p_getNCApp()->isOnTopOf(p_getBuddyListWin(), p_getLogWin()))
 	{
-//		auto const topChatWin = dynamic_cast<ncwin::NCWin*>(win3->getTop());
 		auto const topChatWin = p_getCurrentChatWin();
 		const auto topChatName = (topChatWin)
 				? (topChatWin->getConfig().p_title)
@@ -762,21 +751,35 @@ void NCControl::buddyListRefresh()
 		if(p_getChatsWin && p_getChatsWin())
 			p_getChatsWin()->forEachChild([&](ncpp::ncobject::NCObject* nobj)
 		{
-			auto const ncw = dynamic_cast<ncwin::NCWin*>(nobj);
-			if(ncw)
+			// TODO set the current window's name's background to something different (YELLOW)?
+			auto currentColor = (nobj == p_getCurrentChatWin())
+					? (nccolor::NCColor::BUDDYLIST_HIGHLIGHT)
+					: (nccolor::NCColor::BUDDYLIST_NORMAL);
+
+			auto const ncchatwin = dynamic_cast<NCChatWin*>(nobj);
+			if(ncchatwin)
 			{
-				auto currentColor = (topChatName == ncw->getConfig().p_title)
-						? (nccolor::NCColor::BUDDYLIST_HIGHLIGHT)
-						: (nccolor::NCColor::BUDDYLIST_NORMAL);
 				// TODO set the current window's name's background to something different (YELLOW)?
 
+				auto chat = p_getChats().get(ncchatwin->getConnectionName(), ncchatwin->getBuddyName());
 				if(p_getBuddyListWin && p_getBuddyListWin())
-					p_getBuddyListWin()->append(NCString(ncw->getConfig().p_title, currentColor));
+					p_getBuddyListWin()->append(NCString(chat->display(), currentColor));
 			}
 			else
 			{
-				if(p_getBuddyListWin && p_getBuddyListWin())
-					p_getBuddyListWin()->append("Non window");
+
+				auto const ncw = dynamic_cast<ncwin::NCWin*>(nobj);
+				if(ncw)
+				{
+
+					if(p_getBuddyListWin && p_getBuddyListWin())
+						p_getBuddyListWin()->append(NCString(ncw->getConfig().p_title, currentColor));
+				}
+				else
+				{
+					if(p_getBuddyListWin && p_getBuddyListWin())
+						p_getBuddyListWin()->append("Non window");
+				}
 			}
 			return true;
 		});
@@ -1411,16 +1414,10 @@ void NCControl::appDebugLorem()
 	buddyAppendChat(0, "", entry, true);
 }
 
-std::map<std::string, std::set<std::string>>& NCControl::getChatToConnections()
-{
-	return p_chatToConnections;
-}
-
 NCCmd& NCControl::getCommand()
 {
 	return p_getCommand();
 }
-
 
 } // namespace nccontrol
 } // namespace ncpp

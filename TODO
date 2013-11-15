@@ -1,4 +1,5 @@
 
+ - Fix TODOs in code
  - Add INCDIR, LIBDIR to SConstruct
  - Get rid of build warnings
  - No error log msgs when failed login, also need to delete connection?
@@ -48,10 +49,8 @@ should just generate makefiles automatically
  Make colors configurable
  Save config: key remap, autologin, etc
  A /msg command
- A /time command
  A /about command
  A /away msg command
- A /uptime command
  An auto away message
  Escape doesn't quit - exits reverse search
  Color enum string names
@@ -338,6 +337,8 @@ Next up (TODO list)
  - Get buddy chat backend integrated
  - New msg/online buddies don't put (new) window on top
  - Add a timeout to the window when user doesn't press anything for awhile 
+ - A /time command
+ - A /uptime command
  - Highlight current chat window in different color in buddy list
  - NCTextWinFormatter spaces aware
   . Want to be able to split the lines on spaces where possible
