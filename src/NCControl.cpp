@@ -599,9 +599,26 @@ void NCControl::buddyNextUnread() // CTRL-n
 {
 	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
 
-	if(!p_getCurrentChatWin()) return;
-	p_getCurrentChatWin()->append("CTRL-n");
-	p_getCurrentChatWin()->refresh();
+    if(p_getChatsWin && p_getChatsWin())
+    	p_getChatsWin()->forEachChild([&](ncpp::ncobject::NCObject* nobj)
+    {
+    	auto const ncchatwin = dynamic_cast<NCChatWin*>(nobj);
+    	if(ncchatwin)
+    	{
+    		auto chat = p_getChats().get(ncchatwin->getConnectionName(), ncchatwin->getBuddyName());
+    		if(chat)
+    		{
+    			if(chat->getChatUpdated())
+    			{
+    				p_getChatsWin()->bringToFront(nobj);
+    				nobj->refresh();
+    				// BuddyList gets refreshed (if needed/on top) by normal control flow
+    				return false;
+    			}
+    		}
+    	}
+    	return true;
+    });
 }
 
 void NCControl::buddyNext()
