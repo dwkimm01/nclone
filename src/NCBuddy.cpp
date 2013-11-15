@@ -27,6 +27,8 @@ std::string NCBuddy::getStatus() const { return p_status; }
 
 void NCBuddy::setStatus(const std::string &status) { p_status = status; }
 bool NCBuddy::getChatUpdated() const { return p_chatUpdated; }
+void NCBuddy::resetChatUpdated() { p_chatUpdated = false; }
+
 
 void NCBuddy::setNickName(const std::string& nickName)
 {

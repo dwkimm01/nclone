@@ -27,6 +27,7 @@ public:
 
    void setStatus(const std::string &status);
    bool getChatUpdated() const;
+   void resetChatUpdated();
 
    void setNickName(const std::string& nickName);
 

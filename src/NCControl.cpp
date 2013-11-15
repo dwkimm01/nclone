@@ -761,9 +761,20 @@ void NCControl::buddyListRefresh()
 			{
 				// TODO set the current window's name's background to something different (YELLOW)?
 
-				auto chat = p_getChats().get(ncchatwin->getConnectionName(), ncchatwin->getBuddyName());
 				if(p_getBuddyListWin && p_getBuddyListWin())
-					p_getBuddyListWin()->append(NCString(chat->display(), currentColor));
+				{
+					auto chat = p_getChats().get(ncchatwin->getConnectionName(), ncchatwin->getBuddyName());
+
+					// Reset update flag on top window
+					if(ncchatwin == p_getCurrentChatWin())
+					{
+						chat->resetChatUpdated();
+					}
+
+					p_getBuddyListWin()->append(NCString(
+							chat->display() + ((chat->getChatUpdated())?(" N"):("")),
+							currentColor));
+				}
 			}
 			else
 			{
