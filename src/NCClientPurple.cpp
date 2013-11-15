@@ -12,6 +12,11 @@ namespace ncpp
 namespace ncclientpurple
 {
 
+//- Note for libpurple sipe you still have to add this to your run command
+//    NSS_SSL_CBC_RANDOM_IV=0 ./hw
+// - Or set it in your environment export NSS_SSL_CBC_RANDOM_IV=0 for it to connect
+
+
 NCClientPurple::NCClientPurple
 	( const NCClientPurple::String &name
 	, const NCClientPurple::String &password

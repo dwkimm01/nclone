@@ -1,11 +1,13 @@
 
+ - retry a connection / re-log-on
+ - /msg command to send a buddy a message
+ - /away 
  - Fix TODOs in code
  - Add INCDIR, LIBDIR to SConstruct
  - Get rid of build warnings
  - No error log msgs when failed login, also need to delete connection?
  - Cleanup Client Swiften code
  - Add backend to get multiple connections working at the same time
- - CTRL-n go to next window with unseen updates
  - Save chat histories to file (append to old, have max size of txt log)
  - Add user nickname to chats
  - Change to remove chat window border
@@ -26,8 +28,7 @@
   - Make sure boxes can be removed from window edges, make no boxes default and cfg settable
    
  Network
-  - Fix /delconn on XMPP (swiften), "Client not disconnected properly" 
-  - change to a more generic command string sending to client i/fs (instead of connect, disconnect, etc?)
+  - Change to a more generic command string sending to client i/fs (instead of connect, disconnect, etc?)
   - Add data model for handling sending msgs to specific user on specific connection
   - boost extension for plugin i/f model
   - MS Communicator plugin creation
@@ -365,7 +366,55 @@ Next up (TODO list)
     especially when a line wrapped...
  - Merge Jeremy and my views
  - gloox i/f
-
+ - Command interpreter
+  . read user's input and convert to: messages, commands, searches, etc
+ - Map to hooking up @hostname.com addresses with puple protocol choices
+ . be able to (override) augment with local choices easily
+ . be able to augment from commandline, environment, config file?
+ - Pub/Sub type signal (internally) which efficiently connects PurpleClientIF
+  to particular window
+  . Do we want a hashed GUID, string, 
+ - Probably want an internal data store which windows connect to
+  . separate concerns MVC
+ - Colors
+  . Make a Stream::Entry contain a secondary color attribute vector
+  . The vector enables use of BOOST::zip_iterator (I think)
+  . Make a default CTOR which makes color blank
+  . with this approach how easy will it be to add a colored time entry at
+  the beginning?  Or should time be separated into another Stream::Entry 
+  member variable?
+ - New window for incoming messages (per buddy)
+ - Be able to close/delete a window properly
+ - Change derivation of Window so that you don't override refresh
+  . instead use draw, this should help with windows inside of other windows
+ - Line wrapping does not currently work at all
+  . under the current scheme it's hard to know how many lines have been
+  drawn and when to quit - the nice getWindownDown() doesn't know about
+  entries with multiple lines
+  . it all depends on how wide the screen is
+ - Redraw when window is resized
+ - Segfault on quit (cleanly exits)
+ - Goes back to original text window after exit (order of unallocating objects)
+  . but make sure we can still get debug info from PurpleClientIF
+ - Add ability to remap keys other functionality
+  . Probably want to change around architecture to make it so that
+  commands can easily be accessed
+ - Command history
+  . Up/Down Arrow for Previous/Next commands
+  . CTRL-R for search
+  . SHIFT-CTRL-R for forward search (LOW priority)
+ - Be able to edit current command easily 
+  . Left/Right arrow, delete/backspace work properly
+ - CTRL-u deletes current line behind cursor to beginning
+ - CTRL-a moves cursor to beginning of current line
+ - CTRL-e moves cursor to end of current line
+ - CTRL-c cancels current line (LOW priority, don't know if I like this)
+ - Send a buddy queued messages (only on certain networks which don't buffer) 
+  LOW priority
+ - Fix but where "console" gets added as a window
+ - connect to chat client, CTRL-r for hello "yeah hello!!!" and hit enter seems to do it
+ - Fix /delconn on XMPP (swiften), "Client not disconnected properly" 
+ - CTRL-n go to next window with unseen updates
 
 ----------------------------------------------------
 -- Fixed
