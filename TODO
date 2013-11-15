@@ -1,5 +1,5 @@
-
- - retry a connection / re-log-on
+ - Fix crash when no buddies available on initial startup, then someone logs on later
+ - Retry a connection / re-log-on
  - /msg command to send a buddy a message
  - /away 
  - Fix TODOs in code
@@ -30,7 +30,7 @@
  Network
   - Change to a more generic command string sending to client i/fs (instead of connect, disconnect, etc?)
   - Add data model for handling sending msgs to specific user on specific connection
-  - boost extension for plugin i/f model
+  - Boost extension for plugin i/f model
   - MS Communicator plugin creation
   - Add commands and functions to i/f for handling conversations, new buddies, etc
   - Handle multiple connections
