@@ -63,6 +63,12 @@ public:
 
 	void handleVCardReceived(const JID& actualJID, VCard::ref vcard, ErrorPayload::ref error)
 	{
+		if(!vcard)
+		{
+			p_debugLogCB("DEBUG", NCString("Error empty vcard", nccolor::NCColor::CHAT_HIGHLIGHT));
+			return;
+		}
+
 		p_buddyUpdateCB(p_name, actualJID.toString(), vcard->getFullName(), "");
 
     	p_debugLogCB("DEBUG", NCString("Received [" + actualJID.toString() + "] -> [" + vcard->getFullName() + "]", nccolor::NCColor::CHAT_NORMAL));
