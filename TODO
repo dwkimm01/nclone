@@ -1,4 +1,4 @@
- - Fix crash when no buddies available on initial startup, then someone logs on later
+ - Change window names to buddy nick names?
  - Retry a connection / re-log-on
  - /msg command to send a buddy a message
  - /away 
@@ -332,6 +332,7 @@ Next up (TODO list)
 
 ----------------------------------------------------
 -- Done
+ - Fix crash when no buddies available on initial startup, then someone logs on later
  - Fix login from command line
  - Fix delconn on active connection (XMPP), just deadlocks
  - Add nickname setting

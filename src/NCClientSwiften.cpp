@@ -104,7 +104,7 @@ public:
 
 		if (error)
 		{
-			p_debugLogCB("DEBUG", NCString("Error receiving roster.  Continuing.", nccolor::NCColor::CHAT_HIGHLIGHT));
+			p_debugLogCB("DEBUG", NCString("Error receiving roster.  Continuing.", nccolor::NCColor::CHATBUDDY_NORMAL));
 		}
 		// Send initial available presence
 		client->sendPresence(Presence::create("Online"));
@@ -112,16 +112,14 @@ public:
 
 	void handleRosterReceivedB(boost::shared_ptr<RosterPayload> rosterPayload)
 	{
-		p_debugLogCB("DEBUG", NCString("handleRosterReceivedB", nccolor::NCColor::COMMAND_HIGHLIGHT));
-
-//		if((bool)rosterPayload)
-//		{
-//			for(auto xx : rosterPayload->getItems())
-//			{
-//				p_debugLogCB("DEBUG", NCString("  jid " + xx.getJID().toString(), nccolor::NCColor::COMMAND_HIGHLIGHT));
-//			}
-//
-//		}
+		if((bool)rosterPayload)
+		{
+			for(auto e : rosterPayload->getItems())
+			{
+				p_debugLogCB("DEBUG", NCString("Roster JID " + e.getJID().toString() +
+					", \"" + e.getName() + "\"", nccolor::NCColor::COMMAND_HIGHLIGHT));
+			}
+		}
 	}
 
 
@@ -297,11 +295,11 @@ NCClientSwiften::NCClientSwiften
 	});
 
 	p_data->client->connect();
-	p_debugLogCB("DEBUG", NCString("Running event loop", nccolor::NCColor::CHAT_HIGHLIGHT));
+	p_debugLogCB("DEBUG", NCString("Starting up event thread", nccolor::NCColor::CHAT_NORMAL));
 
 	p_data->loopThread.reset(new std::thread([&]()
 	{
-		p_debugLogCB("DEBUG", NCString("Running event loop", nccolor::NCColor::CHAT_HIGHLIGHT));
+		p_debugLogCB("DEBUG", NCString("Running event loop", nccolor::NCColor::CHAT_NORMAL));
 		p_data->eventLoop.run();
 		// Can't log here if called from inside the recursive lock
 	}));
