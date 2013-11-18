@@ -718,6 +718,11 @@ void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std:
 		auto const currentTop = p_getCurrentChatWin();
 		auto cfg = p_getDefaultWinCfg();
 		cfg.p_title = buddyName;
+
+		p_getChats().add(client->getName(), buddyName, buddyName, "Unknown");
+
+		const std::string clientNameToCopy = client->getName();
+
 		auto addedWin = new NCChatWin(
 				client->getName(),
 				buddyName,
@@ -725,11 +730,16 @@ void NCControl::buddyAppendChat(ncclientif::NCClientIf* const client, const std:
 				cfg,
 				p_defaultScrollbackLength,
 				0,
+//				new NCWinScrollback::ContentFunction([&,clientNameToCopy, buddyName]() -> NCTextBuffer&
+//					{
+//						return p_getChats().get(clientNameToCopy, buddyName)->getChat();
+//					}),
 				p_chatResizeWidth,
 				p_chatResizeHeight);
 		addedWin->append(line);
 		p_getChatsWin()->bringToFront(currentTop);
 	}
+
 
 	// Add text to data
 	// TODO, use this getChats instead of letting NCChatWin create it's own content member

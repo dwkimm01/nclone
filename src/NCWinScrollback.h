@@ -9,6 +9,7 @@
 #define NCWINSCROLLBACK_H_
 
 #include <memory>
+#include <functional>
 #include "NCWin.h"
 #include "NCTextBuffer.h"
 #include "NCString.h"
@@ -30,12 +31,19 @@ public:
 	{
 		NCTextBuffer p_buff;
 	public:
-		Content(int scrollBack) : p_buff(scrollBack) {}
-		~Content() {}
+		Content(const int scrollBack) : p_buff(scrollBack) {}
+		// ~Content() {}
 		NCTextBuffer& textBuffer() { return p_buff; }
 
 	};
 
+	class ContentFunction : public ContentIF
+	{
+		std::function<NCTextBuffer&()> p_getBuff;
+	public:
+		ContentFunction(std::function<NCTextBuffer&()> getBuff) : p_getBuff(getBuff) {}
+		NCTextBuffer& textBuffer() { return p_getBuff(); }
+	};
 
 	/**
 	 * <b>Purpose:</b> CTOR
