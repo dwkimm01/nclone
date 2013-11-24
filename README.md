@@ -39,6 +39,8 @@ Build notes
  - Dependencies can mostly be installed with Homebrew: http://mxcl.github.com/homebrew/
  - BOOST needed to be installed with the clang++ instead since the brew recipe didn't give that option before
 - Swiften
+ website: http://swift.im/git/swift
+ clone: git clone git://swift.im/swift
 <pre>
     scons swiften_dll=yes \
     SWIFTEN_INSTALLDIR=/home/dwkimm01/Documents/Development/deps/swiften-2.0.0 \
