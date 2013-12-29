@@ -1,0 +1,2 @@
+export DYLD_LIBRARY_PATH=/Users/dwkimm01/Documents/Dependencies/boost-1.53.0/lib:/Users/dwkimm01/Documents/Dependencies/swiften-2.0.0/lib
+export DYLD_LIBRARY_PATH=/Users/dwkimm01/Documents/Dependencies/boost-1.53.0/lib:/Users/dwkimm01/Documents/Dependencies/swiften-2.0.0/lib

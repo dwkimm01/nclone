@@ -88,6 +88,15 @@ NClone overview
 --------------
 Resize funcs for windows - could be static still need apt ptr
 
+XMPP Libraries Considered
+--------------
+libpurple/pidgin
+linjingle?
+txmpp
+gloox
+
+
+
 Cmd window (user input)
 Top level chat (container) window
 Console (chat)

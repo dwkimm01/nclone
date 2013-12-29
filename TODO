@@ -1,3 +1,8 @@
+
+ - Add backend to get multiple connections working at the same time
+  . backend exists but it's not being used I believe
+ - Upgrade to BOOST's signal2
+
  - Change window names to buddy nick names?
  - Retry a connection / re-log-on
  - /msg command to send a buddy a message
@@ -5,17 +10,17 @@
  - Fix TODOs in code
  - Add INCDIR, LIBDIR to SConstruct
  - Get rid of build warnings
+   warning: address of stack memory associated with local variable 'app' returned
  - No error log msgs when failed login, also need to delete connection?
  - Cleanup Client Swiften code
- - Add backend to get multiple connections working at the same time
  - Save chat histories to file (append to old, have max size of txt log)
  - Add user nickname to chats
  - Change to remove chat window border
  - Change newconn command to take args: /newconn XMPP user@host.org as args
- - Upgrade to BOOST's signal2
  - Print all available commands (for remapping etc)
 
  GUI
+  - highlight search text
   - Change buddy up/down use CTRL-up/down (use TAB/shifttab for change buddy)
   - Add text notification on CTRL-c when entering newconn info
   - Command helper/guesser (e.g. /ju(mp X, to window x)
