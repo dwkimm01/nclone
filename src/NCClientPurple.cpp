@@ -70,7 +70,7 @@ void NCClientPurple::debugLog(const String &level, const String &logLine) {}
 
 
 #if 0
-#include <signal.h>
+#include <signal2.h>
 #include <libpurple/purple.h>
 #include <thread>
 #include "NCClientPurple.h"

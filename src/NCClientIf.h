@@ -9,7 +9,7 @@
 #define NCCLIENTIF_H_
 
 #include <string>
-#include <boost/signal.hpp>
+#include <boost/signals2.hpp>
 #include "NCString.h"
 
 
@@ -33,7 +33,7 @@ public:
 	typedef std::string String;
 
 	// Params: client*, buddyname/DEBUG level, NCString message, refresh true/false
-	typedef boost::signal<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> MsgSignal;
+	typedef boost::signals2::signal<void(ncclientif::NCClientIf*, const String&, const NCString&, bool)> MsgSignal;
 
 
 	virtual ~NCClientIf();
