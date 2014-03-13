@@ -1,7 +1,10 @@
 
  - Add backend to get multiple connections working at the same time
   . backend exists but it's not being used I believe
- - Upgrade to BOOST's signal2
+ - Just have a single chat window that swaps out the backend?
+ - Remove outer Chats container window
+
+DONE, test still logs in and sends/recvs msgs - Upgrade to BOOST's signal2
 
  - Change window names to buddy nick names?
  - Retry a connection / re-log-on

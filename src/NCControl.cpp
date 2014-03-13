@@ -98,7 +98,8 @@ void NCControl::toggleBuddyListWindowVisibility()
 	if(p_getNCApp()->isOnTopOf(p_getBuddyListWin(), p_getLogWin()))
 	{
 		p_getNCApp()->bringToBack(p_getBuddyListWin());
-		p_getCurrentChatWin()->refresh();
+		p_getChatsWin()->refresh();
+
 		if(p_getTimeWin && p_getTimeWin())
 			p_getTimeWin()->refresh();
 	}
