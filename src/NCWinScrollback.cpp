@@ -25,9 +25,7 @@ NCWinScrollback::NCWinScrollback
 	, ncwin::NCWin::ResizeFuncs resizeX
 	, ncwin::NCWin::ResizeFuncs resizeY )
 	: NCWin(parent, cfg, resizeWidth, resizeHeight, resizeX, resizeY)
-//	, p_buff(scrollback)
 	, p_content(content)
-	, p_buff([&]()->NCTextBuffer&{return p_content->textBuffer();})
 	, p_offs(0, 0)
 {
 	// have some default buffer
@@ -51,7 +49,7 @@ void NCWinScrollback::refresh()
 	// Would be nice to have a more generic way of keeping track of where we are in the
 	// buffer but for now it's nice enough to be able to track the bottom (latest) if
 	// that's where we are
-	const bool following = p_getBottom(p_buff().rbegin(), p_buff().rend(), widthOld, heightOld) == p_offs;
+	const bool following = p_getBottom(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), widthOld, heightOld) == p_offs;
 
 	// Need to call the base class refresh first since it will do the window resizing
 	// so that we will know what the new cfg.p_h/w/x/y are going to be
@@ -74,18 +72,18 @@ void NCWinScrollback::refresh()
 	// Recalculate offset
 	if(following)
 	{
-		p_offs = p_getBottom(p_buff().rbegin(), p_buff().rend(), width, height);
+		p_offs = p_getBottom(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), width, height);
 	}
 
 	// Check to see if we should draw from the bottom up so that when we start off text appears near the bottom (eg cmd window)
 	// aka Determine if we need to push first printed lines further down so that text appears near bottom
-	if(p_buff().size() > 0 && p_buff().size() < height)
+	if(p_content->textBuffer().size() > 0 && p_content->textBuffer().size() < height)
 	{
 		// calculate how many lines we do have to print
 		int linesAvailable = 0;
 		p_printWindow
-		   ( p_buff().begin()
-		   , p_buff().end()
+		   ( p_content->textBuffer().begin()
+		   , p_content->textBuffer().end()
 		   , width
 		   , height
 		   , p_offs.first
@@ -97,7 +95,7 @@ void NCWinScrollback::refresh()
 		const int hmax = height - linesAvailable;
 		for(int i = 0; i < hmax; ++i)
 		{
-			NCWin::print("");
+			NCWin::print(""); // Make empty lines show up as blank in window
 			NCWin::clearTillEnd();
 			NCWin::cursorNextLine();
 		}
@@ -106,8 +104,8 @@ void NCWinScrollback::refresh()
 	int lineCount = 0;
 	// Print the buffer to the window
 	p_printWindow
-	   ( p_buff().begin()
-	   , p_buff().end()
+	   ( p_content->textBuffer().begin()
+	   , p_content->textBuffer().end()
 	   , width
 	   , height
 	   , p_offs.first
@@ -140,13 +138,13 @@ void NCWinScrollback::append(const ncpp::NCString &line)
 	const int height = getTextHeight();
 
 	// TODO, look into using Boost ScopeExit or maybe something like: http://the-witness.net/news/2012/11/scopeexit-in-c11/
-	const bool following = p_getBottom(p_buff().rbegin(), p_buff().rend(), width, height) == p_offs;
+	const bool following = p_getBottom(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), width, height) == p_offs;
 
-	p_buff().addRow(line);
+	p_content->textBuffer().addRow(line);
 
 	if(following)
 	{
-		p_offs = p_getBottom(p_buff().rbegin(), p_buff().rend(), width, height);
+		p_offs = p_getBottom(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), width, height);
 	}
 }
 
@@ -156,7 +154,7 @@ void NCWinScrollback::scrollDown(const int n)
 	const int width = getTextWidth();
 	const int height = getTextHeight();
 
-	p_offs = p_getScrollDown(p_buff().begin(), p_buff().end(), p_buff().rbegin(), p_buff().rend(), width, height, n, p_offs);
+	p_offs = p_getScrollDown(p_content->textBuffer().begin(), p_content->textBuffer().end(), p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), width, height, n, p_offs);
 }
 
 void NCWinScrollback::scrollUp(const int n)
@@ -165,7 +163,7 @@ void NCWinScrollback::scrollUp(const int n)
 	const int width = getTextWidth();
 	const int height = getTextHeight();
 
-	p_offs = p_getScrollUp(p_buff().rbegin(), p_buff().rend(), width, height, n, p_offs);
+	p_offs = p_getScrollUp(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), width, height, n, p_offs);
 }
 
 void NCWinScrollback::pageDown()
@@ -184,7 +182,7 @@ void NCWinScrollback::pageUp()
 
 void NCWinScrollback::home()
 {
-	p_offs = p_getTop(p_buff().begin(), p_buff().end());
+	p_offs = p_getTop(p_content->textBuffer().begin(), p_content->textBuffer().end());
 }
 
 void NCWinScrollback::end()
@@ -193,13 +191,13 @@ void NCWinScrollback::end()
 	const int width = getTextWidth();
 	const int height = getTextHeight();
 
-	p_offs = p_getBottom(p_buff().rbegin(), p_buff().rend(), width, height);
+	p_offs = p_getBottom(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), width, height);
 }
 
 void NCWinScrollback::clear()
 {
-	p_buff().clear();
-	p_offs = p_getTop(p_buff().begin(), p_buff().end());
+	p_content->textBuffer().clear();
+	p_offs = p_getTop(p_content->textBuffer().begin(), p_content->textBuffer().end());
 }
 
 // Helper to set all of the necessary text formatting functions
@@ -257,7 +255,7 @@ int NCWinScrollback::getTextWidth() const
 
 int NCWinScrollback::entryCount() const
 {
-   return p_buff().size();
+   return p_content->textBuffer().size();
 }
 
 // Design note:

@@ -29,7 +29,6 @@ public:
 	NCChatWin
 		( const std::string &connectionId
 		, const std::string &buddyName
-//		, ncchats::NCChats &ncChats
 		, ncobject::NCObject* parent = 0
 		, NCWinCfg cfg = NCWinCfg()
 		, const int scrollback = 200

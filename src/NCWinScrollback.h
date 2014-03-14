@@ -158,13 +158,11 @@ public:
 	int entryCount() const;
 
 private:
-//	NCTextBuffer p_buff;
+	// Window contents
 	std::shared_ptr<ContentIF> p_content;
-	std::function<NCTextBuffer&()> p_buff;
 
-	// Note, the second value will definitely be
-	// dependent on the width and height of the
-	// window
+	// Note, the second value is dependent on the
+	// width of the window
 	std::pair<unsigned int, unsigned int> p_offs;
 
 	// Functions for wrapping
