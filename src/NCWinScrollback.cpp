@@ -9,6 +9,7 @@
 #include "NCStringUtils.h"
 #include "NCTextWinFormatter.h"
 #include "NCString.h"
+#include <fstream>
 
 namespace ncpp
 {
@@ -38,7 +39,13 @@ NCWinScrollback::NCWinScrollback
 	setWrapWordLength();
 }
 
-NCWinScrollback::~NCWinScrollback() {}
+NCWinScrollback::~NCWinScrollback()
+{
+/*	if(p_loggingStream)
+	{
+		p_loggingStream.flush();
+	} */
+}
 
 void NCWinScrollback::refresh()
 {
@@ -49,7 +56,10 @@ void NCWinScrollback::refresh()
 	// Would be nice to have a more generic way of keeping track of where we are in the
 	// buffer but for now it's nice enough to be able to track the bottom (latest) if
 	// that's where we are
-	const bool following = p_getBottom(p_content->textBuffer().rbegin(), p_content->textBuffer().rend(), widthOld, heightOld) == p_offs;
+	const bool following = p_getBottom(
+			p_content->textBuffer().rbegin(),
+			p_content->textBuffer().rend(),
+			widthOld, heightOld) == p_offs;
 
 	// Need to call the base class refresh first since it will do the window resizing
 	// so that we will know what the new cfg.p_h/w/x/y are going to be
@@ -133,6 +143,13 @@ void NCWinScrollback::append(const std::string &line)
 
 void NCWinScrollback::append(const ncpp::NCString &line)
 {
+	if(p_loggingStream)
+	{
+		const auto sLine = line.getString();
+		p_loggingStream->write(sLine.c_str(), sLine.size());
+		p_loggingStream->flush();
+	}
+
 	// Calculate text area width and height
 	const int width = getTextWidth();
 	const int height = getTextHeight();
@@ -256,6 +273,32 @@ int NCWinScrollback::getTextWidth() const
 int NCWinScrollback::entryCount() const
 {
    return p_content->textBuffer().size();
+}
+
+void NCWinScrollback::fileLoggingOn(const std::string &logFileName)
+{
+	auto s = new std::ofstream();
+
+	const std::string fileName = (logFileName.empty())
+			? (getConfig().p_title.empty())
+			? ("default.log")
+			: (getConfig().p_title)
+			: (logFileName);
+	s->open(fileName.c_str(), std::ios::out | std::ios::binary);
+	p_loggingStream.reset(s);
+}
+
+void NCWinScrollback::fileLoggingOff()
+{
+	p_loggingStream.reset();
+}
+
+void NCWinScrollback::fileLoggingflush()
+{
+	if(p_loggingStream)
+	{
+		p_loggingStream->flush();
+	}
 }
 
 // Design note:

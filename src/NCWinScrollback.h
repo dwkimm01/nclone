@@ -157,6 +157,13 @@ public:
 	 */
 	int entryCount() const;
 
+	/**
+	 * <b>Purpose:</b> Getter/Setter for logging window contents to file
+	 */
+	void fileLoggingOn(const std::string &logFileName = "");
+	void fileLoggingOff();
+	void fileLoggingflush();
+
 private:
 	// Window contents
 	std::shared_ptr<ContentIF> p_content;
@@ -173,6 +180,11 @@ private:
 
 	std::function<OffsPair(NCTextBuffer::ReverseIterator, NCTextBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollUp;
 	std::function<OffsPair(NCTextBuffer::Iterator, NCTextBuffer::Iterator, NCTextBuffer::ReverseIterator, NCTextBuffer::ReverseIterator, const unsigned int, const unsigned int, const unsigned int, const OffsPair)> p_getScrollDown;
+
+
+	// Logging
+	bool p_fileLogging;
+	std::shared_ptr<std::ofstream> p_loggingStream;
 };
 
 } // namespace ncpp

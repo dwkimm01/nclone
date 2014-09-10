@@ -39,7 +39,7 @@ int doit(int argc, char* argv[])
 	ncchats::NCChats chats(defaultScrollback);
 
 	// Signals connects client APIs to windows/backend
-	ncclientif::NCClientIf::MsgSignal msgSignal;
+//	ncclientif::NCClientIf::MsgSignal msgSignal;
 
 	// Resize functions
 	ncwin::NCWin::ResizeFuncs borderResizeWidth([&](ncwin::NCWin* ncwin) { return app.maxWidth() - ncwin->getConfig().p_x; } );
@@ -179,7 +179,7 @@ int doit(int argc, char* argv[])
 
 	// Setup
 	ncCommandHandler.Setup(&ncCtrl);
-
+/*
 	// Message received signal connect
 	msgSignal.connect
 		( boost::bind<void>
@@ -195,7 +195,7 @@ int doit(int argc, char* argv[])
 			, _4
 			)
 		);
-
+*/
 	// Draw/show entire app by refreshing
 	ncCtrl.appRefresh();
 

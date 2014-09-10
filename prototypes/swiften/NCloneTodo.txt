@@ -1,0 +1,24 @@
+
+NClone todo still...
+
+- VCard support so it works with facebook
+- Still seems to be some remaining thread-safe issues when maybe
+ the clock is refreshing while a message gets sent
+- Reconnect after suspend/sleep
+- Rename buddy and logged in user with a nickname
+- Save logged in accounts/sessions and auto-logon next time
+- Change UI to look more like naim with no window borders
+- Log chats to file 
+
+- Save settings
+- Line numbers on chat msgs
+
+- CTRL-r enhancements: tab complete, param suggestions
+- Multi-connection support (data-backend, close & open chats) 
+
+- Away message setting, auto away, returned status
+
+  
+
+
+

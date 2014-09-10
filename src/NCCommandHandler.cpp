@@ -162,6 +162,17 @@ void NCCommandHandler::Setup(nccontrol::NCControl* ncControl)
 		p_ncControl->appDelWin(cmd);
 	}, "Name(s) delete a window named name");
 
+	cmdMap["/loggingOn"] = NCCommandHandler::Entry([&](const std::string& cmd)
+	{
+		p_ncControl->chatLoggingOn();
+	}, "Logging on");
+
+	cmdMap["/loggingOff"] = NCCommandHandler::Entry([&](const std::string& cmd)
+	{
+		p_ncControl->chatLoggingOff();
+	}, "Logging off");
+
+
 	cmdMap["/d1"] = NCCommandHandler::Entry([&](const std::string& cmd)
 	{
 		p_ncControl->appDebug1();
@@ -177,6 +188,10 @@ void NCCommandHandler::Setup(nccontrol::NCControl* ncControl)
 		p_ncControl->appDebugLorem();
 	}, "Print debug lorem text to test space wrapping");
 
+	cmdMap["/d3"] = NCCommandHandler::Entry([&](const std::string& cmd)
+	{
+		p_ncControl->appDebugNewline();
+	}, "Print debug newline");
 }
 
 bool NCCommandHandler::ProcessCommand(std::string command)

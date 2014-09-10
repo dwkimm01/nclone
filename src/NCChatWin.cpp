@@ -22,9 +22,15 @@ NCChatWin::NCChatWin
 	, ncwin::NCWin::ResizeFuncs resizeHeight
 	, ncwin::NCWin::ResizeFuncs resizeX
 	, ncwin::NCWin::ResizeFuncs resizeY )
-	: NCWinScrollback(parent, cfg, scrollback,
-			content,
-			resizeWidth, resizeHeight, resizeX, resizeY)
+	: NCWinScrollback
+	  	  ( parent
+	  	  , cfg
+	  	  , scrollback
+	  	  ,	content
+	  	  ,	resizeWidth
+	  	  , resizeHeight
+	  	  , resizeX
+	  	  , resizeY )
 	, p_connectionId(connectionId)
 	, p_buddyName(buddyName)
 {

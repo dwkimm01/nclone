@@ -62,6 +62,8 @@ public:
 	void chatEnd();
 	void chatScrollUp(int i);
 	void chatScrollDown(int i);
+	void chatLoggingOn();
+	void chatLoggingOff();
 
 	void cmdHistoryPrevious();
 	void cmdHistoryNext();
@@ -124,6 +126,7 @@ public:
 	void appDebug1();
 	void appDebug2();
 	void appDebugLorem();
+	void appDebugNewline();
 
 	NCCmd& getCommand();
 

@@ -228,6 +228,13 @@ public:
 		wmove(p_win, cy, cx);
 	}
 
+	static bool printableCharacter(const char c)
+	{
+		if('\n' == c)
+			return false;
+		return true;
+	}
+
 	void printColor(const char* str, const char* color)
 	{
 	//    if(win == NULL)
@@ -244,7 +251,7 @@ public:
 	    		val |= COLOR_PAIR(*color);
 	    		++color;
 	    	}
-	    	if(*str)
+	    	if(*str && printableCharacter(val))
 	    	{
 	    		waddch(p_win, val);
 	    	}

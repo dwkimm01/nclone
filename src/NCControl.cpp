@@ -180,6 +180,22 @@ void NCControl::chatScrollDown(int i)
 	p_getCurrentChatWin()->refresh();
 }
 
+void NCControl::chatLoggingOn()
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->fileLoggingOn();
+}
+
+void NCControl::chatLoggingOff()
+{
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+
+	if(!p_getCurrentChatWin || !p_getCurrentChatWin()) return;
+	p_getCurrentChatWin()->fileLoggingOff();
+}
+
 
 void NCControl::cmdHistoryPrevious()
 {
@@ -1451,6 +1467,15 @@ void NCControl::appDebugLorem()
 	});
 
 	buddyAppendChat(0, "", entry, true);
+}
+
+void NCControl::appDebugNewline()
+{
+	const std::string someNewLine = "This\nIs\nA\nTest";
+
+	boost::unique_lock<boost::recursive_mutex> scoped_lock(p_msgLock);
+	buddyAppendChat(0, "", NCString(someNewLine, nccolor::NCColor::COMMAND_HIGHLIGHT), true);
+
 }
 
 NCCmd& NCControl::getCommand()
